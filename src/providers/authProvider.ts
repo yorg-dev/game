@@ -106,10 +106,13 @@ const authProvider = { //: AuthProvider = {
   },
 
   register: async ({ email, password }: Credentials): Promise<void> => {
+    const token: Token = localStorage.getItem("token");
+    const headers = new Headers({ "Content-Type": "application/json" });
+    if (token) headers.set("Authorization", `Bearer ${token}`);
     const request = new Request(`${API_URL}/registration`, {
       method: "POST",
       body: JSON.stringify({ email, password }),
-      headers: new Headers({ "Content-Type": "application/json" }),
+      headers,
     });
     const response = await fetch(request);
     const body = await response.json().catch(() => ({}));
