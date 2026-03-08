@@ -196,7 +196,7 @@ export class MultiplayerManager {
         this.localToNetwork.clear()
         this.remoteAgents.clear()
         this.lastAgentSent.clear()
-        wsProvider.subscribe('Api::LandChannel', { land_id: land.id })
+        wsProvider.subscribe('LandChannel', { land_id: land.id })
       }),
     )
 
@@ -205,11 +205,11 @@ export class MultiplayerManager {
       EventBus.on('session-ready', () => {
         const freshUrl = resolveWsUrl()
         if (!freshUrl) return
-        wsProvider.reconnect(freshUrl, 'Api::LandChannel', { land_id: this.currentLandId })
+        wsProvider.reconnect(freshUrl, 'LandChannel', { land_id: this.currentLandId })
       }),
     )
 
-    wsProvider.connect(wsUrl, 'Api::LandChannel', { land_id: landId })
+    wsProvider.connect(wsUrl, 'LandChannel', { land_id: landId })
 
     // If already connected (e.g. hot-reload)
     if (wsProvider.status === 'connected') {
