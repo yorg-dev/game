@@ -12,9 +12,9 @@
  *   Organization → World(s) → Land(s) → LandPlacement(s)
  */
 export interface World {
-  id:             string   // "world_acme_01"
-  name:           string   // "Production", "Staging"
-  organizationId: string   // references Organization.id
+  id: string // "world_acme_01"
+  name: string // "Production", "Staging"
+  organizationId: string // references Organization.id
 
   /** ISO-8601 timestamps. */
   createdAt: string

@@ -1,15 +1,15 @@
 export type QuestStatus = 'locked' | 'active' | 'completed'
 
 export interface QuestStep {
-  id:          string
+  id: string
   description: string
-  isComplete:  boolean
+  isComplete: boolean
 }
 
 export interface Quest {
-  id:          string
-  title:       string
+  id: string
+  title: string
   description: string
-  status:      QuestStatus
-  steps:       QuestStep[]
+  status: QuestStatus
+  steps: QuestStep[]
 }

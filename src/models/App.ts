@@ -6,13 +6,13 @@
 
 /** Broad category describing what the app does. */
 export type AppCategory =
-  | 'ecommerce'   // Shopify, WooCommerce
-  | 'crm'         // Salesforce, HubSpot
-  | 'email'       // Gmail, Outlook
-  | 'finance'     // Xero, QuickBooks, Stripe
-  | 'social'      // Buffer, Twitter, LinkedIn
-  | 'ai'          // OpenAI, Anthropic
-  | 'support'     // Zendesk, Intercom
+  | 'ecommerce' // Shopify, WooCommerce
+  | 'crm' // Salesforce, HubSpot
+  | 'email' // Gmail, Outlook
+  | 'finance' // Xero, QuickBooks, Stripe
+  | 'social' // Buffer, Twitter, LinkedIn
+  | 'ai' // OpenAI, Anthropic
+  | 'support' // Zendesk, Intercom
   | 'prospecting' // Apollo, Hunter
 
 /** How the owner authenticates against the app's API. */
@@ -25,9 +25,9 @@ export type AuthType = 'oauth2' | 'api_key' | 'basic'
  */
 export interface App {
   /** Stable identifier. Must match `Skill.integration` and `AgentTemplate.requiredIntegrations` entries. */
-  id: string          // "shopify"
+  id: string // "shopify"
 
-  name: string        // "Shopify"
+  name: string // "Shopify"
   description: string // "ecommerce platform for online stores"
   category: AppCategory
 
@@ -38,7 +38,7 @@ export interface App {
    * Credential keys this app requires.
    * These are the same keys listed in `Skill.requiredCredentials`.
    */
-  requiredCredentials: string[]  // ["shopify_access_token", "shopify_store_url"]
+  requiredCredentials: string[] // ["shopify_access_token", "shopify_store_url"]
 
   /** Accent color used in the UI (hex). */
   color: string

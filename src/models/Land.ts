@@ -12,10 +12,10 @@ import type { LandObject } from './LandObject'
  * Keys are camelCased from the Rails snake_case response via camelize().
  */
 export interface LandViewer {
-  isGuest:     boolean  // authenticated via a guest session
-  isOwner:     boolean  // org-level owner of this land
-  canInteract: boolean  // may enter home, talk to connections (!guest)
-  canManage:   boolean  // may add/move/remove placements (owner only)
+  isGuest: boolean // authenticated via a guest session
+  isOwner: boolean // org-level owner of this land
+  canInteract: boolean // may enter home, talk to connections (!guest)
+  canManage: boolean // may add/move/remove placements (owner only)
 }
 
 /**
@@ -30,15 +30,15 @@ export interface LandViewer {
  * (a team's common view). Visibility is controlled by `isPublic`.
  */
 export interface Land {
-  id:      string   // "land_mktg_01"
-  worldId: string   // parent World
-  name:    string   // "Marketing Team", "Dan's Sandbox"
+  id: string // "land_mktg_01"
+  worldId: string // parent World
+  name: string // "Marketing Team", "Dan's Sandbox"
 
   /**
    * The user or team that created and owns this Land.
    * Determines who can rename, delete, or change visibility.
    */
-  ownerId:   string   // user ID or team ID
+  ownerId: string // user ID or team ID
   ownerType: 'user' | 'team'
 
   /**

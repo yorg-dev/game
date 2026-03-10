@@ -6,13 +6,13 @@ import type { Connection } from '@/models/Connection'
  */
 export const SAMPLE_CONNECTIONS: Connection[] = [
   {
-    id:          'home',
-    appId:       'Home',
-    label:       'Home',
-    status:      'connected',
+    id: 'home',
+    appId: 'Home',
+    label: 'Home',
+    status: 'connected',
     credentials: {},
     connectedAt: '2025-01-10T09:00:00Z',
-    lastUsedAt:  '2026-02-20T14:32:00Z',
+    lastUsedAt: '2026-02-20T14:32:00Z',
   },
 ]
 

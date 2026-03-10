@@ -12,8 +12,8 @@ export type AgentCategory = 'ecommerce' | 'sales' | 'support' | 'marketing'
  * and an optional guard condition.
  */
 export interface AgentSkill {
-  skillId: string   // references Skill.id  e.g. "shopify:create_refund"
-  order:   number   // 1-indexed position in the workflow
+  skillId: string // references Skill.id  e.g. "shopify:create_refund"
+  order: number // 1-indexed position in the workflow
 
   /** When false the agent continues even if this skill fails. */
   isRequired: boolean
@@ -37,23 +37,23 @@ export interface AgentSkill {
   condition?: string
 }
 
-
 export interface AgentTemplate {
-  id:          string         // "returns-agent"
-  name:        string         // "Returns Agent"
-  description: string         // "Handles customer return and refund requests end to end"
-  category:    AgentCategory  // "ecommerce" | "sales" | "support" | "marketing"
+  id: string // "returns-agent"
+  slug: string // URL-safe identifier used by the XP API — typically same as id
+  name: string // "Returns Agent"
+  description: string // "Handles customer return and refund requests end to end"
+  category: AgentCategory // "ecommerce" | "sales" | "support" | "marketing"
 
   /** Ordered list of skill steps — defines the workflow. */
   skills: AgentSkill[]
 
   /** Integrations that must be connected before deploying. */
-  requiredIntegrations: string[]  // ["shopify", "gmail"]
+  requiredIntegrations: string[] // ["shopify", "gmail"]
 
   /** Visual identity on the field.  Currently maps to an existing AgentType key. */
-  sprite: string   // "agent-returns" (or a AgentType key for current renderer)
-  color:  string   // accent color for this agent type
+  sprite: string // "agent-returns" (or a AgentType key for current renderer)
+  color: string // accent color for this agent type
 
-  authorType:  'agent' | 'community' | 'owner'
+  authorType: 'agent' | 'community' | 'owner'
   isPublished: boolean
 }

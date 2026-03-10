@@ -21,10 +21,8 @@ export const SAMPLE_LAND_PLACEMENTS: LandPlacement[] = []
  * Mirrors the query you'd issue against the real API.
  */
 export function getPlacementsByType(
-  landId:     string,
+  landId: string,
   entityType: LandPlacement['entityType'],
 ): LandPlacement[] {
-  return SAMPLE_LAND_PLACEMENTS.filter(
-    p => p.landId === landId && p.entityType === entityType,
-  )
+  return SAMPLE_LAND_PLACEMENTS.filter((p) => p.landId === landId && p.entityType === entityType)
 }

@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { EventBus } from '../game/EventBus'
+import { VoiceButton } from './VoiceButton'
 
 interface Ack {
-  id:        string
+  id: string
   agentName: string
-  message:   string
+  message: string
 }
 
 export function CommandBar() {
-  const [open, setOpen]       = useState(false)
-  const [text, setText]       = useState('')
-  const [acks, setAcks]       = useState<Ack[]>([])
-  const inputRef              = useRef<HTMLInputElement>(null)
+  const [open, setOpen] = useState(false)
+  const [text, setText] = useState('')
+  const [acks, setAcks] = useState<Ack[]>([])
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Focus input when bar opens.
   useEffect(() => {
@@ -21,7 +22,10 @@ export function CommandBar() {
   // Keyboard shortcut: / or Enter opens the bar; Escape closes it.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setOpen(false); return }
+      if (e.key === 'Escape') {
+        setOpen(false)
+        return
+      }
       if (e.key === '/' && !open) {
         e.preventDefault()
         setOpen(true)
@@ -35,13 +39,13 @@ export function CommandBar() {
   useEffect(() => {
     const unsub = EventBus.on('command-acknowledged', ({ commandId, agentId, agentName }) => {
       const ack: Ack = {
-        id:        `${commandId}-${agentId}`,
+        id: `${commandId}-${agentId}`,
         agentName,
-        message:   'acknowledged',
+        message: 'acknowledged',
       }
-      setAcks(prev => [...prev, ack])
+      setAcks((prev) => [...prev, ack])
       setTimeout(() => {
-        setAcks(prev => prev.filter(a => a.id !== ack.id))
+        setAcks((prev) => prev.filter((a) => a.id !== ack.id))
       }, 3500)
     })
     return unsub
@@ -53,7 +57,7 @@ export function CommandBar() {
     if (!trimmed) return
 
     EventBus.emit('command-issued', {
-      id:   `cmd_${Date.now()}`,
+      id: `cmd_${Date.now()}`,
       text: trimmed,
     })
 
@@ -63,18 +67,23 @@ export function CommandBar() {
 
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none">
-
       {/* Command bar */}
-      <div className={`flex items-center gap-2 transition-all duration-200 pointer-events-auto ${open ? 'w-[480px]' : 'w-auto'}`}>
+      <div
+        className={`flex items-center gap-2 transition-all duration-200 pointer-events-auto ${open ? 'w-[480px]' : 'w-auto'}`}
+      >
         {open ? (
-          <form onSubmit={handleSubmit} className="flex w-full gap-2" onKeyDown={e => e.nativeEvent.stopImmediatePropagation()}>
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full gap-2"
+            onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
+          >
             <input
               ref={inputRef}
               value={text}
-              onChange={e => setText(e.target.value)}
+              onChange={(e) => setText(e.target.value)}
               placeholder="Issue a command to all Agents…"
               className="h-9 flex-1 px-3 rounded-md bg-black/80 border border-white/20 text-white text-sm placeholder:text-white/30 backdrop-blur-sm focus:outline-none focus:border-white/50"
-              onKeyDown={e => e.key === 'Escape' && setOpen(false)}
+              onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}
             />
             <button
               type="submit"
@@ -92,21 +101,24 @@ export function CommandBar() {
             </button>
           </form>
         ) : (
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-1.5 h-9 px-3 rounded-md bg-black/70 border border-white/20 text-white/60 text-xs hover:text-white hover:bg-black/90 transition-colors backdrop-blur-sm"
-          >
-            <span className="font-mono text-white/40">&gt;_</span>
-            Issue Command
-            <kbd className="ml-1 text-[10px] text-white/30 font-mono">/</kbd>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setOpen(true)}
+              className="flex items-center gap-1.5 h-9 px-3 rounded-md bg-black/70 border border-white/20 text-white/60 text-xs hover:text-white hover:bg-black/90 transition-colors backdrop-blur-sm"
+            >
+              <span className="font-mono text-white/40">&gt;_</span>
+              Issue Command
+              <kbd className="ml-1 text-[10px] text-white/30 font-mono">/</kbd>
+            </button>
+            <VoiceButton />
+          </div>
         )}
       </div>
 
       {/* Acknowledgment chips */}
       {acks.length > 0 && (
         <div className="flex flex-col gap-1 items-center pointer-events-none">
-          {acks.map(ack => (
+          {acks.map((ack) => (
             <div
               key={ack.id}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 border border-white/10 backdrop-blur-sm text-xs text-white/60"
@@ -118,7 +130,6 @@ export function CommandBar() {
           ))}
         </div>
       )}
-
     </div>
   )
 }

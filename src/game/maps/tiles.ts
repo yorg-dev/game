@@ -9,13 +9,13 @@
 export const TILE_SIZE = 16
 
 export const T = {
-  EMPTY: -1,  // Phaser "no tile" — ground layer shows through
-  WATER:  2,
-  DIRT:   3,
-  STONE:  4,
+  EMPTY: -1, // Phaser "no tile" — ground layer shows through
+  WATER: 2,
+  DIRT: 3,
+  STONE: 4,
 } as const
 
-export type TileValue = typeof T[keyof typeof T]
+export type TileValue = (typeof T)[keyof typeof T]
 
 /** Feature-layer 2-D grid. Rows first, then columns. */
 export type TileGrid = TileValue[][]
@@ -40,15 +40,14 @@ export function buildGroundGrid(cols: number, rows: number, frame = 0): number[]
  * Mutates the grid in place and returns it for chaining.
  */
 export function fillRect(
-  grid:   number[][],
-  row0:   number,
-  col0:   number,
-  row1:   number,
-  col1:   number,
-  frame:  number,
+  grid: number[][],
+  row0: number,
+  col0: number,
+  row1: number,
+  col1: number,
+  frame: number,
 ): number[][] {
   for (let r = row0; r <= row1; r++)
-    for (let c = col0; c <= col1; c++)
-      if (grid[r]?.[c] !== undefined) grid[r][c] = frame
+    for (let c = col0; c <= col1; c++) if (grid[r]?.[c] !== undefined) grid[r][c] = frame
   return grid
 }

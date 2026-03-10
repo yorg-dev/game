@@ -5,15 +5,18 @@ interface Props {
   onCancel: () => void
 }
 
-const btnPrimary = 'px-4 py-1.5 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 active:shadow-[inset_0_-1px_0_0_#5a3810,inset_0_1px_0_0_#c8a060] disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]'
-const btnGhost   = 'px-4 py-1.5 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors'
-const inputClass = 'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] transition-colors'
+const btnPrimary =
+  'px-4 py-1.5 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 active:shadow-[inset_0_-1px_0_0_#5a3810,inset_0_1px_0_0_#c8a060] disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]'
+const btnGhost =
+  'px-4 py-1.5 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors'
+const inputClass =
+  'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] transition-colors'
 
 export function CreateLandModal({ onSubmit, onCancel }: Props) {
-  const [name,     setName]     = useState('')
+  const [name, setName] = useState('')
   const [isPublic, setIsPublic] = useState(true)
-  const [error,    setError]    = useState<string | null>(null)
-  const [loading,  setLoading]  = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -37,8 +40,8 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
     >
       <div
         className="relative w-full max-w-sm bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
-        onClick={e => e.stopPropagation()}
-        onKeyDown={e => e.nativeEvent.stopImmediatePropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
       >
         {/* Close button */}
         <button
@@ -47,7 +50,12 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
           className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square"/>
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
 
@@ -60,12 +68,14 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">Name</label>
+            <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+              Name
+            </label>
             <input
               autoFocus
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Marketing Team"
               className={inputClass}
               required
@@ -73,7 +83,9 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">Visibility</label>
+            <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+              Visibility
+            </label>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -85,8 +97,12 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
                 }`}
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
-                  <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M1 6h10M6 1c-1.5 2-1.5 8 0 10M6 1c1.5 2 1.5 8 0 10" stroke="currentColor" strokeWidth="1.5"/>
+                  <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.5" />
+                  <path
+                    d="M1 6h10M6 1c-1.5 2-1.5 8 0 10M6 1c1.5 2 1.5 8 0 10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                 </svg>
                 Public
               </button>
@@ -100,8 +116,21 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
                 }`}
               >
                 <svg width="10" height="11" viewBox="0 0 10 11" fill="none" className="shrink-0">
-                  <rect x="1.5" y="4.5" width="7" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M3 4.5V3a2 2 0 114 0v1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square"/>
+                  <rect
+                    x="1.5"
+                    y="4.5"
+                    width="7"
+                    height="5.5"
+                    rx="1"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M3 4.5V3a2 2 0 114 0v1.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="square"
+                  />
                 </svg>
                 Private
               </button>
@@ -115,12 +144,10 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
           )}
 
           <div className="flex items-center justify-end gap-2 pt-1 border-t-4 border-[#7a5230] bg-[#dcc898] -mx-5 -mb-5 px-5 py-4">
-            <button type="button" onClick={onCancel} className={btnGhost}>Cancel</button>
-            <button
-              type="submit"
-              disabled={!name.trim() || loading}
-              className={btnPrimary}
-            >
+            <button type="button" onClick={onCancel} className={btnGhost}>
+              Cancel
+            </button>
+            <button type="submit" disabled={!name.trim() || loading} className={btnPrimary}>
               {loading ? 'Creating…' : 'Create Land'}
             </button>
           </div>

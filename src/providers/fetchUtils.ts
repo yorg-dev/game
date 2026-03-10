@@ -1,36 +1,35 @@
-import queryString from "query-string";
+import queryString from 'query-string'
 
-import HttpError from "./HttpError";
+import HttpError from './HttpError'
 
 export interface Options extends RequestInit {
   user?: {
-    authenticated?: boolean;
-    token?: string;
-  };
+    authenticated?: boolean
+    token?: string
+  }
 }
 
 export const createHeadersFromOptions = (options: Options): Headers => {
   const requestHeaders = (options.headers ||
     new Headers({
-      Accept: "application/json",
-    })) as Headers;
-  const hasBody = options && options.body;
-  const isContentTypeSet = requestHeaders.has("Content-Type");
-  const isGetMethod = !options?.method || options?.method === "GET";
-  const isFormData = options?.body instanceof FormData;
+      Accept: 'application/json',
+    })) as Headers
+  const hasBody = options && options.body
+  const isContentTypeSet = requestHeaders.has('Content-Type')
+  const isGetMethod = !options?.method || options?.method === 'GET'
+  const isFormData = options?.body instanceof FormData
 
-  const shouldSetContentType =
-    hasBody && !isContentTypeSet && !isGetMethod && !isFormData;
+  const shouldSetContentType = hasBody && !isContentTypeSet && !isGetMethod && !isFormData
   if (shouldSetContentType) {
-    requestHeaders.set("Content-Type", "application/json");
+    requestHeaders.set('Content-Type', 'application/json')
   }
 
   if (options.user && options.user.authenticated && options.user.token) {
-    requestHeaders.set("Authorization", options.user.token);
+    requestHeaders.set('Authorization', options.user.token)
   }
 
-  return requestHeaders;
-};
+  return requestHeaders
+}
 
 /**
  * Utility function to make HTTP calls. It's similar to the HTML5 `fetch()`, except it handles JSON decoding and HTTP error codes automatically.
@@ -49,7 +48,7 @@ export const createHeadersFromOptions = (options: Options): Headers => {
  * - json: the response body parsed as JSON
  */
 export const fetchJson = (url: string, options: Options = {}) => {
-  const requestHeaders = createHeadersFromOptions(options);
+  const requestHeaders = createHeadersFromOptions(options)
 
   return fetch(url, { ...options, headers: requestHeaders })
     .then((response) =>
@@ -61,47 +60,43 @@ export const fetchJson = (url: string, options: Options = {}) => {
       })),
     )
     .then(({ status, statusText, headers, body }) => {
-      let json;
+      let json
       try {
-        json = JSON.parse(body);
+        json = JSON.parse(body)
       } catch {
         // not json, no big deal
       }
       if (status < 200 || status >= 300) {
-        return Promise.reject(
-          new HttpError((json && json.message) || statusText, status, json),
-        );
+        return Promise.reject(new HttpError((json && json.message) || statusText, status, json))
       }
-      return Promise.resolve({ status, headers, body, json });
-    });
-};
+      return Promise.resolve({ status, headers, body, json })
+    })
+}
 
-export const queryParameters = queryString.stringify;
+export const queryParameters = queryString.stringify
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isValidObject = (value: any) => {
   if (!value) {
-    return false;
+    return false
   }
 
-  const isArray = Array.isArray(value);
-  const isBuffer = false; // Buffer is not available in browser environments
-  const isObject = Object.prototype.toString.call(value) === "[object Object]";
-  const hasKeys = !!Object.keys(value).length;
+  const isArray = Array.isArray(value)
+  const isBuffer = false // Buffer is not available in browser environments
+  const isObject = Object.prototype.toString.call(value) === '[object Object]'
+  const hasKeys = !!Object.keys(value).length
 
-  return !isArray && !isBuffer && isObject && hasKeys;
-};
+  return !isArray && !isBuffer && isObject && hasKeys
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const flattenObject = (value: any, path: string[] = []): any => {
   if (isValidObject(value)) {
     return Object.assign(
       {},
-      ...Object.keys(value).map((key) =>
-        flattenObject(value[key], path.concat([key])),
-      ),
-    );
+      ...Object.keys(value).map((key) => flattenObject(value[key], path.concat([key]))),
+    )
   } else {
-    return path.length ? { [path.join(".")]: value } : value;
+    return path.length ? { [path.join('.')]: value } : value
   }
-};
+}

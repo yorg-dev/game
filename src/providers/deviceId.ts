@@ -7,11 +7,11 @@
 // visitor rather than creating a new one.
 // ---------------------------------------------------------------------------
 
-const LS_KEY  = 'deviceId'
-const IDB_DB  = 'slaivs'
+const LS_KEY = 'deviceId'
+const IDB_DB = 'slaivs'
 const IDB_VER = 1
 const IDB_STORE = 'meta'
-const IDB_KEY   = 'deviceId'
+const IDB_KEY = 'deviceId'
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -22,7 +22,7 @@ function openDb(): Promise<IDBDatabase> {
       }
     }
     req.onsuccess = () => resolve(req.result)
-    req.onerror   = () => reject(req.error)
+    req.onerror = () => reject(req.error)
   })
 }
 
@@ -30,10 +30,10 @@ async function idbGet(): Promise<string | null> {
   try {
     const db = await openDb()
     return new Promise((resolve, reject) => {
-      const tx  = db.transaction(IDB_STORE, 'readonly')
+      const tx = db.transaction(IDB_STORE, 'readonly')
       const req = tx.objectStore(IDB_STORE).get(IDB_KEY)
       req.onsuccess = () => resolve((req.result as string) ?? null)
-      req.onerror   = () => reject(req.error)
+      req.onerror = () => reject(req.error)
     })
   } catch {
     return null
@@ -44,10 +44,10 @@ async function idbSet(id: string): Promise<void> {
   try {
     const db = await openDb()
     await new Promise<void>((resolve, reject) => {
-      const tx  = db.transaction(IDB_STORE, 'readwrite')
+      const tx = db.transaction(IDB_STORE, 'readwrite')
       const req = tx.objectStore(IDB_STORE).put(id, IDB_KEY)
       req.onsuccess = () => resolve()
-      req.onerror   = () => reject(req.error)
+      req.onerror = () => reject(req.error)
     })
   } catch {
     // IndexedDB unavailable (e.g. Firefox private mode) — localStorage alone is enough
@@ -76,7 +76,13 @@ export async function getDeviceId(): Promise<string> {
     return fromIdb
   }
 
-  const id = crypto.randomUUID()
+  const id =
+    typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0
+          return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+        })
   localStorage.setItem(LS_KEY, id)
   await idbSet(id)
   return id

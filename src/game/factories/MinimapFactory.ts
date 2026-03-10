@@ -10,22 +10,28 @@ import type { MapDefinition } from '../maps/MapDefinition'
 // ---------------------------------------------------------------------------
 
 export class MinimapFactory {
-  private readonly scene:   Phaser.Scene
-  private readonly mapDef:  MapDefinition
+  private readonly scene: Phaser.Scene
+  private readonly mapDef: MapDefinition
 
-  private cam!:             Phaser.Cameras.Scene2D.Camera
-  private viewIndicator!:   Phaser.GameObjects.Graphics
-  private _isDragging       = false
+  private cam!: Phaser.Cameras.Scene2D.Camera
+  private viewIndicator!: Phaser.GameObjects.Graphics
+  private _isDragging = false
   private _isCameraDetached = false
 
   constructor(scene: Phaser.Scene, mapDef: MapDefinition) {
-    this.scene  = scene
+    this.scene = scene
     this.mapDef = mapDef
   }
 
-  get isDragging(): boolean        { return this._isDragging }
-  get isCameraDetached(): boolean  { return this._isCameraDetached }
-  set isCameraDetached(v: boolean) { this._isCameraDetached = v }
+  get isDragging(): boolean {
+    return this._isDragging
+  }
+  get isCameraDetached(): boolean {
+    return this._isCameraDetached
+  }
+  set isCameraDetached(v: boolean) {
+    this._isCameraDetached = v
+  }
 
   // Toggle minimap camera visibility on/off.
   toggle(): void {
@@ -40,9 +46,9 @@ export class MinimapFactory {
     const mapH = rows * tileSize
 
     // Preserve map aspect ratio; fit within a ~160 px wide minimap.
-    const mW   = 160
-    const mH   = Math.round(mW * mapH / mapW)
-    const zoom  = mW / mapW
+    const mW = 160
+    const mH = Math.round((mW * mapH) / mapW)
+    const zoom = mW / mapW
 
     // Create the minimap camera.
     // NOTE: do NOT call setRoundPixels — at zoom < 1 it causes a sub-pixel
@@ -67,7 +73,7 @@ export class MinimapFactory {
 
     // Border: drawn in world space along the map boundary.
     // Main camera ignores it so it only appears on the minimap.
-    const lw = 1.5 / zoom   // world units → 1.5 screen pixels on minimap
+    const lw = 1.5 / zoom // world units → 1.5 screen pixels on minimap
     const border = this.scene.add.graphics()
     border.lineStyle(lw, 0x7799bb, 1)
     border.strokeRect(lw / 2, lw / 2, mapW - lw, mapH - lw)
@@ -92,24 +98,28 @@ export class MinimapFactory {
         this.panCamera(pointer)
       }
     })
-    this.scene.input.on('pointerup', () => { this._isDragging = false })
+    this.scene.input.on('pointerup', () => {
+      this._isDragging = false
+    })
   }
 
   // Called every frame from GameScene.update() to redraw the viewport rect.
   updateViewIndicator(): void {
     const cam = this.scene.cameras.main
-    const lw  = 1.5 / this.cam.zoom
+    const lw = 1.5 / this.cam.zoom
     this.viewIndicator.clear()
     this.viewIndicator.lineStyle(lw, 0xffffff, 0.9)
-    this.viewIndicator.strokeRect(cam.scrollX, cam.scrollY, cam.width / cam.zoom, cam.height / cam.zoom)
+    this.viewIndicator.strokeRect(
+      cam.scrollX,
+      cam.scrollY,
+      cam.width / cam.zoom,
+      cam.height / cam.zoom,
+    )
   }
 
   private isPointerInMinimap(pointer: Phaser.Input.Pointer): boolean {
     const { x, y, width, height } = this.cam
-    return (
-      pointer.x >= x && pointer.x <= x + width &&
-      pointer.y >= y && pointer.y <= y + height
-    )
+    return pointer.x >= x && pointer.x <= x + width && pointer.y >= y && pointer.y <= y + height
   }
 
   private panCamera(pointer: Phaser.Input.Pointer): void {
@@ -119,9 +129,9 @@ export class MinimapFactory {
     const worldX = (pointer.x - mx) / mZoom
     const worldY = (pointer.y - my) / mZoom
 
-    const cam  = this.scene.cameras.main
-    const vw   = cam.width  / cam.zoom
-    const vh   = cam.height / cam.zoom
+    const cam = this.scene.cameras.main
+    const vw = cam.width / cam.zoom
+    const vh = cam.height / cam.zoom
     const mapW = this.mapDef.cols * this.mapDef.tileSize
     const mapH = this.mapDef.rows * this.mapDef.tileSize
 

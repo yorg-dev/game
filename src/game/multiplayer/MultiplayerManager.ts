@@ -44,9 +44,9 @@ function getLocalIdentity(): { playerId: string; name: string } {
   try {
     const raw = localStorage.getItem('user')
     if (raw) {
-      const user     = JSON.parse(raw)
-      const userId   = String(user.id ?? user.email ?? 'unknown')
-      const name     = user.email ? (user.email as string).split('@')[0] : userId.slice(0, 8)
+      const user = JSON.parse(raw)
+      const userId = String(user.id ?? user.email ?? 'unknown')
+      const name = user.email ? (user.email as string).split('@')[0] : userId.slice(0, 8)
       return { playerId: `${userId}:${tabId}`, name }
     }
   } catch {
@@ -61,37 +61,37 @@ function getLocalIdentity(): { playerId: string; name: string } {
 // MultiplayerManager
 // ---------------------------------------------------------------------------
 
-const SEND_INTERVAL_MS = 100  // broadcast position at most 10×/s
-const MIN_MOVE_PX      = 1   // min change in px before we bother sending
+const SEND_INTERVAL_MS = 100 // broadcast position at most 10×/s
+const MIN_MOVE_PX = 1 // min change in px before we bother sending
 
 export class MultiplayerManager {
-  private scene:              Phaser.Scene
-  private remotePlayers:      Map<string, RemotePlayer> = new Map()
-  private unsubs:             Array<() => void>          = []
-  private localId             = ''
-  private localName           = ''
-  private localSocketId       = ''   // fresh random ID per WS connection
-  private currentLandId       = ''
+  private scene: Phaser.Scene
+  private remotePlayers: Map<string, RemotePlayer> = new Map()
+  private unsubs: Array<() => void> = []
+  private localId = ''
+  private localName = ''
+  private localSocketId = '' // fresh random ID per WS connection
+  private currentLandId = ''
 
   // Bidirectional maps to match networkId (stable, cross-client) ↔ local Agent id
-  private networkToLocal:     Map<string, number> = new Map()
-  private localToNetwork:     Map<number, string> = new Map()
+  private networkToLocal: Map<string, number> = new Map()
+  private localToNetwork: Map<number, string> = new Map()
   // networkIds of agents spawned by a remote client — position comes from WS, not local wander
-  private remoteAgents:       Set<string>          = new Set()
+  private remoteAgents: Set<string> = new Set()
 
   // Agent position throttle state (mirrors player throttle)
-  private lastAgentSent:      Map<string, { x: number; y: number; time: number }> = new Map()
+  private lastAgentSent: Map<string, { x: number; y: number; time: number }> = new Map()
 
   // Current player position — updated each tick, used for join messages
-  private currentX:      number    = 0
-  private currentY:      number    = 0
+  private currentX: number = 0
+  private currentY: number = 0
   private currentFacing: Direction = 'down'
 
   // throttle state
-  private lastSentX      = -9999
-  private lastSentY      = -9999
+  private lastSentX = -9999
+  private lastSentY = -9999
   private lastSentFacing: Direction = 'down'
-  private lastSentTime   = 0
+  private lastSentTime = 0
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -100,13 +100,13 @@ export class MultiplayerManager {
   private sendJoin(): void {
     this.localSocketId = Math.random().toString(36).slice(2, 10)
     wsProvider.send({
-      type:     'join',
+      type: 'join',
       playerId: this.localId,
       socketId: this.localSocketId,
-      name:     this.localName,
-      x:        this.currentX,
-      y:        this.currentY,
-      facing:   this.currentFacing,
+      name: this.localName,
+      x: this.currentX,
+      y: this.currentY,
+      facing: this.currentFacing,
     })
   }
 
@@ -119,54 +119,64 @@ export class MultiplayerManager {
     if (!wsUrl) return
 
     const { playerId, name } = getLocalIdentity()
-    this.localId       = playerId
-    this.localName     = name
+    this.localId = playerId
+    this.localName = name
     this.currentLandId = landId
-    this.currentX      = x
-    this.currentY      = y
+    this.currentX = x
+    this.currentY = y
     this.currentFacing = facing
     console.log('[MP] init — localId:', playerId, 'land:', landId)
 
     // Subscribe to server messages
     this.unsubs.push(
-      wsProvider.on('players',           msg => this.onWorldState(msg.players)),
-      wsProvider.on('join',              msg => this.onJoin(msg)),
-      wsProvider.on('move',              msg => this.onMoved(msg)),
-      wsProvider.on('leave',             msg => this.onLeave(msg.playerId)),
-      wsProvider.on('placement-added',   msg => {
+      wsProvider.on('players', (msg) => this.onWorldState(msg.players)),
+      wsProvider.on('join', (msg) => this.onJoin(msg)),
+      wsProvider.on('move', (msg) => this.onMoved(msg)),
+      wsProvider.on('leave', (msg) => this.onLeave(msg.playerId)),
+      wsProvider.on('placement-added', (msg) => {
         console.log('[MP] placement-added received:', msg)
         EventBus.emit('add-connection', {
           connectionId: msg.connection.id,
-          appId:        msg.connection.appId,
-          worldX:       msg.worldX,
-          worldY:       msg.worldY,
-          connection:   msg.connection,
-          remote:       true,
+          appId: msg.connection.appId,
+          worldX: msg.worldX,
+          worldY: msg.worldY,
+          connection: msg.connection,
+          remote: true,
         })
       }),
-      wsProvider.on('placement-removed', msg => {
+      wsProvider.on('placement-removed', (msg) => {
         EventBus.emit('remove-connection', { connectionId: msg.connectionId })
       }),
-      wsProvider.on('placement-moved',   msg => {
-        EventBus.emit('move-connection', { connectionId: msg.connectionId, worldX: msg.worldX, worldY: msg.worldY })
-      }),
-      wsProvider.on('agent-added', msg => {
-        EventBus.emit('spawn-agent', {
-          templateId: msg.templateId,
-          name:       msg.name,
-          x:          msg.x,
-          y:          msg.y,
-          networkId:  msg.networkId,
-          remote:     true,
+      wsProvider.on('placement-moved', (msg) => {
+        EventBus.emit('move-connection', {
+          connectionId: msg.connectionId,
+          worldX: msg.worldX,
+          worldY: msg.worldY,
         })
       }),
-      wsProvider.on('agent-moved', msg => {
+      wsProvider.on('agent-added', (msg) => {
+        EventBus.emit('spawn-agent', {
+          templateId: msg.templateId,
+          name: msg.name,
+          x: msg.x,
+          y: msg.y,
+          networkId: msg.networkId,
+          remote: true,
+        })
+      }),
+      wsProvider.on('agent-moved', (msg) => {
         const localId = this.networkToLocal.get(msg.networkId)
         if (localId !== undefined) {
-          EventBus.emit('agent-remote-moved', { localId, x: msg.x, y: msg.y, facing: msg.facing, moving: msg.moving })
+          EventBus.emit('agent-remote-moved', {
+            localId,
+            x: msg.x,
+            y: msg.y,
+            facing: msg.facing,
+            moving: msg.moving,
+          })
         }
       }),
-      wsProvider.on('agent-removed', msg => {
+      wsProvider.on('agent-removed', (msg) => {
         const localId = this.networkToLocal.get(msg.networkId)
         if (localId !== undefined) {
           EventBus.emit('remove-agent', { id: localId })
@@ -176,7 +186,7 @@ export class MultiplayerManager {
 
     // Announce ourselves whenever we (re-)connect or subscribe to a new channel
     this.unsubs.push(
-      wsProvider.onStatus(status => {
+      wsProvider.onStatus((status) => {
         console.log('[MP] WS status:', status)
         if (status === 'connected') {
           this.sendJoin()
@@ -223,22 +233,22 @@ export class MultiplayerManager {
    */
   tick(x: number, y: number, facing: Direction, moving: boolean): void {
     // Always track current position so join messages use up-to-date coordinates
-    this.currentX      = x
-    this.currentY      = y
+    this.currentX = x
+    this.currentY = y
     this.currentFacing = facing
 
-    const now    = Date.now()
-    const moved  =
+    const now = Date.now()
+    const moved =
       Math.abs(x - this.lastSentX) > MIN_MOVE_PX ||
       Math.abs(y - this.lastSentY) > MIN_MOVE_PX ||
       facing !== this.lastSentFacing
 
     if (moved && now - this.lastSentTime >= SEND_INTERVAL_MS) {
       wsProvider.send({ type: 'move', x, y, facing, moving })
-      this.lastSentX      = x
-      this.lastSentY      = y
+      this.lastSentX = x
+      this.lastSentY = y
       this.lastSentFacing = facing
-      this.lastSentTime   = now
+      this.lastSentTime = now
     }
 
     for (const rp of this.remotePlayers.values()) {
@@ -277,25 +287,39 @@ export class MultiplayerManager {
    * Called every game frame by GameScene with each agent's current state.
    * Broadcasts position for owner-spawned agents at most 10×/s.
    */
-  tickAgents(agents: Array<{ localId: number; x: number; y: number; facing: Direction; moving: boolean }>): void {
+  tickAgents(
+    agents: Array<{ localId: number; x: number; y: number; facing: Direction; moving: boolean }>,
+  ): void {
     const now = Date.now()
     for (const a of agents) {
       const networkId = this.localToNetwork.get(a.localId)
-      if (!networkId || this.remoteAgents.has(networkId)) continue  // skip remote agents
+      if (!networkId || this.remoteAgents.has(networkId)) continue // skip remote agents
 
       const last = this.lastAgentSent.get(networkId)
-      const moved = !last ||
-        Math.abs(a.x - last.x) > MIN_MOVE_PX ||
-        Math.abs(a.y - last.y) > MIN_MOVE_PX
+      const moved =
+        !last || Math.abs(a.x - last.x) > MIN_MOVE_PX || Math.abs(a.y - last.y) > MIN_MOVE_PX
 
       if (moved && now - (last?.time ?? 0) >= SEND_INTERVAL_MS) {
-        wsProvider.send({ type: 'agent-moved', networkId, x: a.x, y: a.y, facing: a.facing, moving: a.moving })
+        wsProvider.send({
+          type: 'agent-moved',
+          networkId,
+          x: a.x,
+          y: a.y,
+          facing: a.facing,
+          moving: a.moving,
+        })
         this.lastAgentSent.set(networkId, { x: a.x, y: a.y, time: now })
       }
     }
   }
 
-  broadcastAgentAdded(networkId: string, name: string, templateId: string, x: number, y: number): void {
+  broadcastAgentAdded(
+    networkId: string,
+    name: string,
+    templateId: string,
+    x: number,
+    y: number,
+  ): void {
     wsProvider.send({ type: 'agent-added', networkId, name, templateId, x, y })
   }
 
@@ -304,7 +328,11 @@ export class MultiplayerManager {
     if (networkId) wsProvider.send({ type: 'agent-removed', networkId })
   }
 
-  broadcastPlacementAdded(connection: import('@/models/Connection').Connection, worldX: number, worldY: number): void {
+  broadcastPlacementAdded(
+    connection: import('@/models/Connection').Connection,
+    worldX: number,
+    worldY: number,
+  ): void {
     wsProvider.send({ type: 'placement-added', worldX, worldY, connection })
   }
 
@@ -328,9 +356,12 @@ export class MultiplayerManager {
   // ── Message handlers ──────────────────────────────────────────────────────
 
   private onWorldState(players: PlayerState[]): void {
-    console.log('[MP] players snapshot:', players.map(p => p.playerId))
+    console.log(
+      '[MP] players snapshot:',
+      players.map((p) => p.playerId),
+    )
 
-    const incoming = new Set(players.map(p => p.playerId))
+    const incoming = new Set(players.map((p) => p.playerId))
 
     // Remove any remote player not present in the fresh snapshot (stale / disconnected)
     for (const [id, rp] of this.remotePlayers) {
@@ -347,7 +378,11 @@ export class MultiplayerManager {
   }
 
   private onJoin(p: PlayerState): void {
-    console.log('[MP] join:', p.playerId, p.playerId === this.localId ? '(self, ignoring)' : '(remote)')
+    console.log(
+      '[MP] join:',
+      p.playerId,
+      p.playerId === this.localId ? '(self, ignoring)' : '(remote)',
+    )
     if (p.playerId === this.localId) return
     this.upsert(p)
   }
@@ -363,7 +398,12 @@ export class MultiplayerManager {
   }
 
   private onMoved(msg: {
-    userId: string; playerId: string; x: number; y: number; facing: Direction; moving: boolean
+    userId: string
+    playerId: string
+    x: number
+    y: number
+    facing: Direction
+    moving: boolean
   }): void {
     this.remotePlayers.get(msg.playerId)?.moveTo(msg.x, msg.y, msg.facing, msg.moving)
   }

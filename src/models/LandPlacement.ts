@@ -10,8 +10,8 @@
  * Extend this union as new entity types are introduced.
  */
 export type PlacementEntityType =
-  | 'connection'   // an authenticated integration (Shopify, GitHub, …)
-  | 'agent'        // an AI agent NPC
+  | 'connection' // an authenticated integration (Shopify, GitHub, …)
+  | 'agent' // an AI agent NPC
 
 /**
  * A LandPlacement records that a specific entity exists on a Land
@@ -24,8 +24,8 @@ export type PlacementEntityType =
  * deleting the underlying entity itself.
  */
 export interface LandPlacement {
-  id:     string   // "lp_01"
-  landId: string   // parent Land
+  id: string // "lp_01"
+  landId: string // parent Land
 
   /** Discriminator — determines which table/collection entityId points to. */
   entityType: PlacementEntityType

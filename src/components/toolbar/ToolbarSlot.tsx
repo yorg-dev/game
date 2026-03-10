@@ -1,9 +1,9 @@
 interface ToolbarSlotProps {
-  onClick?:  () => void
-  label?:    string
-  hotkey?:   string
-  active?:   boolean
-  children:  React.ReactNode
+  onClick?: () => void
+  label?: string
+  hotkey?: string
+  active?: boolean
+  children: React.ReactNode
 }
 
 export function ToolbarSlot({ onClick, label, hotkey, active, children }: ToolbarSlotProps) {

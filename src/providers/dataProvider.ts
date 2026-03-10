@@ -1,10 +1,10 @@
-import httpProvider from "./httpProvider";
-import jsonServerProvider from "ra-data-json-server";
+import httpProvider from './httpProvider'
+import jsonServerProvider from 'ra-data-json-server'
 
-import type { DataProvider } from "ra-core";
-import { overridesCapability, registerCapability } from "./capabilities";
+import type { DataProvider } from 'ra-core'
+import { overridesCapability, registerCapability } from './capabilities'
 
-const baseProvider = jsonServerProvider(import.meta.env.VITE_API_URL, httpProvider);
+const baseProvider = jsonServerProvider(import.meta.env.VITE_API_URL, httpProvider)
 
 /**
  * Data provider for the Admin API
@@ -23,4 +23,4 @@ export const dataProvider: DataProvider = {
   ...baseProvider,
   ...overridesCapability(import.meta.env.VITE_API_URL, httpProvider),
   ...registerCapability(import.meta.env.VITE_API_URL, httpProvider),
-};
+}

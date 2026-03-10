@@ -23,21 +23,21 @@ export type JSONSchema = {
 // The atomic unit. One capability. One job.
 // ─────────────────────────────────────────
 export interface Skill {
-  id: string           // "shopify:refund_transaction"
-  name: string         // "Refund Transaction"
-  description: string  // "Issues a full or partial refund for a Shopify order"
+  id: string // "shopify:refund_transaction"
+  name: string // "Refund Transaction"
+  description: string // "Issues a full or partial refund for a Shopify order"
   category: SkillCategory
-  integration: string  // "shopify" — which platform this skill belongs to
+  integration: string // "shopify" — which platform this skill belongs to
 
   // What this skill needs to run
-  requiredCredentials: string[]  // ["shopify_access_token", "shopify_store_url"]
-  inputSchema: JSONSchema        // what data it needs to execute
-  outputSchema: JSONSchema       // what data it returns
+  requiredCredentials: string[] // ["shopify_access_token", "shopify_store_url"]
+  inputSchema: JSONSchema // what data it needs to execute
+  outputSchema: JSONSchema // what data it returns
 
   // How it behaves
   triggerType: TriggerType
-  triggerEvent?: string  // "shopify/order.created" — only when triggerType is "event"
+  triggerEvent?: string // "shopify/order.created" — only when triggerType is "event"
 
-  isComposable: boolean  // can this skill be chained after another?
-  version: string        // "1.0.0"
+  isComposable: boolean // can this skill be chained after another?
+  version: string // "1.0.0"
 }

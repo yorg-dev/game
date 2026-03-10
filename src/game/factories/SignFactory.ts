@@ -15,7 +15,9 @@ export class SignFactory {
   private _sprite: Phaser.Physics.Arcade.Sprite | null = null
 
   /** The static physics body — available after spawn(), used for colliders. */
-  get sprite(): Phaser.Physics.Arcade.Sprite | null { return this._sprite }
+  get sprite(): Phaser.Physics.Arcade.Sprite | null {
+    return this._sprite
+  }
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -43,16 +45,27 @@ export class SignFactory {
     sprite.setInteractive({ useHandCursor: true })
     this._sprite = sprite
 
-    const tooltip = this.scene.add.text(x, y - 22, 'Bulletin Board', {
-      fontSize:        '6px',
-      color:           '#ffffff',
-      backgroundColor: '#00000088',
-      padding:         { x: 3, y: 1 },
-    }).setOrigin(0.5, 1).setDepth(3).setResolution(3).setVisible(false)
+    const tooltip = this.scene.add
+      .text(x, y - 22, 'Bulletin Board', {
+        fontSize: '6px',
+        color: '#ffffff',
+        backgroundColor: '#00000088',
+        padding: { x: 3, y: 1 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(3)
+      .setResolution(3)
+      .setVisible(false)
 
-    sprite.on('pointerover', () => { sprite.setTint(0xddddff); tooltip.setVisible(true) })
-    sprite.on('pointerout',  () => { sprite.clearTint();       tooltip.setVisible(false) })
-    sprite.on('pointerup',   () => {
+    sprite.on('pointerover', () => {
+      sprite.setTint(0xddddff)
+      tooltip.setVisible(true)
+    })
+    sprite.on('pointerout', () => {
+      sprite.clearTint()
+      tooltip.setVisible(false)
+    })
+    sprite.on('pointerup', () => {
       sprite.clearTint()
       tooltip.setVisible(false)
       EventBus.emit('sign-clicked', undefined)

@@ -1,4 +1,4 @@
-import type { Direction }  from '@/game/entities/Character'
+import type { Direction } from '@/game/entities/Character'
 import type { Connection } from '@/models/Connection'
 
 // ---------------------------------------------------------------------------
@@ -8,14 +8,14 @@ import type { Connection } from '@/models/Connection'
 export type WsStatus = 'idle' | 'connecting' | 'connected' | 'disconnected'
 
 export interface PlayerState {
-  userId:   string
+  userId: string
   playerId: string
   socketId: string
-  name:     string
-  x:        number
-  y:        number
-  facing:   Direction
-  moving:   boolean
+  name: string
+  x: number
+  y: number
+  facing: Direction
+  moving: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -23,31 +23,85 @@ export interface PlayerState {
 // ---------------------------------------------------------------------------
 
 export type ServerMessage =
-  | { type: 'welcome';      playerId: string }
-  | { type: 'players';      players: PlayerState[] }
-  | { type: 'join';         userId: string; playerId: string; socketId: string; name: string; x: number; y: number; facing: Direction; moving: boolean }
-  | { type: 'move';         userId: string; playerId: string; x: number; y: number; facing: Direction; moving: boolean }
-  | { type: 'leave';            userId: string; playerId: string | null }
-  | { type: 'placement-added';  worldX: number; worldY: number; connection: Connection }
+  | { type: 'welcome'; playerId: string }
+  | { type: 'players'; players: PlayerState[] }
+  | {
+      type: 'join'
+      userId: string
+      playerId: string
+      socketId: string
+      name: string
+      x: number
+      y: number
+      facing: Direction
+      moving: boolean
+    }
+  | {
+      type: 'move'
+      userId: string
+      playerId: string
+      x: number
+      y: number
+      facing: Direction
+      moving: boolean
+    }
+  | { type: 'leave'; userId: string; playerId: string | null }
+  | { type: 'placement-added'; worldX: number; worldY: number; connection: Connection }
   | { type: 'placement-removed'; connectionId: string }
-  | { type: 'placement-moved';  connectionId: string; worldX: number; worldY: number }
-  | { type: 'agent-added';   networkId: string; name: string; templateId: string; x: number; y: number }
-  | { type: 'agent-moved';   networkId: string; x: number; y: number; facing: Direction; moving: boolean }
+  | { type: 'placement-moved'; connectionId: string; worldX: number; worldY: number }
+  | {
+      type: 'agent-added'
+      networkId: string
+      name: string
+      templateId: string
+      x: number
+      y: number
+    }
+  | {
+      type: 'agent-moved'
+      networkId: string
+      x: number
+      y: number
+      facing: Direction
+      moving: boolean
+    }
   | { type: 'agent-removed'; networkId: string }
   | { type: 'pong' }
   | { type: 'chat-message'; scope: 'world' | 'land'; authorName: string; text: string; ts: number }
 
 export type ClientMessage =
-  | { type: 'join';              playerId: string; socketId: string; name: string; x: number; y: number; facing: Direction }
-  | { type: 'move';              x: number; y: number; facing: Direction; moving: boolean }
+  | {
+      type: 'join'
+      playerId: string
+      socketId: string
+      name: string
+      x: number
+      y: number
+      facing: Direction
+    }
+  | { type: 'move'; x: number; y: number; facing: Direction; moving: boolean }
   | { type: 'leave' }
-  | { type: 'chat';              scope: 'world' | 'land'; text: string; authorName: string }
-  | { type: 'placement-added';   worldX: number; worldY: number; connection: Connection }
+  | { type: 'chat'; scope: 'world' | 'land'; text: string; authorName: string }
+  | { type: 'placement-added'; worldX: number; worldY: number; connection: Connection }
   | { type: 'placement-removed'; connectionId: string }
-  | { type: 'placement-moved';   connectionId: string; worldX: number; worldY: number }
-  | { type: 'agent-added';       networkId: string; name: string; templateId: string; x: number; y: number }
-  | { type: 'agent-moved';       networkId: string; x: number; y: number; facing: Direction; moving: boolean }
-  | { type: 'agent-removed';     networkId: string }
+  | { type: 'placement-moved'; connectionId: string; worldX: number; worldY: number }
+  | {
+      type: 'agent-added'
+      networkId: string
+      name: string
+      templateId: string
+      x: number
+      y: number
+    }
+  | {
+      type: 'agent-moved'
+      networkId: string
+      x: number
+      y: number
+      facing: Direction
+      moving: boolean
+    }
+  | { type: 'agent-removed'; networkId: string }
 
 // ---------------------------------------------------------------------------
 // Internal handler map
@@ -69,28 +123,30 @@ const RECONNECT_DELAYS = [1_000, 2_000, 4_000, 8_000, 16_000]
 // ---------------------------------------------------------------------------
 
 class WsProvider {
-  private ws:              WebSocket | null = null
-  private url:             string           = ''
-  private identifier:      string           = ''
-  private handlers:        HandlerMap       = {}
+  private ws: WebSocket | null = null
+  private url: string = ''
+  private identifier: string = ''
+  private handlers: HandlerMap = {}
   private statusListeners: Set<(s: WsStatus) => void> = new Set()
-  private reconnectTimer:  ReturnType<typeof setTimeout>  | null = null
-  private attempt          = 0
-  private closing          = false
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  private attempt = 0
+  private closing = false
 
   status: WsStatus = 'idle'
 
   // ── Public API ────────────────────────────────────────────────────────────
 
   connect(url: string, channel: string, params: Record<string, string> = {}): void {
-    if (this.ws &&
-      (this.ws.readyState === WebSocket.OPEN ||
-       this.ws.readyState === WebSocket.CONNECTING)) return
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)
+    )
+      return
 
-    this.url        = url
+    this.url = url
     this.identifier = JSON.stringify({ channel, ...params })
-    this.closing    = false
-    this.attempt    = 0
+    this.closing = false
+    this.attempt = 0
     this.open()
   }
 
@@ -125,11 +181,13 @@ class WsProvider {
 
   send(msg: ClientMessage): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({
-        command:    'message',
-        identifier: this.identifier,
-        data:       JSON.stringify(msg),
-      }))
+      this.ws.send(
+        JSON.stringify({
+          command: 'message',
+          identifier: this.identifier,
+          data: JSON.stringify(msg),
+        }),
+      )
     }
   }
 
@@ -139,7 +197,7 @@ class WsProvider {
     handler: (msg: Extract<ServerMessage, { type: K }>) => void,
   ): () => void {
     if (!this.handlers[type]) {
-      (this.handlers as any)[type] = new Set()
+      ;(this.handlers as any)[type] = new Set()
     }
     ;(this.handlers[type] as HandlerSet<any>).add(handler)
     return () => (this.handlers[type] as HandlerSet<any> | undefined)?.delete(handler)
@@ -173,17 +231,27 @@ class WsProvider {
         const frame = JSON.parse(e.data as string)
 
         // ActionCable control frames
-        if (frame.type === 'welcome')              return  // subscribe was already sent in onopen
-        if (frame.type === 'ping')                 return  // server heartbeat — ignore
-        if (frame.type === 'disconnect')           { this.ws?.close(); return }
-        if (frame.type === 'confirm_subscription') { console.log('[WS] subscribed to', this.identifier); this.setStatus('connected'); return }
-        if (frame.type === 'reject_subscription')  { console.error('[WS] subscription rejected'); return }
+        if (frame.type === 'welcome') return // subscribe was already sent in onopen
+        if (frame.type === 'ping') return // server heartbeat — ignore
+        if (frame.type === 'disconnect') {
+          this.ws?.close()
+          return
+        }
+        if (frame.type === 'confirm_subscription') {
+          console.log('[WS] subscribed to', this.identifier)
+          this.setStatus('connected')
+          return
+        }
+        if (frame.type === 'reject_subscription') {
+          console.error('[WS] subscription rejected')
+          return
+        }
 
         // ActionCable application message: { identifier, message: {...} }
         if (frame.message) {
           const msg = frame.message as ServerMessage
           console.log('[WS] message received:', msg.type, msg)
-          ;(this.handlers[msg.type] as HandlerSet<any> | undefined)?.forEach(fn => fn(msg))
+          ;(this.handlers[msg.type] as HandlerSet<any> | undefined)?.forEach((fn) => fn(msg))
         }
       } catch {
         // ignore malformed frames
@@ -211,12 +279,15 @@ class WsProvider {
   }
 
   private clearTimers(): void {
-    if (this.reconnectTimer) { clearTimeout(this.reconnectTimer); this.reconnectTimer = null }
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
   }
 
   private setStatus(s: WsStatus): void {
     this.status = s
-    this.statusListeners.forEach(fn => fn(s))
+    this.statusListeners.forEach((fn) => fn(s))
   }
 }
 

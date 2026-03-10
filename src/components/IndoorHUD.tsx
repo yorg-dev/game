@@ -8,9 +8,9 @@ import type { Connection } from '@/models/Connection'
 // ---------------------------------------------------------------------------
 
 interface IndoorState {
-  appId:      string
+  appId: string
   connection: Connection
-  interior:   AppInterior
+  interior: AppInterior
 }
 
 // ---------------------------------------------------------------------------
@@ -19,10 +19,10 @@ interface IndoorState {
 
 /** Pixel-style border matching the toolbar/dialog aesthetic. */
 const PIXEL_FRAME: React.CSSProperties = {
-  border:           '3px solid #0d0705',
-  boxShadow:        '0 0 0 3px #c8974c, 0 0 0 6px #0d0705',
-  imageRendering:   'pixelated',
-  background:       '#1a0e06',
+  border: '3px solid #0d0705',
+  boxShadow: '0 0 0 3px #c8974c, 0 0 0 6px #0d0705',
+  imageRendering: 'pixelated',
+  background: '#1a0e06',
 }
 
 function ActionCard({
@@ -30,31 +30,31 @@ function ActionCard({
   accentColor,
   onClick,
 }: {
-  action:      InteriorAction
+  action: InteriorAction
   accentColor: string
-  onClick:     () => void
+  onClick: () => void
 }) {
   return (
     <button
       onClick={onClick}
       className="flex items-start gap-3 w-full px-3 py-2.5 text-left transition-colors"
       style={{
-        background:   '#0d0705',
-        border:       '2px solid #2a1608',
-        outline:      'none',
-        cursor:       'pointer',
+        background: '#0d0705',
+        border: '2px solid #2a1608',
+        outline: 'none',
+        cursor: 'pointer',
       }}
-      onMouseEnter={e => (e.currentTarget.style.background = '#1a0e06')}
-      onMouseLeave={e => (e.currentTarget.style.background = '#0d0705')}
+      onMouseEnter={(e) => (e.currentTarget.style.background = '#1a0e06')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = '#0d0705')}
     >
       {/* Icon badge */}
       <span
         className="shrink-0 w-7 h-7 flex items-center justify-center text-sm font-bold"
         style={{
-          background:   accentColor + '33',
-          border:       `2px solid ${accentColor}`,
-          color:        accentColor,
-          fontFamily:   'monospace',
+          background: accentColor + '33',
+          border: `2px solid ${accentColor}`,
+          color: accentColor,
+          fontFamily: 'monospace',
         }}
       >
         {action.icon}
@@ -83,14 +83,13 @@ function ActionModal({
   accentColor,
   onClose,
 }: {
-  action:      InteriorAction
+  action: InteriorAction
   accentColor: string
-  onClose:     () => void
+  onClose: () => void
 }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
       <div className="w-full max-w-sm" style={PIXEL_FRAME}>
-
         {/* Header */}
         <div
           className="flex items-center gap-3 px-4 py-3"
@@ -98,7 +97,12 @@ function ActionModal({
         >
           <span
             className="w-8 h-8 flex items-center justify-center text-base font-bold shrink-0"
-            style={{ background: accentColor + '33', border: `2px solid ${accentColor}`, color: accentColor, fontFamily: 'monospace' }}
+            style={{
+              background: accentColor + '33',
+              border: `2px solid ${accentColor}`,
+              color: accentColor,
+              fontFamily: 'monospace',
+            }}
           >
             {action.icon}
           </span>
@@ -119,7 +123,10 @@ function ActionModal({
 
         {/* Body — stubbed action UI */}
         <div className="px-4 py-4 flex flex-col gap-3">
-          <p className="text-[11px] leading-relaxed" style={{ fontFamily: 'monospace', color: '#c0a070' }}>
+          <p
+            className="text-[11px] leading-relaxed"
+            style={{ fontFamily: 'monospace', color: '#c0a070' }}
+          >
             {action.description}
           </p>
           <div
@@ -132,14 +139,14 @@ function ActionModal({
             onClick={onClose}
             className="w-full py-2 text-[11px] font-bold uppercase tracking-widest transition-colors"
             style={{
-              background:   accentColor,
-              color:        '#0d0705',
-              border:       `2px solid ${accentColor}`,
-              fontFamily:   'monospace',
-              cursor:       'pointer',
+              background: accentColor,
+              color: '#0d0705',
+              border: `2px solid ${accentColor}`,
+              fontFamily: 'monospace',
+              cursor: 'pointer',
             }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
             Close
           </button>
@@ -154,24 +161,28 @@ function ActionModal({
 // ---------------------------------------------------------------------------
 
 export function IndoorHUD() {
-  const [state,          setState]          = useState<IndoorState | null>(null)
-  const [activeAction,   setActiveAction]   = useState<InteriorAction | null>(null)
+  const [state, setState] = useState<IndoorState | null>(null)
+  const [activeAction, setActiveAction] = useState<InteriorAction | null>(null)
   const [actionsVisible, setActionsVisible] = useState(false)
 
   useEffect(() => {
-    const unsubEnter    = EventBus.on('enter-house', ({ appId, connection, interior }) => {
+    const unsubEnter = EventBus.on('enter-house', ({ appId, connection, interior }) => {
       setState({ appId, connection, interior })
       setActiveAction(null)
       setActionsVisible(false)
     })
-    const unsubExit     = EventBus.on('exit-house', () => {
+    const unsubExit = EventBus.on('exit-house', () => {
       setState(null)
       setActiveAction(null)
     })
     const unsubTerminal = EventBus.on('terminal-interact', ({ action }) => {
       setActiveAction(action)
     })
-    return () => { unsubEnter(); unsubExit(); unsubTerminal() }
+    return () => {
+      unsubEnter()
+      unsubExit()
+      unsubTerminal()
+    }
   }, [])
 
   if (!state) return null
@@ -213,14 +224,14 @@ export function IndoorHUD() {
 
         {/* Actions toggle */}
         <button
-          onClick={() => setActionsVisible(v => !v)}
+          onClick={() => setActionsVisible((v) => !v)}
           className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors"
           style={{
-            borderLeft:  '2px solid #2a1608',
-            fontFamily:  'monospace',
-            color:       actionsVisible ? accent : '#7a5a3a',
-            cursor:      'pointer',
-            background:  actionsVisible ? '#2a1608' : 'transparent',
+            borderLeft: '2px solid #2a1608',
+            fontFamily: 'monospace',
+            color: actionsVisible ? accent : '#7a5a3a',
+            cursor: 'pointer',
+            background: actionsVisible ? '#2a1608' : 'transparent',
           }}
         >
           Actions {actionsVisible ? '▲' : '▼'}
@@ -233,12 +244,12 @@ export function IndoorHUD() {
           style={{
             borderLeft: '2px solid #2a1608',
             fontFamily: 'monospace',
-            color:      '#c84040',
-            cursor:     'pointer',
+            color: '#c84040',
+            cursor: 'pointer',
             background: 'transparent',
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#2a1608')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#2a1608')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
         >
           ← Leave
         </button>
@@ -256,12 +267,15 @@ export function IndoorHUD() {
           >
             Walk to a {interior.terminalLabel.toLowerCase()} and press [E], or click below:
           </div>
-          {interior.actions.map(action => (
+          {interior.actions.map((action) => (
             <ActionCard
               key={action.id}
               action={action}
               accentColor={accent}
-              onClick={() => { setActiveAction(action); setActionsVisible(false) }}
+              onClick={() => {
+                setActiveAction(action)
+                setActionsVisible(false)
+              }}
             />
           ))}
         </div>

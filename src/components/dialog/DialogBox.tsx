@@ -3,7 +3,7 @@ import type { DialogLine } from '../../game/dialog/DialogScript'
 import { EventBus } from '../../game/EventBus'
 
 interface DialogBoxProps {
-  lines:   DialogLine[]
+  lines: DialogLine[]
   onClose: () => void
 }
 
@@ -12,27 +12,27 @@ const TYPEWRITER_MS = 30
 // Pixel-perfect border using layered box-shadow:
 // black outer → tan highlight → dark wood → black inner
 const PIXEL_BORDER: React.CSSProperties = {
-  border:      '4px solid #0d0705',
-  boxShadow:   '0 0 0 4px #c8974c, 0 0 0 8px #0d0705, 0 0 0 12px #7c4a1e',
+  border: '4px solid #0d0705',
+  boxShadow: '0 0 0 4px #c8974c, 0 0 0 8px #0d0705, 0 0 0 12px #7c4a1e',
   imageRendering: 'pixelated',
 }
 
 // Same stack but thinner — used for the speaker name box
 const PIXEL_BORDER_SM: React.CSSProperties = {
-  border:      '3px solid #0d0705',
-  boxShadow:   '0 0 0 3px #c8974c, 0 0 0 6px #0d0705',
+  border: '3px solid #0d0705',
+  boxShadow: '0 0 0 3px #c8974c, 0 0 0 6px #0d0705',
   imageRendering: 'pixelated',
 }
 
 export function DialogBox({ lines, onClose }: DialogBoxProps) {
-  const [lineIndex,     setLineIndex]     = useState(0)
+  const [lineIndex, setLineIndex] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
-  const [isComplete,    setIsComplete]    = useState(false)
-  const [blink,         setBlink]         = useState(true)
+  const [isComplete, setIsComplete] = useState(false)
+  const [blink, setBlink] = useState(true)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const currentLine = lines[lineIndex]
-  const isLast      = lineIndex === lines.length - 1
+  const isLast = lineIndex === lines.length - 1
 
   // Typewriter effect
   useEffect(() => {
@@ -50,13 +50,15 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
       }
     }, TYPEWRITER_MS)
 
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
   }, [lineIndex, currentLine.text])
 
   // Blink the continue arrow
   useEffect(() => {
     if (!isComplete) return
-    const id = setInterval(() => setBlink(b => !b), 500)
+    const id = setInterval(() => setBlink((b) => !b), 500)
     return () => clearInterval(id)
   }, [isComplete])
 
@@ -68,7 +70,7 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
       return
     }
     if (lineIndex < lines.length - 1) {
-      setLineIndex(i => i + 1)
+      setLineIndex((i) => i + 1)
     } else {
       EventBus.emit('dialog-end', undefined)
       onClose()
@@ -91,13 +93,8 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
   return (
     // Backdrop click area — does NOT advance (prevents accidental dismiss)
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-10 px-6">
-
       {/* Outer pixel frame */}
-      <div
-        className="relative w-full max-w-2xl"
-        style={PIXEL_BORDER}
-        onClick={advance}
-      >
+      <div className="relative w-full max-w-2xl" style={PIXEL_BORDER} onClick={advance}>
         {/* Speaker name — sits above the box, aligned to left */}
         <div
           className="absolute left-4"
@@ -110,9 +107,9 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
           <span
             className="block px-3 py-[3px] text-[11px] font-bold uppercase tracking-widest"
             style={{
-              fontFamily:  '"Courier New", Courier, monospace',
-              color:       currentLine.speakerColor ?? '#f0e0c0',
-              textShadow:  `0 0 6px ${currentLine.speakerColor ?? '#c8974c'}88`,
+              fontFamily: '"Courier New", Courier, monospace',
+              color: currentLine.speakerColor ?? '#f0e0c0',
+              textShadow: `0 0 6px ${currentLine.speakerColor ?? '#c8974c'}88`,
               letterSpacing: '0.15em',
             }}
           >
@@ -124,10 +121,10 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
         <div
           className="flex items-start gap-4 px-5 py-4"
           style={{
-            background:  '#0d0705',
-            minHeight:   '88px',
+            background: '#0d0705',
+            minHeight: '88px',
             // Inner highlight top-left, shadow bottom-right
-            boxShadow:   'inset 2px 2px 0 #2a1a0e, inset -2px -2px 0 #000',
+            boxShadow: 'inset 2px 2px 0 #2a1a0e, inset -2px -2px 0 #000',
           }}
         >
           {/* Speaker colour accent bar */}
@@ -141,7 +138,7 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
             className="flex-1 text-[13px] leading-[1.7]"
             style={{
               fontFamily: '"Courier New", Courier, monospace',
-              color:      '#f0e0c0',
+              color: '#f0e0c0',
             }}
           >
             {displayedText}
@@ -159,9 +156,9 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
               <span
                 className="block text-[14px] font-bold"
                 style={{
-                  fontFamily:  'monospace',
-                  color:       blink ? (currentLine.speakerColor ?? '#c8974c') : 'transparent',
-                  lineHeight:  1,
+                  fontFamily: 'monospace',
+                  color: blink ? (currentLine.speakerColor ?? '#c8974c') : 'transparent',
+                  lineHeight: 1,
                 }}
               >
                 {isLast ? '■' : '▼'}
@@ -175,7 +172,7 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
           className="flex items-center justify-between px-4 py-[5px]"
           style={{
             background: '#140a04',
-            borderTop:  '2px solid #0d0705',
+            borderTop: '2px solid #0d0705',
           }}
         >
           {/* Pip progress */}
@@ -185,11 +182,12 @@ export function DialogBox({ lines, onClose }: DialogBoxProps) {
                 key={i}
                 className="inline-block w-[6px] h-[6px]"
                 style={{
-                  background: i < lineIndex
-                    ? '#4a2c14'
-                    : i === lineIndex
-                      ? (currentLine.speakerColor ?? '#c8974c')
-                      : '#2a1608',
+                  background:
+                    i < lineIndex
+                      ? '#4a2c14'
+                      : i === lineIndex
+                        ? (currentLine.speakerColor ?? '#c8974c')
+                        : '#2a1608',
                   outline: `1px solid #0d0705`,
                 }}
               />

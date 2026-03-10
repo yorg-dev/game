@@ -9,10 +9,10 @@ import type { App } from './App'
 
 /** Lifecycle state of the connection. */
 export type ConnectionStatus =
-  | 'connected'    // credentials valid, ready to use
+  | 'connected' // credentials valid, ready to use
   | 'disconnected' // intentionally unlinked by the owner
-  | 'expired'      // oauth token has passed its expiry
-  | 'error'        // last health-check or auth attempt failed
+  | 'expired' // oauth token has passed its expiry
+  | 'error' // last health-check or auth attempt failed
 
 /**
  * A workspace's authenticated link to a single App.
@@ -24,8 +24,8 @@ export type ConnectionStatus =
  * credentials required to execute their Skills.
  */
 export interface Connection {
-  id:    string  // "conn_shopify_01"
-  appId: string  // references App.id — "shopify"
+  id: string // "conn_shopify_01"
+  appId: string // references App.id — "shopify"
 
   /**
    * Human-readable label set by the owner.
@@ -73,6 +73,6 @@ export interface Connection {
  * `connection` is undefined when no matching Connection exists yet.
  */
 export interface AppConnectionStatus {
-  app:        App
+  app: App
   connection: Connection | undefined
 }

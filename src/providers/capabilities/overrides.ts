@@ -1,5 +1,5 @@
-import queryString from "query-string";
-import * as fetchUtils from "../fetchUtils";
+import queryString from 'query-string'
+import * as fetchUtils from '../fetchUtils'
 
 const capability = (apiUrl: string, httpClient = fetchUtils.fetchJson) => ({
   /*
@@ -7,38 +7,35 @@ const capability = (apiUrl: string, httpClient = fetchUtils.fetchJson) => ({
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getList: async (resource: string, params: any) => {
-    const { page, perPage } = params.pagination || {};
-    const { field, order } = params.sort || {};
+    const { page, perPage } = params.pagination || {}
+    const { field, order } = params.sort || {}
     const query = {
       ...fetchUtils.flattenObject(params.filter),
       _sort: field,
       _order: order,
-      _start:
-        page != null && perPage != null ? (page - 1) * perPage : undefined,
+      _start: page != null && perPage != null ? (page - 1) * perPage : undefined,
       _end: page != null && perPage != null ? page * perPage : undefined,
       _embed: params?.meta?.embed,
-    };
-    const url = `${apiUrl}/${resource}?${queryString.stringify(query, { arrayFormat: "bracket" })}`; /// Uses arrayFormat here
+    }
+    const url = `${apiUrl}/${resource}?${queryString.stringify(query, { arrayFormat: 'bracket' })}` /// Uses arrayFormat here
 
     const { headers, json } = await httpClient(url, {
       signal: params?.signal,
-    });
+    })
 
-    if (!headers.has("x-total-count")) {
+    if (!headers.has('x-total-count')) {
       throw new Error(
-        "The X-Total-Count header is missing in the HTTP Response. The jsonServer Data Provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?",
-      );
+        'The X-Total-Count header is missing in the HTTP Response. The jsonServer Data Provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?',
+      )
     }
 
-    const totalString = headers.get("x-total-count")!.split("/").pop();
+    const totalString = headers.get('x-total-count')!.split('/').pop()
 
     if (totalString == null) {
-      throw new Error(
-        "The X-Total-Count header is invalid in the HTTP Response.",
-      );
+      throw new Error('The X-Total-Count header is invalid in the HTTP Response.')
     }
 
-    return { data: json, total: parseInt(totalString, 10) };
+    return { data: json, total: parseInt(totalString, 10) }
   },
 
   /*
@@ -47,16 +44,16 @@ const capability = (apiUrl: string, httpClient = fetchUtils.fetchJson) => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMany: (resource: string, params: any) => {
     const query = {
-      [`id_like`]: params.ids.join("|"),
-    };
+      [`id_like`]: params.ids.join('|'),
+    }
 
-    const url = `${apiUrl}/${resource}?${queryString.stringify(query)}`;
+    const url = `${apiUrl}/${resource}?${queryString.stringify(query)}`
 
     return (
       httpClient(url)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then(({ json }: any) => ({ data: json }))
-    );
+    )
   },
 
   /*
@@ -71,8 +68,8 @@ const capability = (apiUrl: string, httpClient = fetchUtils.fetchJson) => ({
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getManyReference: async (resource: string, params: any) => {
-    const { page, perPage } = params.pagination;
-    const { field, order } = params.sort;
+    const { page, perPage } = params.pagination
+    const { field, order } = params.sort
     const query = {
       ...fetchUtils.flattenObject(params.filter),
       [params.target]: params.id,
@@ -81,29 +78,27 @@ const capability = (apiUrl: string, httpClient = fetchUtils.fetchJson) => ({
       _start: (page - 1) * perPage,
       _end: page * perPage,
       _embed: params?.meta?.embed,
-    };
-    const url = `${apiUrl}/${resource}?${queryString.stringify(query, { arrayFormat: "bracket" })}`; /// NOTE: This allows stringify to pass an array in URL
+    }
+    const url = `${apiUrl}/${resource}?${queryString.stringify(query, { arrayFormat: 'bracket' })}` /// NOTE: This allows stringify to pass an array in URL
 
     const { headers, json } = await httpClient(url, {
       signal: params?.signal,
-    });
+    })
 
-    if (!headers.has("x-total-count")) {
+    if (!headers.has('x-total-count')) {
       throw new Error(
-        "The X-Total-Count header is missing in the HTTP Response. The jsonServer Data Provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?",
-      );
+        'The X-Total-Count header is missing in the HTTP Response. The jsonServer Data Provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?',
+      )
     }
 
-    const totalString = headers.get("x-total-count")!.split("/").pop();
+    const totalString = headers.get('x-total-count')!.split('/').pop()
 
     if (totalString == null) {
-      throw new Error(
-        "The X-Total-Count header is invalid in the HTTP Response.",
-      );
+      throw new Error('The X-Total-Count header is invalid in the HTTP Response.')
     }
 
-    return { data: json, total: parseInt(totalString, 10) };
+    return { data: json, total: parseInt(totalString, 10) }
   },
-});
+})
 
-export default capability;
+export default capability

@@ -23,16 +23,16 @@ function buildGroundData() {
   // Frame 12 (row 1, col 1 of grass.png) — clean interior tile with no borders.
   const g = buildGroundGrid(COLS, ROWS, 12)
 
-  fillRect(g, 1, 2, 1, COLS - 3, 1)                 // top border
-  fillRect(g, 2, COLS - 2, ROWS - 3, COLS - 2, 13)  // right border
-  fillRect(g, ROWS - 2, 2, ROWS - 2, COLS - 3, 23)  // bottom border
-  fillRect(g, 2, 1, ROWS - 3, 1, 11)                // left border
+  fillRect(g, 1, 2, 1, COLS - 3, 1) // top border
+  fillRect(g, 2, COLS - 2, ROWS - 3, COLS - 2, 13) // right border
+  fillRect(g, ROWS - 2, 2, ROWS - 2, COLS - 3, 23) // bottom border
+  fillRect(g, 2, 1, ROWS - 3, 1, 11) // left border
 
   // Grass Corners
-  g[1][1] = 0                 // top left
-  g[1][COLS - 2] = 2          // top right
-  g[ROWS - 2][COLS - 2] = 24  // bottom right
-  g[ROWS - 2][1] = 22         // bottom left
+  g[1][1] = 0 // top left
+  g[1][COLS - 2] = 2 // top right
+  g[ROWS - 2][COLS - 2] = 24 // bottom right
+  g[ROWS - 2][1] = 22 // bottom left
 
   return g
 }
@@ -56,22 +56,20 @@ function buildWaterData() {
 // ── Feature layer ─────────────────────────────────────────────────────────────
 
 function buildFeatures() {
-  return Array.from({ length: ROWS }, () =>
-    Array.from({ length: COLS }, () => T.EMPTY),
-  )
+  return Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => T.EMPTY))
 }
 
 export const MEADOW_MAP: MapDefinition = {
-  id:             'meadow',
-  name:           'Meadow',
-  description:    'Open grassland with two ponds and a central plaza.',
-  cols:           COLS,
-  rows:           ROWS,
-  tileSize:       TILE_SIZE,
-  groundData:     buildGroundData(),
-  waterData:      buildWaterData(),
-  features:       buildFeatures() as MapDefinition['features'],
+  id: 'meadow',
+  name: 'Meadow',
+  description: 'Open grassland with two ponds and a central plaza.',
+  cols: COLS,
+  rows: ROWS,
+  tileSize: TILE_SIZE,
+  groundData: buildGroundData(),
+  waterData: buildWaterData(),
+  features: buildFeatures() as MapDefinition['features'],
   collidingTiles: [T.STONE],
-  spawnTile:      { col: Math.floor(COLS / 2), row: Math.floor(ROWS / 2) + 3 },
-  bgColor:        undefined, // '#7dcfbe',
+  spawnTile: { col: Math.floor(COLS / 2), row: Math.floor(ROWS / 2) + 3 },
+  bgColor: undefined, // '#7dcfbe',
 }

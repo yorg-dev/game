@@ -11,6 +11,10 @@ import { LoginModal } from './components/LoginModal'
 import { ProfileButton } from './components/ProfileButton'
 import { ChatPanel } from './components/ChatPanel'
 import { LandSwitcher } from './components/LandSwitcher'
+import { QuestTracker } from './components/QuestTracker'
+import { AgentExecutionPanel } from './components/AgentExecutionPanel'
+import { AchievementsModal } from './components/AchievementsModal'
+import { AchievementToast } from './components/AchievementToast'
 import { EventBus } from './game/EventBus'
 import { authProvider } from './providers'
 import { landProvider, landPlacementProvider } from './providers/landProvider'
@@ -21,10 +25,10 @@ import { SAMPLE_CONNECTIONS } from './mocks/connections'
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false)
-  const [indoor,      setIndoor]      = useState(false)
-  const [showLogin,   setShowLogin]   = useState(false)
-  const [loginTab,    setLoginTab]    = useState<'login' | 'register'>('login')
-  const [canManage,   setCanManage]   = useState(false)
+  const [indoor, setIndoor] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginTab, setLoginTab] = useState<'login' | 'register'>('login')
+  const [canManage, setCanManage] = useState(false)
 
   // 1. Ensure a valid session exists, then 2. resolve the starting land.
   // Sequential so land requests always have a valid token.
@@ -71,12 +75,12 @@ function App() {
       }
       EventBus.emit('session-ready', undefined)
 
-      const urlLandId   = new URLSearchParams(window.location.search).get('landId')
-      const land        = await resolveStartingLand(urlLandId)
-      const placements  = await landPlacementProvider.getPlacements(land.id)
+      const urlLandId = new URLSearchParams(window.location.search).get('landId')
+      const land = await resolveStartingLand(urlLandId)
+      const placements = await landPlacementProvider.getPlacements(land.id)
       // Objects are embedded in the land response — no separate fetch needed.
       // Fall back to mock objects if the land came from a list endpoint (no objects field).
-      const landObjects = land.objects ?? SAMPLE_LAND_OBJECTS.filter(o => o.landId === land.id)
+      const landObjects = land.objects ?? SAMPLE_LAND_OBJECTS.filter((o) => o.landId === land.id)
       const connections = [...SAMPLE_CONNECTIONS]
 
       const { canInteract, canManage } = viewerPermissions(land)
@@ -91,19 +95,44 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const unsubStarted = EventBus.on('game-started',      () => setGameStarted(true))
-    const unsubEnter   = EventBus.on('enter-house',       () => setIndoor(true))
-    const unsubExit    = EventBus.on('exit-house',        () => setIndoor(false))
-    const unsubLogin   = EventBus.on('show-login',        (p) => { setLoginTab(p?.tab ?? 'login'); setShowLogin(true) })
+    const unsubStarted = EventBus.on('game-started', () => setGameStarted(true))
+    const unsubLogout = EventBus.on('logout', () => setGameStarted(false))
+    const unsubEnter = EventBus.on('enter-house', () => setIndoor(true))
+    const unsubExit = EventBus.on('exit-house', () => setIndoor(false))
+    const unsubLogin = EventBus.on('show-login', (p) => {
+      setLoginTab(p?.tab ?? 'login')
+      setShowLogin(true)
+    })
     const unsubLandRdy = EventBus.on('land-ready', ({ land }) => {
       const { canManage } = viewerPermissions(land)
       setCanManage(canManage)
     })
-    const unsubConfirm = EventBus.on('login-confirmed', () => {
-      const { canManage } = viewerPermissions(getActiveLand().land)
-      setCanManage(canManage)
+    const unsubConfirm = EventBus.on('login-confirmed', async () => {
+      // Switch to the user's first real land now that they're authenticated.
+      const land = await landProvider.getMyFirstLand()
+      if (land && land.id !== getActiveLand().land.id) {
+        const placements = await landPlacementProvider.getPlacements(land.id)
+        const landObjects = land.objects ?? SAMPLE_LAND_OBJECTS.filter((o) => o.landId === land.id)
+        const connections = [...SAMPLE_CONNECTIONS]
+        const { canInteract, canManage } = viewerPermissions(land)
+        const state = { land, placements, landObjects, connections, canInteract, canManage }
+        setActiveLand(state)
+        setCanManage(canManage)
+        EventBus.emit('land-ready', state)
+      } else {
+        const { canManage } = viewerPermissions(getActiveLand().land)
+        setCanManage(canManage)
+      }
     })
-    return () => { unsubStarted(); unsubEnter(); unsubExit(); unsubLogin(); unsubLandRdy(); unsubConfirm() }
+    return () => {
+      unsubStarted()
+      unsubLogout()
+      unsubEnter()
+      unsubExit()
+      unsubLogin()
+      unsubLandRdy()
+      unsubConfirm()
+    }
   }, [])
 
   return (
@@ -129,6 +158,10 @@ function App() {
               <ConnectionPopover />
               <ControlHUD />
               <NotificationsModal />
+              <QuestTracker />
+              <AgentExecutionPanel />
+              <AchievementsModal />
+              <AchievementToast />
             </>
           )}
         </>

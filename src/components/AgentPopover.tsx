@@ -3,52 +3,76 @@ import { EventBus } from '../game/EventBus'
 import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
 import { APPS } from '@/mocks/apps'
 import type { AgentTemplate } from '@/models/AgentTemplate'
+import { agentLevelProvider } from '@/providers/agentLevelProvider'
+import type { AgentLevel } from '@/models/AgentLevel'
+import { XP_PER_LEVEL, MAX_LEVEL } from '@/models/AgentLevel'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface SelectedAgent {
-  id:       number
-  name:     string
+  id: number
+  name: string
   template: AgentTemplate
 }
 
 type Tab = 'overview' | 'chat'
 
 interface ChatMessage {
-  id:       string
-  from:     'user' | 'agent'
-  text:     string
-  ts:       number
+  id: string
+  from: 'user' | 'agent'
+  text: string
+  ts: number
   pending?: boolean
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function AgentPopover() {
-  const [agent, setAgent]     = useState<SelectedAgent | null>(null)
-  const [tab, setTab]         = useState<Tab>('overview')
+  const [agent, setAgent] = useState<SelectedAgent | null>(null)
+  const [tab, setTab] = useState<Tab>('overview')
   const [history, setHistory] = useState<Record<number, ChatMessage[]>>({})
-  const [draft, setDraft]     = useState('')
-  const bottomRef             = useRef<HTMLDivElement>(null)
+  const [draft, setDraft] = useState('')
+  const [agentLevel, setAgentLevel] = useState<AgentLevel | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const unsub = EventBus.on('agent-clicked', ({ id, name, templateId, tab }) => {
-      const template = AGENT_TEMPLATES.find(t => t.id === templateId)
+      const template = AGENT_TEMPLATES.find((t) => t.id === templateId)
       if (!template) return
       setAgent({ id, name, template })
       setTab(tab ?? 'overview')
+      setAgentLevel(null)
+      agentLevelProvider.getLevel(template.slug).then((lvl) => {
+        if (lvl) setAgentLevel(lvl)
+      })
     })
     return unsub
   }, [])
 
+  // Live-update the XP bar when this agent gains XP while the popover is open
+  useEffect(() => {
+    const unsub = EventBus.on('agent-xp-gained', ({ agentId, xpGained, level, xp, xpToNext }) => {
+      if (!agent || agentId !== agent.id) return
+      setAgentLevel((prev) => ({
+        level,
+        xp,
+        xp_to_next: xpToNext,
+        command_count: (prev?.command_count ?? 0) + 1,
+        last_used_at: new Date().toISOString(),
+        xp_gained: xpGained,
+      }))
+    })
+    return unsub
+  }, [agent])
+
   useEffect(() => {
     const unsub = EventBus.on('agent-response', ({ messageId, agentId, text }) => {
-      setHistory(prev => {
+      setHistory((prev) => {
         const msgs = prev[agentId] ?? []
-        const replaced = msgs.map(m =>
+        const replaced = msgs.map((m) =>
           m.id === `${messageId}-pending`
             ? { ...m, id: messageId, text, pending: false, from: 'agent' as const }
-            : m
+            : m,
         )
         return { ...prev, [agentId]: replaced }
       })
@@ -60,7 +84,10 @@ export function AgentPopover() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [history, agent?.id])
 
-  function handleClose() { setAgent(null); setDraft('') }
+  function handleClose() {
+    setAgent(null)
+    setDraft('')
+  }
 
   function handleRemove() {
     if (!agent) return
@@ -72,12 +99,12 @@ export function AgentPopover() {
     e.preventDefault()
     if (!agent || !draft.trim()) return
     const messageId = `msg_${Date.now()}`
-    setHistory(prev => ({
+    setHistory((prev) => ({
       ...prev,
       [agent.id]: [
         ...(prev[agent.id] ?? []),
-        { id: messageId,              from: 'user',  text: draft.trim(), ts: Date.now() },
-        { id: `${messageId}-pending`, from: 'agent', text: '…',         ts: Date.now(), pending: true },
+        { id: messageId, from: 'user', text: draft.trim(), ts: Date.now() },
+        { id: `${messageId}-pending`, from: 'agent', text: '…', ts: Date.now(), pending: true },
       ],
     }))
     EventBus.emit('agent-message', { messageId, agentId: agent.id, text: draft.trim() })
@@ -90,11 +117,15 @@ export function AgentPopover() {
   const messages = history[agent.id] ?? []
 
   return (
-    <div data-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={handleClose}>
+    <div
+      data-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={handleClose}
+    >
       <div
         className={`relative flex flex-col w-full max-w-md bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden ${tab === 'chat' ? 'h-[520px]' : 'h-auto'}`}
-        onClick={e => e.stopPropagation()}
-        onKeyDown={e => e.nativeEvent.stopImmediatePropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
       >
         {/* Close button */}
         <button
@@ -103,7 +134,12 @@ export function AgentPopover() {
           className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square"/>
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
 
@@ -125,12 +161,36 @@ export function AgentPopover() {
             <p className="text-xs text-[#7a5230] mt-0.5 leading-snug line-clamp-2">
               {template.description}
             </p>
+            {/* XP bar */}
+            {agentLevel && (
+              <div className="mt-1.5 flex items-center gap-2">
+                <span className="text-[10px] font-bold text-[#7a5230] shrink-0">
+                  {agentLevel.level >= MAX_LEVEL ? 'MAX' : `Lv.${agentLevel.level}`}
+                </span>
+                <div className="flex-1 h-2 rounded-full bg-[#b8955a]/40 overflow-hidden border border-[#7a5230]/30">
+                  <div
+                    className="h-full rounded-full bg-[#c8974c] transition-all duration-500"
+                    style={{
+                      width:
+                        agentLevel.level >= MAX_LEVEL
+                          ? '100%'
+                          : `${((agentLevel.xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100}%`,
+                    }}
+                  />
+                </div>
+                {agentLevel.level < MAX_LEVEL && (
+                  <span className="text-[10px] text-[#9a6b28] shrink-0 tabular-nums">
+                    {agentLevel.xp_to_next} XP
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* ── Tab bar ────────────────────────────────────────────────── */}
         <div className="flex border-b-4 border-[#7a5230] px-5 shrink-0 bg-[#dcc898]">
-          {(['overview', 'chat'] as Tab[]).map(t => (
+          {(['overview', 'chat'] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -148,7 +208,6 @@ export function AgentPopover() {
         {/* ── Overview ───────────────────────────────────────────────── */}
         {tab === 'overview' && (
           <div className="flex flex-col gap-4 px-5 py-4 overflow-y-auto">
-
             {/* Badges */}
             <div className="flex items-center gap-2">
               <span className="bg-[#c8b07a] border border-[#9a6b28] text-[#3d2010] text-xs font-bold px-2.5 py-1 rounded-md capitalize">
@@ -161,9 +220,11 @@ export function AgentPopover() {
 
             {/* Skills */}
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">Skills</p>
+              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+                Skills
+              </p>
               <div className="flex flex-col gap-1.5">
-                {template.skills.map(skill => (
+                {template.skills.map((skill) => (
                   <div
                     key={skill.skillId}
                     className="flex items-center gap-3 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-2"
@@ -178,7 +239,9 @@ export function AgentPopover() {
                       {skill.skillId}
                     </span>
                     {!skill.isRequired && (
-                      <span className="text-[10px] text-[#9a6b28] shrink-0 font-bold">optional</span>
+                      <span className="text-[10px] text-[#9a6b28] shrink-0 font-bold">
+                        optional
+                      </span>
                     )}
                   </div>
                 ))}
@@ -187,16 +250,21 @@ export function AgentPopover() {
 
             {/* Required apps */}
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">Required Apps</p>
+              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+                Required Apps
+              </p>
               <div className="flex flex-wrap gap-2">
-                {template.requiredIntegrations.map(appId => {
-                  const app = APPS.find(a => a.id === appId)
+                {template.requiredIntegrations.map((appId) => {
+                  const app = APPS.find((a) => a.id === appId)
                   return (
                     <div
                       key={appId}
                       className="flex items-center gap-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-1.5"
                     >
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: app?.color ?? '#9a6b28' }} />
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ background: app?.color ?? '#9a6b28' }}
+                      />
                       <span className="text-sm font-bold text-[#3d2010]">{app?.name ?? appId}</span>
                     </div>
                   )
@@ -207,7 +275,10 @@ export function AgentPopover() {
             {/* Actions */}
             <div className="flex gap-2 pt-1 border-t-2 border-[#b8955a]">
               <button
-                onClick={() => { EventBus.emit('select-agent', { id: agent.id }); handleClose() }}
+                onClick={() => {
+                  EventBus.emit('select-agent', { id: agent.id })
+                  handleClose()
+                }}
                 className="flex-1 px-3 py-1.5 rounded-lg text-sm font-bold text-[#3d2010] border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] hover:brightness-110 transition-[filter]"
               >
                 Take Control
@@ -225,7 +296,6 @@ export function AgentPopover() {
         {/* ── Chat ───────────────────────────────────────────────────── */}
         {tab === 'chat' && (
           <div className="flex flex-col flex-1 min-h-0">
-
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-5">
               {messages.length === 0 ? (
@@ -241,7 +311,7 @@ export function AgentPopover() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3 py-4">
-                  {messages.map(msg => (
+                  {messages.map((msg) => (
                     <div
                       key={msg.id}
                       className={`flex gap-2.5 ${msg.from === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
@@ -276,7 +346,7 @@ export function AgentPopover() {
                 <input
                   autoFocus
                   value={draft}
-                  onChange={e => setDraft(e.target.value)}
+                  onChange={(e) => setDraft(e.target.value)}
                   placeholder={`Message ${agent.name}…`}
                   className="flex-1 px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810]"
                 />
@@ -291,7 +361,6 @@ export function AgentPopover() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   )

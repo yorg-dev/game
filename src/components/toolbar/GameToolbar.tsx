@@ -1,9 +1,9 @@
-import { AddAgentSlot }      from './AddAgentSlot'
+import { AddAgentSlot } from './AddAgentSlot'
 import { AddConnectionSlot } from './AddConnectionSlot'
 
 interface GameToolbarProps {
-  onAddAgent:       () => void
-  onAddConnection:  () => void
+  onAddAgent: () => void
+  onAddConnection: () => void
 }
 
 export function GameToolbar({ onAddAgent, onAddConnection }: GameToolbarProps) {
@@ -14,7 +14,8 @@ export function GameToolbar({ onAddAgent, onAddConnection }: GameToolbarProps) {
         className="rounded-lg p-[5px]"
         style={{
           background: '#7c4a1e',
-          boxShadow: 'inset 0 2px 0 0 #a0622a, inset 0 -3px 0 0 #4e2a0e, 0 4px 12px rgba(0,0,0,0.6)',
+          boxShadow:
+            'inset 0 2px 0 0 #a0622a, inset 0 -3px 0 0 #4e2a0e, 0 4px 12px rgba(0,0,0,0.6)',
           border: '3px solid #3e1e08',
         }}
       >
@@ -26,7 +27,7 @@ export function GameToolbar({ onAddAgent, onAddConnection }: GameToolbarProps) {
             boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)',
           }}
         >
-          <AddAgentSlot      onClick={onAddAgent}      />
+          <AddAgentSlot onClick={onAddAgent} />
           <AddConnectionSlot onClick={onAddConnection} />
         </div>
       </div>

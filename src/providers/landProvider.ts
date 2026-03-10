@@ -1,12 +1,12 @@
 import httpProvider from './httpProvider'
-import type { World }          from '@/models/World'
-import type { Land }           from '@/models/Land'
+import type { World } from '@/models/World'
+import type { Land } from '@/models/Land'
 import type { LandPlacement, PlacementEntityType } from '@/models/LandPlacement'
-import type { LandObject }     from '@/models/LandObject'
+import type { LandObject } from '@/models/LandObject'
 import { SAMPLE_WORLDS, DEFAULT_WORLD } from '@/mocks/worlds'
-import { SAMPLE_LANDS,  DEFAULT_LAND  } from '@/mocks/lands'
-import { SAMPLE_LAND_PLACEMENTS        } from '@/mocks/landPlacements'
-import { SAMPLE_LAND_OBJECTS           } from '@/mocks/landObjects'
+import { SAMPLE_LANDS, DEFAULT_LAND } from '@/mocks/lands'
+import { SAMPLE_LAND_PLACEMENTS } from '@/mocks/landPlacements'
+import { SAMPLE_LAND_OBJECTS } from '@/mocks/landObjects'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,7 +40,7 @@ async function getList<T>(path: string): Promise<T[]> {
 async function post<T>(path: string, body: unknown): Promise<T> {
   const { json } = await httpProvider(url(path), {
     method: 'POST',
-    body:   JSON.stringify(body),
+    body: JSON.stringify(body),
   })
   return camelize(json) as T
 }
@@ -48,7 +48,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 async function patch<T>(path: string, body: unknown): Promise<T> {
   const { json } = await httpProvider(url(path), {
     method: 'PATCH',
-    body:   JSON.stringify(body),
+    body: JSON.stringify(body),
   })
   return camelize(json) as T
 }
@@ -85,7 +85,7 @@ export const worldProvider = {
       const { json } = await httpProvider(url(`worlds/${id}`))
       return camelize(json) as World
     } catch {
-      return SAMPLE_WORLDS.find(w => w.id === id) ?? DEFAULT_WORLD
+      return SAMPLE_WORLDS.find((w) => w.id === id) ?? DEFAULT_WORLD
     }
   },
 }
@@ -100,7 +100,7 @@ export const landProvider = {
    * Falls back to SAMPLE_LANDS filtered by worldId.
    */
   async getLands(worldId: string): Promise<Land[]> {
-    if (!api) return SAMPLE_LANDS.filter(l => l.worldId === worldId)
+    if (!api) return SAMPLE_LANDS.filter((l) => l.worldId === worldId)
     try {
       return await getList<Land>(`worlds/${worldId}/lands`)
     } catch {
@@ -113,7 +113,7 @@ export const landProvider = {
    * Falls back to DEFAULT_LAND when the API is unavailable.
    */
   async getLand(id: string): Promise<Land> {
-    if (!api) return SAMPLE_LANDS.find(l => l.id === id) ?? DEFAULT_LAND
+    if (!api) return SAMPLE_LANDS.find((l) => l.id === id) ?? DEFAULT_LAND
     try {
       const { json } = await httpProvider(url(`lands/${id}`))
       return camelize(json) as Land
@@ -123,7 +123,7 @@ export const landProvider = {
         console.warn(`[landProvider] GET /lands/${id} → ${err.status} (no access)`)
         return DEFAULT_LAND
       }
-      return SAMPLE_LANDS.find(l => l.id === id) ?? DEFAULT_LAND
+      return SAMPLE_LANDS.find((l) => l.id === id) ?? DEFAULT_LAND
     }
   },
 
@@ -164,7 +164,9 @@ export const landProvider = {
       const worlds = await getList<{ id: string }>(`organizations/${orgs[0].id}/worlds`)
       if (!worlds.length) return null
       const lands = await getList<Land>(`worlds/${worlds[0].id}/lands`)
-      return lands[0] ?? null
+      if (!lands[0]) return null
+      // Fetch full detail so the viewer permissions object is included.
+      return await landProvider.getLand(lands[0].id)
     } catch {
       return null
     }
@@ -190,7 +192,7 @@ export const landPlacementProvider = {
    */
   async getPlacements(landId: string, entityType?: PlacementEntityType): Promise<LandPlacement[]> {
     const mockFallback = SAMPLE_LAND_PLACEMENTS.filter(
-      p => p.landId === landId && (entityType == null || p.entityType === entityType),
+      (p) => p.landId === landId && (entityType == null || p.entityType === entityType),
     )
 
     if (!api) return mockFallback
@@ -213,7 +215,7 @@ export const landPlacementProvider = {
 
   async movePlacement(
     landId: string,
-    id:     string,
+    id: string,
     worldX: number,
     worldY: number,
   ): Promise<LandPlacement> {
@@ -241,7 +243,7 @@ export const landObjectProvider = {
    * GET /v1/lands/:id/objects.
    */
   async getObjects(landId: string): Promise<LandObject[]> {
-    const mockFallback = SAMPLE_LAND_OBJECTS.filter(o => o.landId === landId)
+    const mockFallback = SAMPLE_LAND_OBJECTS.filter((o) => o.landId === landId)
 
     if (!api) return mockFallback
 

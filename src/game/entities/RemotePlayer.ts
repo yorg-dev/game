@@ -13,36 +13,34 @@ const REMOTE_TINT = 0x88bbff
  */
 export class RemotePlayer {
   readonly sprite: Phaser.GameObjects.Sprite
-  readonly label:  Phaser.GameObjects.Text
+  readonly label: Phaser.GameObjects.Text
 
   private targetX: number
   private targetY: number
   private _facing: Direction
   private _moving: boolean
 
-  constructor(
-    scene:   Phaser.Scene,
-    x:       number,
-    y:       number,
-    name:    string,
-    facing:  Direction,
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, name: string, facing: Direction) {
     this.targetX = x
     this.targetY = y
     this._facing = facing
     this._moving = false
 
-    this.sprite = scene.add.sprite(x, y, 'char-user', IDLE_FRAMES[facing])
+    this.sprite = scene.add
+      .sprite(x, y, 'char-user', IDLE_FRAMES[facing])
       .setDepth(4)
       .setTint(REMOTE_TINT)
 
-    this.label = scene.add.text(x, y - 26, name, {
-      fontSize:        '5px',
-      color:           '#e0f0ff',
-      stroke:          '#000000',
-      strokeThickness: 2,
-      resolution:      3,
-    }).setOrigin(0.5, 1).setDepth(10)
+    this.label = scene.add
+      .text(x, y - 26, name, {
+        fontSize: '5px',
+        color: '#e0f0ff',
+        stroke: '#000000',
+        strokeThickness: 2,
+        resolution: 3,
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(10)
   }
 
   /** Called when a player-moved message arrives. */

@@ -16,7 +16,9 @@ export class ChestFactory {
   private _sprite: Phaser.Physics.Arcade.Sprite | null = null
 
   /** The static physics body — available after spawn(), used for colliders. */
-  get sprite(): Phaser.Physics.Arcade.Sprite | null { return this._sprite }
+  get sprite(): Phaser.Physics.Arcade.Sprite | null {
+    return this._sprite
+  }
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -31,10 +33,10 @@ export class ChestFactory {
   // Called from GameScene.create() — register animation before spawning.
   createAnimations(): void {
     this.scene.anims.create({
-      key:       'chest-opening',
-      frames:    this.scene.anims.generateFrameNumbers('chest', { start: 0, end: 2 }),
+      key: 'chest-opening',
+      frames: this.scene.anims.generateFrameNumbers('chest', { start: 0, end: 2 }),
       frameRate: 6,
-      repeat:    0,
+      repeat: 0,
     })
   }
 
@@ -55,17 +57,25 @@ export class ChestFactory {
     sprite.setInteractive({ useHandCursor: true })
     this._sprite = sprite
 
-    this.scene.add.text(x, y + 28, 'Chest', {
-      fontSize:        '6px',
-      color:           '#ffffff',
-      backgroundColor: '#00000088',
-      padding:         { x: 3, y: 1 },
-    }).setOrigin(0.5, 0).setDepth(2).setResolution(3)
+    this.scene.add
+      .text(x, y + 28, 'Chest', {
+        fontSize: '6px',
+        color: '#ffffff',
+        backgroundColor: '#00000088',
+        padding: { x: 3, y: 1 },
+      })
+      .setOrigin(0.5, 0)
+      .setDepth(2)
+      .setResolution(3)
 
     let isOpen = false
 
-    sprite.on('pointerover', () => { if (!isOpen) sprite.setTint(0xddddff) })
-    sprite.on('pointerout',  () => { if (!isOpen) sprite.clearTint() })
+    sprite.on('pointerover', () => {
+      if (!isOpen) sprite.setTint(0xddddff)
+    })
+    sprite.on('pointerout', () => {
+      if (!isOpen) sprite.clearTint()
+    })
     sprite.on('pointerup', () => {
       if (isOpen) return
       isOpen = true

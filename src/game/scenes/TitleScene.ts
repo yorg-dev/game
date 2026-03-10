@@ -7,16 +7,16 @@ import logoUrl from '../../assets/objects/logo.jpeg'
 // ---------------------------------------------------------------------------
 
 const C = {
-  bg:           0x080818,
-  star:         0xffffff,
-  accent:       0xc8974c,   // wood/tan — matches toolbar palette
-  menuNormal:   '#8aa8c0',
-  menuHover:    '#c0d8ec',
-  menuSelected: '#f0e0c0',  // warm cream
-  tagline:      '#a0b8c8',
-  hint:         '#6a8a9a',
-  divider:      0x1a2535,
-  cursorGlow:   0xc8974c,
+  bg: 0x080818,
+  star: 0xffffff,
+  accent: 0xc8974c, // wood/tan — matches toolbar palette
+  menuNormal: '#8aa8c0',
+  menuHover: '#c0d8ec',
+  menuSelected: '#f0e0c0', // warm cream
+  tagline: '#a0b8c8',
+  hint: '#6a8a9a',
+  divider: 0x1a2535,
+  cursorGlow: 0xc8974c,
 }
 
 // ---------------------------------------------------------------------------
@@ -24,9 +24,9 @@ const C = {
 // ---------------------------------------------------------------------------
 
 interface MenuItem {
-  label:    string
+  label: string
   subLabel: string
-  text:     Phaser.GameObjects.Text | null
+  text: Phaser.GameObjects.Text | null
   onSelect: () => void
 }
 
@@ -37,13 +37,13 @@ interface MenuItem {
 export class TitleScene extends Phaser.Scene {
   static readonly KEY = 'TitleScene'
 
-  private selectedIndex   = 0
-  private menuItems:        MenuItem[] = []
-  private cursor!:          Phaser.GameObjects.Text
+  private selectedIndex = 0
+  private menuItems: MenuItem[] = []
+  private cursor!: Phaser.GameObjects.Text
   private isTransitioning = false
 
-  private upKey!:    Phaser.Input.Keyboard.Key
-  private downKey!:  Phaser.Input.Keyboard.Key
+  private upKey!: Phaser.Input.Keyboard.Key
+  private downKey!: Phaser.Input.Keyboard.Key
   private enterKey!: Phaser.Input.Keyboard.Key
   private spaceKey!: Phaser.Input.Keyboard.Key
 
@@ -62,7 +62,7 @@ export class TitleScene extends Phaser.Scene {
   create(): void {
     this.cameras.main.setBackgroundColor(C.bg)
     this.isTransitioning = false
-    this.menuItems       = []
+    this.menuItems = []
 
     // Skip the menu entirely for returning users
     if (localStorage.getItem('token')) {
@@ -119,22 +119,22 @@ export class TitleScene extends Phaser.Scene {
     const { width: w, height: h } = this.scale
 
     for (let i = 0; i < 90; i++) {
-      const x     = Math.random() * w
-      const y     = Math.random() * h
-      const size  = Math.random() < 0.65 ? 1 : 2
+      const x = Math.random() * w
+      const y = Math.random() * h
+      const size = Math.random() < 0.65 ? 1 : 2
       const alpha = 0.15 + Math.random() * 0.55
 
       const star = this.add.rectangle(x, y, size, size, C.star, 1).setAlpha(alpha)
 
       // Each star twinkles independently
       this.tweens.add({
-        targets:  star,
-        alpha:    { from: alpha * 0.25, to: Math.min(1, alpha + 0.3) },
+        targets: star,
+        alpha: { from: alpha * 0.25, to: Math.min(1, alpha + 0.3) },
         duration: 1200 + Math.random() * 2800,
-        repeat:   -1,
-        yoyo:     true,
-        delay:    Math.random() * 3000,
-        ease:     'Sine.easeInOut',
+        repeat: -1,
+        yoyo: true,
+        delay: Math.random() * 3000,
+        ease: 'Sine.easeInOut',
       })
     }
   }
@@ -144,7 +144,7 @@ export class TitleScene extends Phaser.Scene {
   // ---------------------------------------------------------------------------
 
   private createLogo(): void {
-    const cx = this.scale.width  / 2
+    const cx = this.scale.width / 2
     const cy = this.scale.height / 2
 
     // Logo image
@@ -164,12 +164,15 @@ export class TitleScene extends Phaser.Scene {
     */
 
     // Tagline
-    const tag = this.add.text(cx, cy + 44, 'Build your world. Command your agents.', {
-      fontFamily: '"Courier New", monospace',
-      fontSize:   '13px',
-      color:      C.tagline,
-      letterSpacing: 1,
-    }).setOrigin(0.5).setAlpha(0)
+    const tag = this.add
+      .text(cx, cy + 44, 'Build your world. Command your agents.', {
+        fontFamily: '"Courier New", monospace',
+        fontSize: '13px',
+        color: C.tagline,
+        letterSpacing: 1,
+      })
+      .setOrigin(0.5)
+      .setAlpha(0)
 
     this.tweens.add({ targets: tag, alpha: 1, duration: 500, delay: 450, ease: 'Power2' })
 
@@ -186,45 +189,56 @@ export class TitleScene extends Phaser.Scene {
   // ---------------------------------------------------------------------------
 
   private createMenu(): void {
-    const cx = this.scale.width  / 2
+    const cx = this.scale.width / 2
     const cy = this.scale.height / 2
 
     const defs: Array<Pick<MenuItem, 'label' | 'subLabel' | 'onSelect'>> = [
       {
-        label:    'NEW GAME',
+        label: 'NEW GAME',
         subLabel: 'Start a fresh world',
         onSelect: () => this.startGame(),
       },
       {
-        label:    'LOAD WORLD',
+        label: 'LOAD WORLD',
         subLabel: 'Continue from a save',
         onSelect: () => this.requestLogin(),
       },
     ]
 
     // Cursor glyph — repositioned by refreshSelection()
-    this.cursor = this.add.text(0, 0, '▶', {
-      fontFamily: '"Courier New", monospace',
-      fontSize:   '14px',
-      color:      '#c8974c',
-    }).setOrigin(1, 0.5).setDepth(10).setAlpha(0)
+    this.cursor = this.add
+      .text(0, 0, '▶', {
+        fontFamily: '"Courier New", monospace',
+        fontSize: '14px',
+        color: '#c8974c',
+      })
+      .setOrigin(1, 0.5)
+      .setDepth(10)
+      .setAlpha(0)
 
     defs.forEach((def, i) => {
       const y = cy + 96 + i * 44
 
-      const txt = this.add.text(cx + 14, y, def.label, {
-        fontFamily: '"Courier New", monospace',
-        fontSize:   '16px',
-        color:      C.menuNormal,
-        letterSpacing: 3,
-      }).setOrigin(0, 0.5).setAlpha(0).setInteractive({ useHandCursor: true })
+      const txt = this.add
+        .text(cx + 14, y, def.label, {
+          fontFamily: '"Courier New", monospace',
+          fontSize: '16px',
+          color: C.menuNormal,
+          letterSpacing: 3,
+        })
+        .setOrigin(0, 0.5)
+        .setAlpha(0)
+        .setInteractive({ useHandCursor: true })
 
-      const sub = this.add.text(cx + 14, y + 14, def.subLabel, {
-        fontFamily: '"Courier New", monospace',
-        fontSize:   '9px',
-        color:      C.hint,
-        letterSpacing: 1,
-      }).setOrigin(0, 0.5).setAlpha(0)
+      const sub = this.add
+        .text(cx + 14, y + 14, def.subLabel, {
+          fontFamily: '"Courier New", monospace',
+          fontSize: '9px',
+          color: C.hint,
+          letterSpacing: 1,
+        })
+        .setOrigin(0, 0.5)
+        .setAlpha(0)
 
       txt.on('pointerover', () => {
         if (!this.isTransitioning && this.selectedIndex !== i) {
@@ -236,7 +250,13 @@ export class TitleScene extends Phaser.Scene {
         if (!this.isTransitioning) this.activateSelected()
       })
 
-      this.tweens.add({ targets: [txt, sub], alpha: 1, duration: 400, delay: 650 + i * 110, ease: 'Power2' })
+      this.tweens.add({
+        targets: [txt, sub],
+        alpha: 1,
+        duration: 400,
+        delay: 650 + i * 110,
+        ease: 'Power2',
+      })
 
       this.menuItems.push({ ...def, text: txt })
       void sub
@@ -262,12 +282,12 @@ export class TitleScene extends Phaser.Scene {
       // Pulse the cursor
       this.tweens.killTweensOf(this.cursor)
       this.tweens.add({
-        targets:  this.cursor,
-        alpha:    { from: 1, to: 0.3 },
+        targets: this.cursor,
+        alpha: { from: 1, to: 0.3 },
         duration: 540,
-        repeat:   -1,
-        yoyo:     true,
-        ease:     'Sine.easeInOut',
+        repeat: -1,
+        yoyo: true,
+        ease: 'Sine.easeInOut',
       })
     }
   }
@@ -280,11 +300,11 @@ export class TitleScene extends Phaser.Scene {
     if (!item?.text) return
 
     this.tweens.add({
-      targets:  item.text,
-      alpha:    { from: 1, to: 0.2 },
+      targets: item.text,
+      alpha: { from: 1, to: 0.2 },
       duration: 80,
-      repeat:   3,
-      yoyo:     true,
+      repeat: 3,
+      yoyo: true,
       onComplete: () => item.onSelect(),
     })
   }
@@ -294,39 +314,43 @@ export class TitleScene extends Phaser.Scene {
   // ---------------------------------------------------------------------------
 
   private createHint(): void {
-    const cx = this.scale.width  / 2
+    const cx = this.scale.width / 2
     const cy = this.scale.height / 2
 
-    this.add.text(cx, cy + 210, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
-      fontFamily: '"Courier New", monospace',
-      fontSize:   '8px',
-      color:      C.hint,
-      letterSpacing: 2,
-    }).setOrigin(0.5).setAlpha(0)
+    this.add
+      .text(cx, cy + 210, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
+        fontFamily: '"Courier New", monospace',
+        fontSize: '8px',
+        color: C.hint,
+        letterSpacing: 2,
+      })
+      .setOrigin(0.5)
+      .setAlpha(0)
       // fade in last
       .setAlpha(0)
 
     // Use a tween since we set alpha 0 twice above — create a local ref
-    const hint = this.add.text(cx, cy + 210, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
-      fontFamily: '"Courier New", monospace',
-      fontSize:   '8px',
-      color:      C.hint,
-      letterSpacing: 2,
-    }).setOrigin(0.5).setAlpha(0)
+    const hint = this.add
+      .text(cx, cy + 210, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
+        fontFamily: '"Courier New", monospace',
+        fontSize: '8px',
+        color: C.hint,
+        letterSpacing: 2,
+      })
+      .setOrigin(0.5)
+      .setAlpha(0)
 
     this.tweens.add({ targets: hint, alpha: 1, duration: 400, delay: 1000 })
 
     // Version tag bottom-right
-    const vTag = this.add.text(
-      this.scale.width  - 12,
-      this.scale.height - 10,
-      'v0.1.0',
-      {
+    const vTag = this.add
+      .text(this.scale.width - 12, this.scale.height - 10, 'v0.1.0', {
         fontFamily: '"Courier New", monospace',
-        fontSize:   '8px',
-        color:      C.hint,
-      },
-    ).setOrigin(1, 1).setAlpha(0)
+        fontSize: '8px',
+        color: C.hint,
+      })
+      .setOrigin(1, 1)
+      .setAlpha(0)
 
     this.tweens.add({ targets: vTag, alpha: 1, duration: 400, delay: 1200 })
   }
@@ -336,8 +360,8 @@ export class TitleScene extends Phaser.Scene {
   // ---------------------------------------------------------------------------
 
   private setupInput(): void {
-    this.upKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
-    this.downKey  = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
+    this.upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
+    this.downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
     this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
   }

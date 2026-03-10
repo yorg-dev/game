@@ -14,6 +14,6 @@
  * access to its Worlds and Lands.
  */
 export interface Organization {
-  id:   string   // "org_acme_01"
-  name: string   // "Acme Corp"
+  id: string // "org_acme_01"
+  name: string // "Acme Corp"
 }

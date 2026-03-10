@@ -11,14 +11,14 @@ import type { TileGrid } from './tiles'
  */
 export interface MapDefinition {
   /** Unique key used in the registry. */
-  id:          string
+  id: string
   /** Display name shown in any map-picker UI. */
-  name:        string
+  name: string
   description: string
 
   /** Map dimensions in tiles. */
-  cols:     number
-  rows:     number
+  cols: number
+  rows: number
   tileSize: number
 
   groundData: number[][]

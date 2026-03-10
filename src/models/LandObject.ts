@@ -14,11 +14,11 @@
  * Others carry type-specific config (chest has items, portal has a destination).
  */
 export type LandObjectType =
-  | 'home'           // the Home building — player identity anchor
+  | 'home' // the Home building — player identity anchor
   | 'bulletin_board' // readable announcements / quests board
-  | 'chest'          // interactive storage / loot
-  | 'spawn_point'    // where players enter the land
-  | 'portal'         // teleporter to another land
+  | 'chest' // interactive storage / loot
+  | 'spawn_point' // where players enter the land
+  | 'portal' // teleporter to another land
 
 /**
  * Admin-defined interior definition for a map object.
@@ -26,14 +26,14 @@ export type LandObjectType =
  * Use layout.data to render the interior when a player enters the object.
  */
 export interface LandLayout {
-  id:   string
+  id: string
   name: string
   data: Record<string, unknown>
 }
 
 export interface LandObject {
-  id:         string
-  landId:     string
+  id: string
+  landId: string
   objectType: LandObjectType
 
   /** World-space pixel coordinates. */

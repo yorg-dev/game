@@ -1,15 +1,27 @@
 import type { Quest } from '@/models/Quest'
 
 export const TUTORIAL_QUEST: Quest = {
-  id:          'tutorial',
-  title:       'Getting Started',
-  description: 'Learn the basics of managing your world.',
-  status:      'active',
+  id: 'tutorial',
+  title: 'Welcome to Yorg',
+  description: 'Learn the basics of your AI world.',
+  status: 'active',
   steps: [
-    { id: 'move',    description: 'Move around using WASD',               isComplete: false },
-    { id: 'connect', description: 'Add a new connection from the menu',    isComplete: false },
-    { id: 'agent',   description: 'Spawn an agent and give it a command',  isComplete: false },
+    { id: 'move', description: 'Walk around with WASD', isComplete: false },
+    { id: 'spawn', description: 'Spawn your first agent', isComplete: false },
+    { id: 'command', description: 'Give all agents a command', isComplete: false },
   ],
 }
 
-export const SAMPLE_QUESTS: Quest[] = [TUTORIAL_QUEST]
+export const EXPLORE_QUEST: Quest = {
+  id: 'explore',
+  title: 'Dive Deeper',
+  description: 'Discover what makes AI agents powerful.',
+  status: 'locked',
+  steps: [
+    { id: 'direct-chat', description: 'Chat directly with an agent', isComplete: false },
+    { id: 'connection', description: 'Add your first integration', isComplete: false },
+    { id: 'voice', description: 'Try a voice command', isComplete: false },
+  ],
+}
+
+export const SAMPLE_QUESTS: Quest[] = [TUTORIAL_QUEST, EXPLORE_QUEST]

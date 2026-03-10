@@ -10,11 +10,11 @@ import type { Direction } from '../entities/Character'
 // ---------------------------------------------------------------------------
 
 export class CharacterSheetFactory {
-  private readonly scene:    Phaser.Scene
+  private readonly scene: Phaser.Scene
   private readonly tileSize: number
 
   constructor(scene: Phaser.Scene, tileSize: number) {
-    this.scene    = scene
+    this.scene = scene
     this.tileSize = tileSize
   }
 
@@ -24,20 +24,23 @@ export class CharacterSheetFactory {
   //   Row 2 (frames  8-11): walk left
   //   Row 3 (frames 12-15): walk right
   createBunnyAnimations(): void {
-    const key  = User.TEXTURE_KEY
+    const key = User.TEXTURE_KEY
     const COLS = 4
     const rows: { dir: Direction; row: number }[] = [
-      { dir: 'down',  row: 0 },
-      { dir: 'up',    row: 1 },
-      { dir: 'left',  row: 2 },
+      { dir: 'down', row: 0 },
+      { dir: 'up', row: 1 },
+      { dir: 'left', row: 2 },
       { dir: 'right', row: 3 },
     ]
     for (const { dir, row } of rows) {
       this.scene.anims.create({
-        key:       `${key}-walk-${dir}`,
-        frames:    this.scene.anims.generateFrameNumbers(key, { start: row * COLS, end: row * COLS + COLS - 1 }),
+        key: `${key}-walk-${dir}`,
+        frames: this.scene.anims.generateFrameNumbers(key, {
+          start: row * COLS,
+          end: row * COLS + COLS - 1,
+        }),
         frameRate: 8,
-        repeat:    -1,
+        repeat: -1,
       })
     }
   }
@@ -45,14 +48,15 @@ export class CharacterSheetFactory {
   createAssetSpriteAnimations(type: 'engineering' | 'marketing'): void {
     const texKey = `char-${type}`
 
-    const { frameCount, frameRate } = type === 'engineering'
-      ? { frameCount: 4, frameRate: 8 }   // chicken: 4 walk frames
-      : { frameCount: 3, frameRate: 6 }   // cow:     3 walk frames
+    const { frameCount, frameRate } =
+      type === 'engineering'
+        ? { frameCount: 4, frameRate: 8 } // chicken: 4 walk frames
+        : { frameCount: 3, frameRate: 6 } // cow:     3 walk frames
 
     const frames = this.scene.anims.generateFrameNumbers(texKey, { start: 0, end: frameCount - 1 })
     const dirs: Direction[] = ['down', 'left', 'right', 'up']
 
-    dirs.forEach(dir => {
+    dirs.forEach((dir) => {
       this.scene.anims.create({ key: `${texKey}-walk-${dir}`, frames, frameRate, repeat: -1 })
     })
   }
@@ -63,7 +67,8 @@ export class CharacterSheetFactory {
   //   Row 2 (frames  6-8): facing right
   //   Row 3 (frames 9-11): facing up
   createCharacterSheet(texKey: string, shirtColor: string): void {
-    const S   = this.tileSize
+    const S = this.tileSize
+    if (this.scene.textures.exists(texKey)) this.scene.textures.remove(texKey)
     const tex = this.scene.textures.createCanvas(texKey, S * 3, S * 4)!
     const ctx = tex.getContext()
 
@@ -85,11 +90,11 @@ export class CharacterSheetFactory {
   }
 
   private drawCharFrame(
-    ctx:        CanvasRenderingContext2D,
-    fx:         number,
-    fy:         number,
-    dir:        Direction,
-    phase:      number,
+    ctx: CanvasRenderingContext2D,
+    fx: number,
+    fy: number,
+    dir: Direction,
+    phase: number,
     shirtColor: string,
   ): void {
     const p = (x: number, y: number, w: number, h: number, c: string): void => {
@@ -98,8 +103,8 @@ export class CharacterSheetFactory {
     }
 
     // Walk phases: alternate left/right leg vertical offsets for a step cycle.
-    const ll = phase === 1 ? -1 : phase === 2 ?  1 : 0
-    const rl = phase === 1 ?  1 : phase === 2 ? -1 : 0
+    const ll = phase === 1 ? -1 : phase === 2 ? 1 : 0
+    const rl = phase === 1 ? 1 : phase === 2 ? -1 : 0
 
     // Shadow at feet
     ctx.fillStyle = 'rgba(0,0,0,0.2)'
@@ -126,10 +131,10 @@ export class CharacterSheetFactory {
 
     // Eyes — direction-specific
     if (dir === 'down') {
-      p(5,  4, 2, 1, '#111111')
-      p(9,  4, 2, 1, '#111111')
+      p(5, 4, 2, 1, '#111111')
+      p(9, 4, 2, 1, '#111111')
     } else if (dir === 'left') {
-      p(4,  4, 2, 1, '#111111')
+      p(4, 4, 2, 1, '#111111')
     } else if (dir === 'right') {
       p(10, 4, 2, 1, '#111111')
     }
@@ -138,18 +143,18 @@ export class CharacterSheetFactory {
 
   createAnimations(texKey: string): void {
     const dirs: Array<{ dir: Direction; start: number }> = [
-      { dir: 'down',  start: 0 },
-      { dir: 'left',  start: 3 },
+      { dir: 'down', start: 0 },
+      { dir: 'left', start: 3 },
       { dir: 'right', start: 6 },
-      { dir: 'up',    start: 9 },
+      { dir: 'up', start: 9 },
     ]
 
     dirs.forEach(({ dir, start }) => {
       this.scene.anims.create({
-        key:       `${texKey}-walk-${dir}`,
-        frames:    this.scene.anims.generateFrameNumbers(texKey, { start, end: start + 2 }),
+        key: `${texKey}-walk-${dir}`,
+        frames: this.scene.anims.generateFrameNumbers(texKey, { start, end: start + 2 }),
         frameRate: 8,
-        repeat:    -1,
+        repeat: -1,
       })
     })
   }

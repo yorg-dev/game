@@ -3,22 +3,25 @@ import { authProvider } from '@/providers'
 import { landProvider } from '@/providers/landProvider'
 
 interface Props {
-  landId:   string
+  landId: string
   landName: string
   onSignIn: () => void
   onCancel: () => void
 }
 
-const btnPrimary = 'px-4 py-1.5 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 active:shadow-[inset_0_-1px_0_0_#5a3810,inset_0_1px_0_0_#c8a060] disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]'
-const btnGhost   = 'px-4 py-1.5 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors'
-const inputClass = 'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] transition-colors'
+const btnPrimary =
+  'px-4 py-1.5 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 active:shadow-[inset_0_-1px_0_0_#5a3810,inset_0_1px_0_0_#c8a060] disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]'
+const btnGhost =
+  'px-4 py-1.5 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors'
+const inputClass =
+  'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] transition-colors'
 
 export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props) {
   const isGuest = authProvider.isGuest()
-  const [email,   setEmail]   = useState('')
+  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
-  const [sent,    setSent]    = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -43,8 +46,8 @@ export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props)
     >
       <div
         className="relative w-full max-w-sm bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
-        onClick={e => e.stopPropagation()}
-        onKeyDown={e => e.nativeEvent.stopImmediatePropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
       >
         {/* Close */}
         <button
@@ -53,7 +56,12 @@ export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props)
           className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square"/>
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
 
@@ -70,8 +78,17 @@ export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props)
               Create a free account to invite others to your land and save your progress.
             </p>
             <div className="flex items-center justify-end gap-2 pt-1 border-t-4 border-[#7a5230] bg-[#dcc898] -mx-5 -mb-5 px-5 py-4">
-              <button type="button" onClick={onCancel} className={btnGhost}>Not now</button>
-              <button type="button" onClick={() => { onSignIn(); onCancel() }} className={btnPrimary}>
+              <button type="button" onClick={onCancel} className={btnGhost}>
+                Not now
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onSignIn()
+                  onCancel()
+                }}
+                className={btnPrimary}
+              >
                 Create account
               </button>
             </div>
@@ -79,31 +96,52 @@ export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props)
         ) : sent ? (
           <div className="flex flex-col gap-4 px-5 py-5">
             <div className="flex items-center gap-3 px-3 py-3 rounded-lg bg-emerald-50 border-2 border-emerald-300">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-emerald-700">
-                <path d="M2 8l4 4 8-8" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="shrink-0 text-emerald-700"
+              >
+                <path
+                  d="M2 8l4 4 8-8"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
+                />
               </svg>
-              <p className="text-sm font-bold text-emerald-800">Invite sent to <span className="font-bold">{email}</span></p>
+              <p className="text-sm font-bold text-emerald-800">
+                Invite sent to <span className="font-bold">{email}</span>
+              </p>
             </div>
             <div className="flex items-center justify-end gap-2 pt-1 border-t-4 border-[#7a5230] bg-[#dcc898] -mx-5 -mb-5 px-5 py-4">
               <button
                 type="button"
-                onClick={() => { setEmail(''); setSent(false) }}
+                onClick={() => {
+                  setEmail('')
+                  setSent(false)
+                }}
                 className={btnGhost}
               >
                 Invite another
               </button>
-              <button type="button" onClick={onCancel} className={btnPrimary}>Done</button>
+              <button type="button" onClick={onCancel} className={btnPrimary}>
+                Done
+              </button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">Email address</label>
+              <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+                Email address
+              </label>
               <input
                 autoFocus
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="teammate@example.com"
                 className={inputClass}
                 required
@@ -117,12 +155,10 @@ export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props)
             )}
 
             <div className="flex items-center justify-end gap-2 pt-1 border-t-4 border-[#7a5230] bg-[#dcc898] -mx-5 -mb-5 px-5 py-4">
-              <button type="button" onClick={onCancel} className={btnGhost}>Cancel</button>
-              <button
-                type="submit"
-                disabled={!email.trim() || loading}
-                className={btnPrimary}
-              >
+              <button type="button" onClick={onCancel} className={btnGhost}>
+                Cancel
+              </button>
+              <button type="submit" disabled={!email.trim() || loading} className={btnPrimary}>
                 {loading ? 'Sending…' : 'Send Invite'}
               </button>
             </div>

@@ -6,11 +6,11 @@ import type { World } from '@/models/World'
  */
 export const SAMPLE_WORLDS: World[] = [
   {
-    id:             'world_demo_01',
-    name:           'Demo World',
+    id: 'world_demo_01',
+    name: 'Demo World',
     organizationId: 'org_demo_01',
-    createdAt:      '2025-01-01T00:00:00Z',
-    updatedAt:      '2025-01-01T00:00:00Z',
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z',
   },
 ]
 

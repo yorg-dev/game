@@ -5,29 +5,29 @@ import { wsProvider } from '../providers/wsProvider'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ChatMessage {
-  id:         string
+  id: string
   authorName: string
-  text:       string
-  ts:         number
-  fromSelf:   boolean
+  text: string
+  ts: number
+  fromSelf: boolean
 }
 
 type ChatTab = 'world' | 'land' | 'agents'
 
 interface AgentEntry {
-  id:   number
+  id: number
   name: string
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function parseMention(
-  text:   string,
+  text: string,
   agents: AgentEntry[],
 ): { agentId: number | null; cleanText: string } {
   const match = text.match(/^@(\S+)\s*(.*)$/s)
   if (match) {
-    const agent = agents.find(a => a.name.toLowerCase() === match[1].toLowerCase())
+    const agent = agents.find((a) => a.name.toLowerCase() === match[1].toLowerCase())
     if (agent) return { agentId: agent.id, cleanText: match[2].trim() || text }
   }
   return { agentId: null, cleanText: text }
@@ -36,21 +36,25 @@ function parseMention(
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function ChatPanel() {
-  const [open,          setOpen]          = useState(false)
-  const [activeTab,     setActiveTab]     = useState<ChatTab>('world')
+  const [open, setOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<ChatTab>('world')
   const [worldMessages, setWorldMessages] = useState<ChatMessage[]>([])
-  const [landMessages,  setLandMessages]  = useState<ChatMessage[]>([])
+  const [landMessages, setLandMessages] = useState<ChatMessage[]>([])
   const [agentMessages, setAgentMessages] = useState<ChatMessage[]>([])
-  const [agents,        setAgents]        = useState<AgentEntry[]>([])
-  const [draft,         setDraft]         = useState('')
-  const [unread,        setUnread]        = useState({ world: false, land: false, agents: false })
+  const [agents, setAgents] = useState<AgentEntry[]>([])
+  const [draft, setDraft] = useState('')
+  const [unread, setUnread] = useState({ world: false, land: false, agents: false })
 
   const bottomRef = useRef<HTMLDivElement>(null)
-  const openRef   = useRef(open)
-  const tabRef    = useRef(activeTab)
+  const openRef = useRef(open)
+  const tabRef = useRef(activeTab)
 
-  useEffect(() => { openRef.current = open }, [open])
-  useEffect(() => { tabRef.current  = activeTab }, [activeTab])
+  useEffect(() => {
+    openRef.current = open
+  }, [open])
+  useEffect(() => {
+    tabRef.current = activeTab
+  }, [activeTab])
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -59,23 +63,23 @@ export function ChatPanel() {
 
   // WebSocket: incoming chat-message
   useEffect(() => {
-    const unsub = wsProvider.on('chat-message', msg => {
+    const unsub = wsProvider.on('chat-message', (msg) => {
       const newMsg: ChatMessage = {
-        id:         `ws_${msg.ts}_${Math.random()}`,
+        id: `ws_${msg.ts}_${Math.random()}`,
         authorName: msg.authorName,
-        text:       msg.text,
-        ts:         msg.ts,
-        fromSelf:   false,
+        text: msg.text,
+        ts: msg.ts,
+        fromSelf: false,
       }
       if (msg.scope === 'world') {
-        setWorldMessages(prev => [...prev, newMsg])
+        setWorldMessages((prev) => [...prev, newMsg])
         if (!openRef.current || tabRef.current !== 'world') {
-          setUnread(u => ({ ...u, world: true }))
+          setUnread((u) => ({ ...u, world: true }))
         }
       } else {
-        setLandMessages(prev => [...prev, newMsg])
+        setLandMessages((prev) => [...prev, newMsg])
         if (!openRef.current || tabRef.current !== 'land') {
-          setUnread(u => ({ ...u, land: true }))
+          setUnread((u) => ({ ...u, land: true }))
         }
       }
     })
@@ -85,41 +89,47 @@ export function ChatPanel() {
   // EventBus: agent lifecycle
   useEffect(() => {
     const unsubSpawned = EventBus.on('agent-spawned', ({ id, name }) => {
-      setAgents(prev => prev.some(a => a.id === id) ? prev : [...prev, { id, name }])
+      setAgents((prev) => (prev.some((a) => a.id === id) ? prev : [...prev, { id, name }]))
     })
     const unsubRemoved = EventBus.on('agent-removed', ({ id }) => {
-      setAgents(prev => prev.filter(a => a.id !== id))
+      setAgents((prev) => prev.filter((a) => a.id !== id))
     })
     EventBus.emit('request-agent-sync', undefined)
-    return () => { unsubSpawned(); unsubRemoved() }
+    return () => {
+      unsubSpawned()
+      unsubRemoved()
+    }
   }, [])
 
   // EventBus: agent responses
   useEffect(() => {
     const unsub = EventBus.on('agent-response', ({ messageId, agentId, text }) => {
       // Find agent name
-      const agent = agents.find(a => a.id === agentId)
+      const agent = agents.find((a) => a.id === agentId)
       const agentName = agent?.name ?? `Agent ${agentId}`
 
-      setAgentMessages(prev => {
+      setAgentMessages((prev) => {
         // Replace pending placeholder if present
-        const replaced = prev.map(m =>
+        const replaced = prev.map((m) =>
           m.id === `${messageId}-pending`
             ? { ...m, id: `${messageId}-agent`, authorName: agentName, text, fromSelf: false }
-            : m
+            : m,
         )
         // If no placeholder found, just append
-        if (replaced.some(m => m.id === `${messageId}-agent`)) return replaced
-        return [...prev, {
-          id:         `${messageId}-agent`,
-          authorName: agentName,
-          text,
-          ts:         Date.now(),
-          fromSelf:   false,
-        }]
+        if (replaced.some((m) => m.id === `${messageId}-agent`)) return replaced
+        return [
+          ...prev,
+          {
+            id: `${messageId}-agent`,
+            authorName: agentName,
+            text,
+            ts: Date.now(),
+            fromSelf: false,
+          },
+        ]
       })
       if (!openRef.current || tabRef.current !== 'agents') {
-        setUnread(u => ({ ...u, agents: true }))
+        setUnread((u) => ({ ...u, agents: true }))
       }
     })
     return unsub
@@ -127,12 +137,12 @@ export function ChatPanel() {
 
   function handleTabClick(tab: ChatTab) {
     setActiveTab(tab)
-    setUnread(u => ({ ...u, [tab]: false }))
+    setUnread((u) => ({ ...u, [tab]: false }))
   }
 
   function handleOpen() {
     setOpen(true)
-    setUnread(u => ({ ...u, [activeTab]: false }))
+    setUnread((u) => ({ ...u, [activeTab]: false }))
   }
 
   function handleSend(e: React.FormEvent) {
@@ -140,36 +150,42 @@ export function ChatPanel() {
     const text = draft.trim()
     if (!text) return
 
-    const messageId  = `msg_${Date.now()}`
+    const messageId = `msg_${Date.now()}`
     const authorName = 'You'
 
     if (activeTab === 'world' || activeTab === 'land') {
       wsProvider.send({ type: 'chat', scope: activeTab, text, authorName })
-      setWorldMessages(prev =>
+      setWorldMessages((prev) =>
         activeTab === 'world'
           ? [...prev, { id: messageId, authorName, text, ts: Date.now(), fromSelf: true }]
-          : prev
+          : prev,
       )
-      setLandMessages(prev =>
+      setLandMessages((prev) =>
         activeTab === 'land'
           ? [...prev, { id: messageId, authorName, text, ts: Date.now(), fromSelf: true }]
-          : prev
+          : prev,
       )
     } else {
       // Agents tab
       const { agentId, cleanText } = parseMention(text, agents)
 
       // Add user message immediately
-      setAgentMessages(prev => [
+      setAgentMessages((prev) => [
         ...prev,
         { id: messageId, authorName, text, ts: Date.now(), fromSelf: true },
       ])
 
       if (agentId !== null) {
         // Add pending placeholder for response
-        setAgentMessages(prev => [
+        setAgentMessages((prev) => [
           ...prev,
-          { id: `${messageId}-pending`, authorName: 'Agent', text: '…', ts: Date.now(), fromSelf: false },
+          {
+            id: `${messageId}-pending`,
+            authorName: 'Agent',
+            text: '…',
+            ts: Date.now(),
+            fromSelf: false,
+          },
         ])
         EventBus.emit('agent-message', { messageId, agentId, text: cleanText })
       } else {
@@ -183,13 +199,11 @@ export function ChatPanel() {
   const hasUnread = unread.world || unread.land || unread.agents
 
   const activeMessages =
-    activeTab === 'world'  ? worldMessages :
-    activeTab === 'land'   ? landMessages  :
-    agentMessages
+    activeTab === 'world' ? worldMessages : activeTab === 'land' ? landMessages : agentMessages
 
   const TABS: { key: ChatTab; label: string }[] = [
-    { key: 'world',  label: 'World'  },
-    { key: 'land',   label: 'Land'   },
+    { key: 'world', label: 'World' },
+    { key: 'land', label: 'Land' },
     { key: 'agents', label: 'Agents' },
   ]
 
@@ -206,7 +220,10 @@ export function ChatPanel() {
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path
               d="M3 3h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6l-4 3V4a1 1 0 0 1 1-1z"
-              stroke="#7a5230" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"
+              stroke="#7a5230"
+              strokeWidth="2"
+              strokeLinecap="square"
+              strokeLinejoin="miter"
             />
           </svg>
           {/* Unread dot */}
@@ -233,7 +250,12 @@ export function ChatPanel() {
               className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square"/>
+                <path
+                  d="M10 2L2 10M2 2l8 8"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="square"
+                />
               </svg>
             </button>
           </div>
@@ -265,12 +287,10 @@ export function ChatPanel() {
                 No agents in this land
               </p>
             ) : activeMessages.length === 0 ? (
-              <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">
-                No messages yet
-              </p>
+              <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">No messages yet</p>
             ) : (
               <div className="flex flex-col gap-2">
-                {activeMessages.map(msg => (
+                {activeMessages.map((msg) => (
                   <div
                     key={msg.id}
                     className={`flex flex-col gap-0.5 ${msg.fromSelf ? 'items-end' : 'items-start'}`}
@@ -301,7 +321,7 @@ export function ChatPanel() {
             <form onSubmit={handleSend} className="flex items-center gap-2">
               <input
                 value={draft}
-                onChange={e => setDraft(e.target.value)}
+                onChange={(e) => setDraft(e.target.value)}
                 placeholder={
                   activeTab === 'agents'
                     ? 'Message all agents, or @name for one'
