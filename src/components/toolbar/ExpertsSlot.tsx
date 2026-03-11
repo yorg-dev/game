@@ -48,7 +48,7 @@ function ExpertsIcon() {
 
 export function ExpertsSlot({ onClick }: ExpertsSlotProps) {
   return (
-    <ToolbarSlot onClick={onClick} label="Experts Directory" hotkey="E">
+    <ToolbarSlot onClick={onClick} label="Experts Directory" hotkey="X">
       <ExpertsIcon />
     </ToolbarSlot>
   )

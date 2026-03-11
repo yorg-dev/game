@@ -64,8 +64,11 @@ export class TitleScene extends Phaser.Scene {
     this.isTransitioning = false
     this.menuItems = []
 
-    // Skip the menu entirely for returning users
-    if (localStorage.getItem('token')) {
+    // Skip the menu only for returning users (had a token before this page load).
+    // New guest sessions created during init() must still see the title screen.
+    // sessionStorage._returningUser is set synchronously in App.tsx init() before
+    // any async work, so it reliably reflects pre-load auth state.
+    if (localStorage.getItem('token') && sessionStorage.getItem('_returningUser') === '1') {
       this.startGame()
       return
     }
@@ -78,10 +81,12 @@ export class TitleScene extends Phaser.Scene {
     this.createHint()
     this.setupInput()
 
-    // Auto-start once a guest session is created (for visitors arriving via invite link)
+    // Auto-start only for invite-link visitors (?landId=...) once their
+    // guest session is ready. Direct visits always stay on the title screen.
+    const hasInviteLink = new URLSearchParams(window.location.search).has('landId')
     const unsubSession = EventBus.on('session-ready', () => {
       unsubSession()
-      if (!this.isTransitioning && localStorage.getItem('token')) {
+      if (!this.isTransitioning && localStorage.getItem('token') && hasInviteLink) {
         this.startGame()
       }
     })

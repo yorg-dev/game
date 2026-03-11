@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PhaserGame } from './components/PhaserGame'
 import { GameMenu } from './components/GameMenu'
 import { AgentPopover } from './components/AgentPopover'
@@ -29,10 +29,15 @@ function App() {
   const [showLogin, setShowLogin] = useState(false)
   const [loginTab, setLoginTab] = useState<'login' | 'register'>('login')
   const [canManage, setCanManage] = useState(false)
+  const initRan = useRef(false)
 
   // 1. Ensure a valid session exists, then 2. resolve the starting land.
   // Sequential so land requests always have a valid token.
+  // initRan guard prevents React StrictMode from running this twice in dev,
+  // which would create duplicate guest users / organizations on every page load.
   useEffect(() => {
+    if (initRan.current) return
+    initRan.current = true
     async function ensureGuestSession(): Promise<boolean> {
       try {
         await authProvider.createGuestSession()
@@ -69,6 +74,15 @@ function App() {
       const storedToken = localStorage.getItem('token')
       const storedUser = localStorage.getItem('user')
       console.debug('[App:init] stored token:', storedToken, '| stored user:', storedUser)
+
+      // Record synchronously (before any await) whether the user had a valid token
+      // when the page loaded. TitleScene uses this to distinguish returning users
+      // (who should skip the title screen) from freshly-created guest sessions
+      // (who should see the menu). Without this flag, createGuestSession() can
+      // complete before Phaser's first rAF, and the bare localStorage check would
+      // auto-start the game for new guests.
+      const hadToken = !!storedToken && storedToken !== 'undefined'
+      sessionStorage.setItem('_returningUser', hadToken ? '1' : '0')
 
       if (!storedToken || storedToken === 'undefined') {
         if (storedToken === 'undefined') localStorage.removeItem('token')

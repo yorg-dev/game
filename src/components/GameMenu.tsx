@@ -127,8 +127,8 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           e.preventDefault()
           setShowLeaderboard((v) => !v)
           break
-        case 'e':
-        case 'E':
+        case 'x':
+        case 'X':
           e.preventDefault()
           setShowExperts((v) => !v)
           break
@@ -538,7 +538,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                   { keys: ['M'], label: 'Toggle menu' },
                   { keys: ['T'], label: 'Toggle toolbar' },
                   { keys: ['L'], label: 'Leaderboard' },
-                  { keys: ['E'], label: 'Experts directory' },
+                  { keys: ['X'], label: 'Experts directory' },
                   { keys: ['P'], label: 'Toggle minimap' },
                   { keys: ['/'], label: 'Issue command' },
                   { keys: ['Esc'], label: 'Close / cancel' },

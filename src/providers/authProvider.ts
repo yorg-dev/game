@@ -94,7 +94,7 @@ const authProvider = {
     const deviceId = await getDeviceId()
     const request = new Request(`${API_URL}/guest`, {
       method: 'POST',
-      body: JSON.stringify({ device_id: deviceId }),
+      body: JSON.stringify({ device_id: deviceId, visitor: true }),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     })
     const response = await fetch(request)
