@@ -26,7 +26,9 @@ export const achievementProvider = {
     if (!api) return SAMPLE_ACHIEVEMENTS
     try {
       const { json } = await httpProvider(url('achievements'))
-      return camelize(json) as Achievement[]
+      const camelized = camelize(json)
+      const list = Array.isArray(camelized) ? camelized : (camelized?.achievements ?? [])
+      return list as Achievement[]
     } catch {
       return SAMPLE_ACHIEVEMENTS
     }

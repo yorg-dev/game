@@ -14,6 +14,7 @@ export type AppCategory =
   | 'ai' // OpenAI, Anthropic
   | 'support' // Zendesk, Intercom
   | 'prospecting' // Apollo, Hunter
+  | 'automation' // n8n, Zapier, Make
 
 /** How the owner authenticates against the app's API. */
 export type AuthType = 'oauth2' | 'api_key' | 'basic'
@@ -45,4 +46,10 @@ export interface App {
 
   /** Whether the app is available for connection in the current build. */
   isAvailable: boolean
+
+  /**
+   * Maps to the API's `connection_type` field.
+   * Defaults to 'webhook' if not specified.
+   */
+  connectionType?: string
 }

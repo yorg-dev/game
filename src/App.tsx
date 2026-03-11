@@ -17,10 +17,10 @@ import { AchievementsModal } from './components/AchievementsModal'
 import { AchievementToast } from './components/AchievementToast'
 import { EventBus } from './game/EventBus'
 import { authProvider } from './providers'
-import { landProvider, landPlacementProvider } from './providers/landProvider'
+import { landProvider, landPlacementProvider, landObjectProvider } from './providers/landProvider'
 import { setActiveLand, getActiveLand, viewerPermissions } from './providers/activeLand'
 import { DEFAULT_LAND } from './mocks/lands'
-import { SAMPLE_LAND_OBJECTS } from './mocks/landObjects'
+
 import { SAMPLE_CONNECTIONS } from './mocks/connections'
 
 function App() {
@@ -66,24 +66,39 @@ function App() {
     }
 
     async function init() {
-      if (!localStorage.getItem('token')) {
+      const storedToken = localStorage.getItem('token')
+      const storedUser = localStorage.getItem('user')
+      console.debug('[App:init] stored token:', storedToken, '| stored user:', storedUser)
+
+      if (!storedToken || storedToken === 'undefined') {
+        if (storedToken === 'undefined') localStorage.removeItem('token')
+        console.debug('[App:init] No valid token — creating guest session')
         const ok = await ensureGuestSession()
         if (!ok) {
           // Guest session failed — still proceed, using local sandbox
           console.warn('[App] Proceeding without a session token.')
         }
+        console.debug('[App:init] After guest session — token:', localStorage.getItem('token'), '| user:', localStorage.getItem('user'))
+      } else {
+        console.debug('[App:init] Existing token found — skipping guest session')
       }
       EventBus.emit('session-ready', undefined)
 
       const urlLandId = new URLSearchParams(window.location.search).get('landId')
       const land = await resolveStartingLand(urlLandId)
+      console.debug('[App:init] resolved land:', land?.id, '| viewer:', land?.viewer)
+
       const placements = await landPlacementProvider.getPlacements(land.id)
-      // Objects are embedded in the land response — no separate fetch needed.
-      // Fall back to mock objects if the land came from a list endpoint (no objects field).
-      const landObjects = land.objects ?? SAMPLE_LAND_OBJECTS.filter((o) => o.landId === land.id)
+      // Prefer objects embedded in the land detail response. If absent or empty,
+      // fetch from the dedicated endpoint (falls back to mocks if API is unavailable).
+      const landObjects =
+        land.objects && land.objects.length > 0
+          ? land.objects
+          : await landObjectProvider.getObjects(land.id)
       const connections = [...SAMPLE_CONNECTIONS]
 
       const { canInteract, canManage } = viewerPermissions(land)
+      console.debug('[App:init] permissions — canInteract:', canInteract, '| canManage:', canManage)
       const state = { land, placements, landObjects, connections, canInteract, canManage }
       setActiveLand(state)
       setCanManage(canManage)
@@ -110,9 +125,12 @@ function App() {
     const unsubConfirm = EventBus.on('login-confirmed', async () => {
       // Switch to the user's first real land now that they're authenticated.
       const land = await landProvider.getMyFirstLand()
-      if (land && land.id !== getActiveLand().land.id) {
+      if (land) {
         const placements = await landPlacementProvider.getPlacements(land.id)
-        const landObjects = land.objects ?? SAMPLE_LAND_OBJECTS.filter((o) => o.landId === land.id)
+        const landObjects =
+          land.objects && land.objects.length > 0
+            ? land.objects
+            : await landObjectProvider.getObjects(land.id)
         const connections = [...SAMPLE_CONNECTIONS]
         const { canInteract, canManage } = viewerPermissions(land)
         const state = { land, placements, landObjects, connections, canInteract, canManage }
@@ -120,6 +138,7 @@ function App() {
         setCanManage(canManage)
         EventBus.emit('land-ready', state)
       } else {
+        // No land found — permissions stay as-is from the active land.
         const { canManage } = viewerPermissions(getActiveLand().land)
         setCanManage(canManage)
       }

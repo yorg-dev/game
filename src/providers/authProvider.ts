@@ -1,5 +1,5 @@
 // import { AuthProvider } from "ra-core";
-import { getDeviceId } from './deviceId'
+import { getDeviceId, clearDeviceId } from './deviceId'
 
 const API_URL = import.meta.env.VITE_API_URL as string
 
@@ -102,13 +102,14 @@ const authProvider = {
     if (response.status < 200 || response.status >= 300) {
       throw new Error(body?.error ?? body?.message ?? response.statusText)
     }
-    localStorage.setItem('token', body.token)
+    if (body.token) localStorage.setItem('token', body.token)
     if (body.user) localStorage.setItem('user', JSON.stringify(body.user))
   },
 
   register: async ({ email, password }: Credentials): Promise<void> => {
     // Registration is an upgrade of a guest session — ensure one exists first.
-    if (!localStorage.getItem('token')) {
+    const existingToken = localStorage.getItem('token')
+    if (!existingToken || existingToken === 'undefined') {
       await authProvider.createGuestSession()
     }
     const token: Token = localStorage.getItem('token')
@@ -124,7 +125,7 @@ const authProvider = {
     if (response.status < 200 || response.status >= 300) {
       throw new Error(body?.error ?? body?.message ?? response.statusText)
     }
-    localStorage.setItem('token', body.token)
+    if (body.token) localStorage.setItem('token', body.token)
     if (body.user) localStorage.setItem('user', JSON.stringify(body.user))
   },
 
@@ -134,11 +135,20 @@ const authProvider = {
     return user.guest === true
   },
 
-  logout: () => {
+  logout: async () => {
+    // Invalidate the server session (clears the session cookie) before wiping localStorage.
+    // Failure is non-fatal — we still clear local state so the UI resets.
+    try {
+      const token: Token = localStorage.getItem('token')
+      const headers = new Headers({ 'Content-Type': 'application/json' })
+      if (token) headers.set('Authorization', `Bearer ${token}`)
+      await fetch(`${API_URL}/sessions`, { method: 'DELETE', headers })
+    } catch {
+      // ignore — network may be unavailable
+    }
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    localStorage.removeItem('deviceId')
-    return Promise.resolve()
+    clearDeviceId() // clears both localStorage and IndexedDB
   },
   async canAccess(_params: any) {
     return Promise.resolve()

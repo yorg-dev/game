@@ -54,8 +54,8 @@ export function ProfileButton() {
     EventBus.emit('login-confirmed', undefined)
   }
 
-  function handleLogout() {
-    authProvider.logout()
+  async function handleLogout() {
+    await authProvider.logout()
     setGuest(true)
     setEmail(null)
     setShowDropdown(false)

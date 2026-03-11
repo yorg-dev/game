@@ -101,6 +101,17 @@ export const APPS: App[] = [
     color: '#168eea',
     isAvailable: true,
   },
+  {
+    id: 'n8n',
+    name: 'n8n',
+    description: 'Open-source workflow automation — webhooks, HTTP requests, and 400+ integrations',
+    category: 'automation',
+    authType: 'api_key',
+    requiredCredentials: ['api_key'],
+    color: '#ea4b71',
+    isAvailable: true,
+    connectionType: 'n8n',
+  },
 ]
 
 /** Look up an App by its id. Returns undefined if not found. */

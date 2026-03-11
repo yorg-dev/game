@@ -1,12 +1,16 @@
 import { AddAgentSlot } from './AddAgentSlot'
 import { AddConnectionSlot } from './AddConnectionSlot'
+import { LeaderboardSlot } from './LeaderboardSlot'
+import { ExpertsSlot } from './ExpertsSlot'
 
 interface GameToolbarProps {
   onAddAgent: () => void
   onAddConnection: () => void
+  onLeaderboard: () => void
+  onExperts: () => void
 }
 
-export function GameToolbar({ onAddAgent, onAddConnection }: GameToolbarProps) {
+export function GameToolbar({ onAddAgent, onAddConnection, onLeaderboard, onExperts }: GameToolbarProps) {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 select-none">
       {/* Outer wood frame */}
@@ -29,6 +33,8 @@ export function GameToolbar({ onAddAgent, onAddConnection }: GameToolbarProps) {
         >
           <AddAgentSlot onClick={onAddAgent} />
           <AddConnectionSlot onClick={onAddConnection} />
+          <LeaderboardSlot onClick={onLeaderboard} />
+          <ExpertsSlot onClick={onExperts} />
         </div>
       </div>
     </div>

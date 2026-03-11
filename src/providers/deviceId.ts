@@ -55,6 +55,25 @@ async function idbSet(id: string): Promise<void> {
 }
 
 /**
+ * Clears the stored device ID from both localStorage and IndexedDB.
+ * Call this on logout so the next guest session gets a fresh identity.
+ */
+export async function clearDeviceId(): Promise<void> {
+  localStorage.removeItem(LS_KEY)
+  try {
+    const db = await openDb()
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite')
+      const req = tx.objectStore(IDB_STORE).delete(IDB_KEY)
+      req.onsuccess = () => resolve()
+      req.onerror = () => reject(req.error)
+    })
+  } catch {
+    // Ignore — localStorage was already cleared above
+  }
+}
+
+/**
  * Returns the stable device ID for this browser, creating one on first call.
  *
  * Resolution order:

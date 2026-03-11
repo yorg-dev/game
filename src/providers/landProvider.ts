@@ -160,14 +160,20 @@ export const landProvider = {
     if (!api) return null
     try {
       const orgs = await getList<{ id: string }>('organizations')
+      console.debug('[landProvider:getMyFirstLand] orgs:', orgs)
       if (!orgs.length) return null
       const worlds = await getList<{ id: string }>(`organizations/${orgs[0].id}/worlds`)
+      console.debug('[landProvider:getMyFirstLand] worlds:', worlds)
       if (!worlds.length) return null
       const lands = await getList<Land>(`worlds/${worlds[0].id}/lands`)
+      console.debug('[landProvider:getMyFirstLand] lands:', lands)
       if (!lands[0]) return null
       // Fetch full detail so the viewer permissions object is included.
-      return await landProvider.getLand(lands[0].id)
-    } catch {
+      const land = await landProvider.getLand(lands[0].id)
+      console.debug('[landProvider:getMyFirstLand] land detail viewer:', land?.viewer)
+      return land
+    } catch (err) {
+      console.warn('[landProvider:getMyFirstLand] failed:', err)
       return null
     }
   },

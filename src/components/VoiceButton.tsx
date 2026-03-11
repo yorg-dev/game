@@ -20,14 +20,18 @@ export function VoiceButton() {
     // agents on this land share the same voice command stream.
     agentChannelProvider.connect(getActiveLand().land.id)
 
-    // Forward confirmed voice_command payloads to the EventBus so GameScene
-    // can react identically to typed commands.
-    const unsub = agentChannelProvider.onVoiceCommand((msg) => {
+    // Forward confirmed voice command acknowledgements to the EventBus so
+    // GameScene can react identically to typed commands.
+    const unsub = agentChannelProvider.onMessage((msg) => {
+      if (msg.type !== 'acknowledged') return
+      const storedUser = (() => {
+        try { return JSON.parse(localStorage.getItem('user') ?? 'null') } catch { return null }
+      })()
       EventBus.emit('voice-command', {
         agentId: msg.agentId,
-        command: msg.command,
+        command: msg.transcript,
         transcript: msg.transcript,
-        userId: msg.userId,
+        userId: parseInt(storedUser?.id ?? '0', 10),
       })
     })
 

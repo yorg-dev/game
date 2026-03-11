@@ -4,6 +4,7 @@ import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
 import { APPS } from '@/mocks/apps'
 import type { AgentTemplate } from '@/models/AgentTemplate'
 import { agentLevelProvider } from '@/providers/agentLevelProvider'
+import { agentChannelProvider } from '@/providers/agentChannelProvider'
 import type { AgentLevel } from '@/models/AgentLevel'
 import { XP_PER_LEVEL, MAX_LEVEL } from '@/models/AgentLevel'
 
@@ -34,6 +35,8 @@ export function AgentPopover() {
   const [draft, setDraft] = useState('')
   const [agentLevel, setAgentLevel] = useState<AgentLevel | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  // Track whether we're using the real API channel (vs EventBus mock fallback)
+  const usingRealApi = useRef(false)
 
   useEffect(() => {
     const unsub = EventBus.on('agent-clicked', ({ id, name, templateId, tab }) => {
@@ -48,6 +51,93 @@ export function AgentPopover() {
     })
     return unsub
   }, [])
+
+  // Connect to AgentChannel when an agent is open
+  useEffect(() => {
+    if (!agent) return
+
+    const slug = agent.template.slug
+    agentChannelProvider.connect(slug)
+    usingRealApi.current = agentChannelProvider.isConnected
+
+    const unsub = agentChannelProvider.onMessage((msg) => {
+      usingRealApi.current = true
+
+      if (msg.type === 'result') {
+        setHistory((prev) => {
+          const agentMsgs = prev[agent.id] ?? []
+          // Resolve the first pending agent message
+          let resolved = false
+          const updated = agentMsgs.map((m) => {
+            if (!resolved && m.from === 'agent' && m.pending) {
+              resolved = true
+              return { ...m, text: msg.output, pending: false }
+            }
+            return m
+          })
+          return { ...prev, [agent.id]: updated }
+        })
+      } else if (msg.type === 'tool_executing') {
+        setHistory((prev) => ({
+          ...prev,
+          [agent.id]: [
+            ...(prev[agent.id] ?? []),
+            {
+              id: `tool_${Date.now()}`,
+              from: 'agent' as const,
+              text: `⚙️ Running ${msg.toolName}…`,
+              ts: Date.now(),
+              pending: true,
+            },
+          ],
+        }))
+      } else if (msg.type === 'tool_executed') {
+        setHistory((prev) => {
+          const agentMsgs = prev[agent.id] ?? []
+          let resolved = false
+          const updated = agentMsgs.map((m) => {
+            if (!resolved && m.pending && m.text.includes(msg.toolName)) {
+              resolved = true
+              return { ...m, text: `✓ ${msg.toolName} triggered`, pending: false }
+            }
+            return m
+          })
+          return { ...prev, [agent.id]: updated }
+        })
+      } else if (msg.type === 'tool_error') {
+        setHistory((prev) => {
+          const agentMsgs = prev[agent.id] ?? []
+          let resolved = false
+          const updated = agentMsgs.map((m) => {
+            if (!resolved && m.pending) {
+              resolved = true
+              return { ...m, text: `✗ ${msg.toolName}: ${msg.message}`, pending: false }
+            }
+            return m
+          })
+          return { ...prev, [agent.id]: updated }
+        })
+      } else if (msg.type === 'error') {
+        setHistory((prev) => {
+          const agentMsgs = prev[agent.id] ?? []
+          let resolved = false
+          const updated = agentMsgs.map((m) => {
+            if (!resolved && m.pending) {
+              resolved = true
+              return { ...m, text: `Error: ${msg.message}`, pending: false }
+            }
+            return m
+          })
+          return { ...prev, [agent.id]: updated }
+        })
+      }
+    })
+
+    return () => {
+      unsub()
+      usingRealApi.current = false
+    }
+  }, [agent?.id])
 
   // Live-update the XP bar when this agent gains XP while the popover is open
   useEffect(() => {
@@ -65,8 +155,10 @@ export function AgentPopover() {
     return unsub
   }, [agent])
 
+  // Fallback: handle mock responses from GameScene when real API isn't connected
   useEffect(() => {
     const unsub = EventBus.on('agent-response', ({ messageId, agentId, text }) => {
+      if (usingRealApi.current) return // real API is handling responses
       setHistory((prev) => {
         const msgs = prev[agentId] ?? []
         const replaced = msgs.map((m) =>
@@ -99,15 +191,26 @@ export function AgentPopover() {
     e.preventDefault()
     if (!agent || !draft.trim()) return
     const messageId = `msg_${Date.now()}`
+    const text = draft.trim()
+
     setHistory((prev) => ({
       ...prev,
       [agent.id]: [
         ...(prev[agent.id] ?? []),
-        { id: messageId, from: 'user', text: draft.trim(), ts: Date.now() },
+        { id: messageId, from: 'user', text, ts: Date.now() },
         { id: `${messageId}-pending`, from: 'agent', text: '…', ts: Date.now(), pending: true },
       ],
     }))
-    EventBus.emit('agent-message', { messageId, agentId: agent.id, text: draft.trim() })
+
+    // Try real API first; fall back to EventBus (GameScene mock handler)
+    const sent = agentChannelProvider.sendChat(text)
+    if (!sent) {
+      EventBus.emit('agent-message', { messageId, agentId: agent.id, text })
+    } else {
+      // Still emit for achievements/quests that listen on agent-message
+      EventBus.emit('agent-message', { messageId, agentId: agent.id, text })
+    }
+
     setDraft('')
   }
 

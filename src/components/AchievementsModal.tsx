@@ -78,12 +78,21 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 
 type FilterTab = 'all' | 'earned' | 'locked'
 
+const CATEGORY_LABELS: Record<string, string> = {
+  exploration: '🗺️ Exploration',
+  agents: '🤖 Agents',
+  social: '💬 Social',
+  quests: '📜 Quests',
+  mastery: '👑 Mastery',
+}
+
 export function AchievementsModal() {
   const [open, setOpen] = useState(false)
   const [achievements, setAchievements] = useState<Achievement[]>(() =>
     achievementStore.getAchievementsWithProgress(),
   )
   const [filter, setFilter] = useState<FilterTab>('all')
+  const [category, setCategory] = useState<string | null>(null)
 
   useEffect(() => {
     achievementStore.initAchievementListeners()
@@ -110,8 +119,12 @@ export function AchievementsModal() {
   const earned = achievements.filter((a) => !!a.unlockedAt)
   const locked = achievements.filter((a) => !a.unlockedAt)
 
-  const visible =
+  const byStatus =
     filter === 'earned' ? earned : filter === 'locked' ? locked : achievements
+
+  const categories = Array.from(new Set(achievements.map((a) => a.category))).filter(Boolean)
+
+  const visible = category ? byStatus.filter((a) => a.category === category) : byStatus
 
   const TABS: { key: FilterTab; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: achievements.length },
@@ -154,8 +167,8 @@ export function AchievementsModal() {
           </button>
         </div>
 
-        {/* ── Filter tabs ─────────────────────────────────────────────── */}
-        <div className="flex border-b-4 border-[#7a5230] shrink-0 bg-[#dcc898]">
+        {/* ── Status tabs ─────────────────────────────────────────────── */}
+        <div className="flex border-b-2 border-[#7a5230] shrink-0 bg-[#dcc898]">
           {TABS.map(({ key, label, count }) => (
             <button
               key={key}
@@ -168,6 +181,33 @@ export function AchievementsModal() {
             >
               {label}
               <span className="ml-1 text-[10px] tabular-nums">({count})</span>
+            </button>
+          ))}
+        </div>
+
+        {/* ── Category filter ──────────────────────────────────────────── */}
+        <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b-4 border-[#7a5230] shrink-0 bg-[#dcc898]">
+          <button
+            onClick={() => setCategory(null)}
+            className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+              category === null
+                ? 'bg-[#7a5230] border-[#5a3810] text-[#f5edd5]'
+                : 'bg-[#c8b07a] border-[#9a6b28] text-[#5a3810] hover:bg-[#baa068]'
+            }`}
+          >
+            All categories
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat === category ? null : cat)}
+              className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+                category === cat
+                  ? 'bg-[#7a5230] border-[#5a3810] text-[#f5edd5]'
+                  : 'bg-[#c8b07a] border-[#9a6b28] text-[#5a3810] hover:bg-[#baa068]'
+              }`}
+            >
+              {CATEGORY_LABELS[cat] ?? cat}
             </button>
           ))}
         </div>

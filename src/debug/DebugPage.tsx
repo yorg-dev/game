@@ -104,8 +104,8 @@ function NewConnectionPanel() {
       {last && <p className="text-xs text-emerald-400 font-mono">✓ Submitted: {last}</p>}
       {open && (
         <NewConnectionModal
-          onSubmit={(appId, label) => {
-            setLast(`${label} (${appId})`)
+          onSuccess={(appId, connection) => {
+            setLast(`${connection.name} (${appId})`)
             setOpen(false)
           }}
           onCancel={() => setOpen(false)}

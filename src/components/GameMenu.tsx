@@ -7,10 +7,14 @@ import type { Connection } from '@/models/Connection'
 import { NewAgentModal } from './NewAgentModal'
 import { NewConnectionModal } from './NewConnectionModal'
 import { CreateAccountModal } from './CreateAccountModal'
+import { LeaderboardModal } from './LeaderboardModal'
+import { ExpertsModal } from './ExpertsModal'
 import { GameToolbar } from './toolbar/GameToolbar'
 import { DialogBox } from './dialog/DialogBox'
 import type { DialogLine } from '../game/dialog/DialogScript'
 import { EXTRA_HOUSE_POSITIONS, SAMPLE_CONNECTIONS } from '@/mocks/connections'
+import type { ApiConnection } from '@/providers/connectionsProvider'
+import type { Tool } from '@/models/Tool'
 
 interface AgentEntry {
   id: number
@@ -83,6 +87,8 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
   const [settingsExpanded, setSettingsExpanded] = useState(false)
   const [showHotkeys, setShowHotkeys] = useState(false)
   const [showCreateAccount, setShowCreateAccount] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showExperts, setShowExperts] = useState(false)
   const [toolbarVisible, setToolbarVisible] = useState(true)
   const [dialogLines, setDialogLines] = useState<DialogLine[] | null>(null)
 
@@ -91,7 +97,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
   useEffect(() => {
     if (!canManage) return
     function onKeyDown(e: KeyboardEvent) {
-      if (showAgentModal || showConnModal || showHotkeys) return
+      if (showAgentModal || showConnModal || showHotkeys || showLeaderboard || showExperts) return
       const tag = (document.activeElement?.tagName ?? '').toUpperCase()
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
 
@@ -116,11 +122,21 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           e.preventDefault()
           setToolbarVisible((v) => !v)
           break
+        case 'l':
+        case 'L':
+          e.preventDefault()
+          setShowLeaderboard((v) => !v)
+          break
+        case 'e':
+        case 'E':
+          e.preventDefault()
+          setShowExperts((v) => !v)
+          break
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [canManage, showAgentModal, showConnModal, showHotkeys])
+  }, [canManage, showAgentModal, showConnModal, showHotkeys, showLeaderboard, showExperts])
 
   useEffect(() => {
     const unsubSpawned = EventBus.on('agent-spawned', ({ id, name, templateId }) => {
@@ -155,21 +171,20 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
     setShowAgentModal(false)
   }
 
-  function handleNewConnection(appId: string, label: string, credentials: Record<string, string>) {
-    const connectionId = `conn_${appId}_${Date.now()}`
+  function handleNewConnection(appId: string, apiConnection: ApiConnection, _tool: Tool | null) {
     const pos = EXTRA_HOUSE_POSITIONS[dynamicCount % EXTRA_HOUSE_POSITIONS.length]
     dynamicCount++
     const newConn: Connection = {
-      id: connectionId,
+      id: apiConnection.id,
       appId,
-      label,
+      label: apiConnection.name,
       status: 'connected',
-      credentials,
+      credentials: {},
       connectedAt: new Date().toISOString(),
     }
     setConnections((prev) => [...prev, newConn])
     EventBus.emit('add-connection', {
-      connectionId,
+      connectionId: apiConnection.id,
       appId,
       worldX: pos.x,
       worldY: pos.y,
@@ -241,6 +256,26 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
             >
               <span className="text-base leading-none">+</span>
               Create Land
+            </button>
+            <button
+              onClick={() => {
+                setOpen(false)
+                setShowLeaderboard(true)
+              }}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors"
+            >
+              <span className="text-base leading-none">🏆</span>
+              Leaderboard
+            </button>
+            <button
+              onClick={() => {
+                setOpen(false)
+                setShowExperts(true)
+              }}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors"
+            >
+              <span className="text-base leading-none">⭐</span>
+              Experts
             </button>
           </div>
         </nav>
@@ -435,6 +470,8 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
         <GameToolbar
           onAddAgent={() => setShowAgentModal(true)}
           onAddConnection={() => setShowConnModal(true)}
+          onLeaderboard={() => setShowLeaderboard(true)}
+          onExperts={() => setShowExperts(true)}
         />
       )}
 
@@ -444,7 +481,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
       )}
       {canManage && showConnModal && (
         <NewConnectionModal
-          onSubmit={handleNewConnection}
+          onSuccess={handleNewConnection}
           onCancel={() => setShowConnModal(false)}
         />
       )}
@@ -453,6 +490,12 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           onSuccess={() => setShowCreateAccount(false)}
           onCancel={() => setShowCreateAccount(false)}
         />
+      )}
+      {showLeaderboard && (
+        <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
+      )}
+      {showExperts && (
+        <ExpertsModal onClose={() => setShowExperts(false)} />
       )}
 
       {/* ── Hotkeys modal ── */}
@@ -494,6 +537,8 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                   { keys: ['C'], label: 'Add connection' },
                   { keys: ['M'], label: 'Toggle menu' },
                   { keys: ['T'], label: 'Toggle toolbar' },
+                  { keys: ['L'], label: 'Leaderboard' },
+                  { keys: ['E'], label: 'Experts directory' },
                   { keys: ['P'], label: 'Toggle minimap' },
                   { keys: ['/'], label: 'Issue command' },
                   { keys: ['Esc'], label: 'Close / cancel' },
