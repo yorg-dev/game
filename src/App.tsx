@@ -92,7 +92,12 @@ function App() {
           // Guest session failed — still proceed, using local sandbox
           console.warn('[App] Proceeding without a session token.')
         }
-        console.debug('[App:init] After guest session — token:', localStorage.getItem('token'), '| user:', localStorage.getItem('user'))
+        console.debug(
+          '[App:init] After guest session — token:',
+          localStorage.getItem('token'),
+          '| user:',
+          localStorage.getItem('user'),
+        )
       } else {
         console.debug('[App:init] Existing token found — skipping guest session')
       }

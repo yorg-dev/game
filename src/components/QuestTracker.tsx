@@ -95,9 +95,7 @@ export function QuestTracker() {
             {doneCount}/{totalCount}
           </span>
         </button>
-        {showBrowser && (
-          <QuestBrowserModal quests={quests} onClose={() => setShowBrowser(false)} />
-        )}
+        {showBrowser && <QuestBrowserModal quests={quests} onClose={() => setShowBrowser(false)} />}
       </>
     )
   }
@@ -141,9 +139,7 @@ export function QuestTracker() {
           <div className="px-4 py-3 flex flex-col gap-2.5">
             {/* Title + description */}
             <div>
-              <p className="text-sm font-bold text-[#3d2010] leading-tight">
-                {displayQuest.title}
-              </p>
+              <p className="text-sm font-bold text-[#3d2010] leading-tight">{displayQuest.title}</p>
               <p className="text-[10px] text-[#7a5230] mt-0.5 leading-snug">
                 {displayQuest.description}
               </p>
@@ -187,36 +183,62 @@ export function QuestTracker() {
         {isCelebrating && nextQuest && (
           <div className="px-4 pb-3 -mt-1">
             <div className="rounded-lg bg-[#e8a830] border-2 border-[#8b6c2a] px-3 py-2">
-              <p className="text-[10px] font-bold text-[#3d2010]">
-                🔓 Unlocked: {nextQuest.title}
-              </p>
+              <p className="text-[10px] font-bold text-[#3d2010]">🔓 Unlocked: {nextQuest.title}</p>
               <p className="text-[10px] text-[#5a3810] mt-0.5">{nextQuest.description}</p>
             </div>
           </div>
         )}
 
         {/* ── Browse all quests button ────────────────────────────────────── */}
-        <div
-          className={`px-4 pb-3 ${displayQuest || (isCelebrating && nextQuest) ? '' : 'pt-1'}`}
-        >
+        <div className={`px-4 pb-3 ${displayQuest || (isCelebrating && nextQuest) ? '' : 'pt-1'}`}>
           <button
             onClick={() => setShowBrowser(true)}
             className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-dashed border-[#b8955a] text-xs text-[#9a6b28] font-bold hover:border-[#7a5230] hover:text-[#5a3810] hover:bg-[#dcc898] transition-colors"
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <rect x="0.5" y="0.5" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-              <rect x="6" y="0.5" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-              <rect x="0.5" y="6" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-              <rect x="6" y="6" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
+              <rect
+                x="0.5"
+                y="0.5"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="6"
+                y="0.5"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="0.5"
+                y="6"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="6"
+                y="6"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
             </svg>
             Browse all quests
           </button>
         </div>
       </div>
 
-      {showBrowser && (
-        <QuestBrowserModal quests={quests} onClose={() => setShowBrowser(false)} />
-      )}
+      {showBrowser && <QuestBrowserModal quests={quests} onClose={() => setShowBrowser(false)} />}
     </>
   )
 }

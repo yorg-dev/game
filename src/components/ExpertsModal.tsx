@@ -7,13 +7,13 @@ interface Props {
 }
 
 const CONTACT_ICONS: Record<string, string> = {
-  phone:     '📞',
-  website:   '🌐',
-  email:     '✉️',
-  linkedin:  '💼',
-  twitter:   '𝕏',
+  phone: '📞',
+  website: '🌐',
+  email: '✉️',
+  linkedin: '💼',
+  twitter: '𝕏',
   instagram: '📷',
-  facebook:  '🔵',
+  facebook: '🔵',
 }
 
 function ContactLink({ type, value }: { type: string; value: string }) {
@@ -23,10 +23,14 @@ function ContactLink({ type, value }: { type: string; value: string }) {
   if (type === 'website') href = value.startsWith('http') ? value : `https://${value}`
   else if (type === 'email') href = `mailto:${value}`
   else if (type === 'phone') href = `tel:${value.replace(/\s/g, '')}`
-  else if (type === 'linkedin') href = value.startsWith('http') ? value : `https://linkedin.com/in/${value}`
-  else if (type === 'twitter') href = value.startsWith('http') ? value : `https://x.com/${value.replace(/^@/, '')}`
-  else if (type === 'instagram') href = value.startsWith('http') ? value : `https://instagram.com/${value.replace(/^@/, '')}`
-  else if (type === 'facebook') href = value.startsWith('http') ? value : `https://facebook.com/${value}`
+  else if (type === 'linkedin')
+    href = value.startsWith('http') ? value : `https://linkedin.com/in/${value}`
+  else if (type === 'twitter')
+    href = value.startsWith('http') ? value : `https://x.com/${value.replace(/^@/, '')}`
+  else if (type === 'instagram')
+    href = value.startsWith('http') ? value : `https://instagram.com/${value.replace(/^@/, '')}`
+  else if (type === 'facebook')
+    href = value.startsWith('http') ? value : `https://facebook.com/${value}`
 
   const label = (
     <span className="flex items-center gap-1.5 text-xs font-medium text-[#5a3810]">
@@ -140,14 +144,21 @@ export function ExpertsModal({ onClose }: Props) {
           className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
 
         {/* Header */}
         <div className="px-5 pt-5 pb-3 border-b-4 border-[#7a5230] bg-[#dcc898] pr-14 shrink-0">
           <h2 className="text-[#3d2010] font-bold text-base">Experts Directory</h2>
-          <p className="text-xs text-[#7a5230] mt-0.5">Find specialists who can help with your land.</p>
+          <p className="text-xs text-[#7a5230] mt-0.5">
+            Find specialists who can help with your land.
+          </p>
         </div>
 
         {/* Tag filter */}
@@ -184,7 +195,10 @@ export function ExpertsModal({ onClose }: Props) {
           {loading && (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-28 rounded-xl bg-[#dcc898] border-2 border-[#b8955a] animate-pulse" />
+                <div
+                  key={i}
+                  className="h-28 rounded-xl bg-[#dcc898] border-2 border-[#b8955a] animate-pulse"
+                />
               ))}
             </div>
           )}

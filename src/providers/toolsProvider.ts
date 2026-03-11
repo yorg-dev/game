@@ -23,7 +23,11 @@ export const toolsProvider = {
     return json as Tool
   },
 
-  async update(connectionId: string, toolId: string, data: Partial<CreateToolInput>): Promise<Tool> {
+  async update(
+    connectionId: string,
+    toolId: string,
+    data: Partial<CreateToolInput>,
+  ): Promise<Tool> {
     const { json } = await httpProvider(url(`connections/${connectionId}/tools/${toolId}`), {
       method: 'PATCH',
       body: JSON.stringify({ tool: data }),

@@ -51,7 +51,9 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 
       {/* Title + rarity */}
       <div>
-        <p className={`text-xs font-bold leading-tight ${earned ? 'text-[#3d2010]' : 'text-[#7a5230]'}`}>
+        <p
+          className={`text-xs font-bold leading-tight ${earned ? 'text-[#3d2010]' : 'text-[#7a5230]'}`}
+        >
           {achievement.title}
         </p>
         <span
@@ -119,8 +121,7 @@ export function AchievementsModal() {
   const earned = achievements.filter((a) => !!a.unlockedAt)
   const locked = achievements.filter((a) => !a.unlockedAt)
 
-  const byStatus =
-    filter === 'earned' ? earned : filter === 'locked' ? locked : achievements
+  const byStatus = filter === 'earned' ? earned : filter === 'locked' ? locked : achievements
 
   const categories = Array.from(new Set(achievements.map((a) => a.category))).filter(Boolean)
 

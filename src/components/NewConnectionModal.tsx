@@ -236,7 +236,8 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
                       <label className="text-xs text-[#7a5230] font-mono font-bold">{key}</label>
                       <input
                         type={
-                          key.toLowerCase().includes('secret') || key.toLowerCase().includes('token')
+                          key.toLowerCase().includes('secret') ||
+                          key.toLowerCase().includes('token')
                             ? 'password'
                             : 'text'
                         }
@@ -280,7 +281,9 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
           <form onSubmit={handleAddWebhook} className="flex flex-col">
             <div className="px-5 pt-4 pb-2">
               <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
-                <span className="text-emerald-700 text-xs font-bold">✓ Connected to {app.name}</span>
+                <span className="text-emerald-700 text-xs font-bold">
+                  ✓ Connected to {app.name}
+                </span>
               </div>
               <p className="text-xs text-[#7a5230] leading-relaxed">
                 Add a webhook URL so your agent can trigger it when you ask. You can skip this and
@@ -322,7 +325,11 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
             </div>
 
             <div className="flex items-center justify-between gap-2 px-5 py-4 border-t-4 border-[#7a5230] bg-[#dcc898]">
-              <button type="button" onClick={handleSkipWebhook} className="text-xs text-[#9a6b28] hover:text-[#5a3810] font-bold transition-colors">
+              <button
+                type="button"
+                onClick={handleSkipWebhook}
+                className="text-xs text-[#9a6b28] hover:text-[#5a3810] font-bold transition-colors"
+              >
                 Skip for now
               </button>
               <div className="flex items-center gap-2">

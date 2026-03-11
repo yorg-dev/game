@@ -491,12 +491,8 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           onCancel={() => setShowCreateAccount(false)}
         />
       )}
-      {showLeaderboard && (
-        <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
-      )}
-      {showExperts && (
-        <ExpertsModal onClose={() => setShowExperts(false)} />
-      )}
+      {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
+      {showExperts && <ExpertsModal onClose={() => setShowExperts(false)} />}
 
       {/* ── Hotkeys modal ── */}
       {showHotkeys && (

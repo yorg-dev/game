@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { leaderboardProvider } from '@/providers/leaderboardProvider'
-import type { Leaderboard, LeaderboardEntry, LeaderboardPeriod, LeaderboardType } from '@/models/Leaderboard'
+import type {
+  Leaderboard,
+  LeaderboardEntry,
+  LeaderboardPeriod,
+  LeaderboardType,
+} from '@/models/Leaderboard'
 
 interface Props {
   onClose: () => void
@@ -19,19 +24,11 @@ const TYPES: { key: LeaderboardType; label: string }[] = [
 
 const MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' }
 
-function RankRow({
-  entry,
-  isCurrentUser,
-}: {
-  entry: LeaderboardEntry
-  isCurrentUser: boolean
-}) {
+function RankRow({ entry, isCurrentUser }: { entry: LeaderboardEntry; isCurrentUser: boolean }) {
   return (
     <div
       className={`flex items-center gap-3 px-3 py-2 rounded-lg border-2 ${
-        isCurrentUser
-          ? 'border-[#7a5230] bg-[#c8b07a]'
-          : 'border-[#9a6b28] bg-[#dcc898]'
+        isCurrentUser ? 'border-[#7a5230] bg-[#c8b07a]' : 'border-[#9a6b28] bg-[#dcc898]'
       }`}
     >
       <span className="w-7 text-center text-sm font-bold shrink-0 text-[#7a5230]">
@@ -44,7 +41,8 @@ function RankRow({
         )}
       </span>
       <span className="text-sm font-bold text-[#3d2010] tabular-nums shrink-0">
-        {entry.score.toLocaleString()} <span className="text-xs text-[#7a5230] font-normal">pts</span>
+        {entry.score.toLocaleString()}{' '}
+        <span className="text-xs text-[#7a5230] font-normal">pts</span>
       </span>
     </div>
   )
@@ -79,8 +77,7 @@ export function LeaderboardModal({ onClose }: Props) {
 
   const currentUserId = data?.currentUserEntry?.id
   const showCurrentUserFooter =
-    data?.currentUserEntry &&
-    !data.entries.some((e) => e.id === data.currentUserEntry!.id)
+    data?.currentUserEntry && !data.entries.some((e) => e.id === data.currentUserEntry!.id)
 
   return (
     <div
@@ -100,7 +97,12 @@ export function LeaderboardModal({ onClose }: Props) {
           className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
 
@@ -175,11 +177,7 @@ export function LeaderboardModal({ onClose }: Props) {
           {!loading &&
             !error &&
             data?.entries.map((entry) => (
-              <RankRow
-                key={entry.id}
-                entry={entry}
-                isCurrentUser={entry.id === currentUserId}
-              />
+              <RankRow key={entry.id} entry={entry} isCurrentUser={entry.id === currentUserId} />
             ))}
         </div>
 

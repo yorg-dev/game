@@ -87,7 +87,9 @@ export function AchievementToast() {
                 Achievement unlocked!
               </p>
               <p className="text-xs font-bold text-[#3d2010]">{toast.title}</p>
-              <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${s.badge}`}>
+              <span
+                className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${s.badge}`}
+              >
                 {s.label}
               </span>
             </div>

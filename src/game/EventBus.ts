@@ -122,7 +122,12 @@ export interface GameEventMap {
     xpToNext: number
   }
   /** GameScene → all: an agent crossed a level threshold. */
-  'agent-leveled-up': { agentId: number; agentSlug: string; newLevel: number; previousLevel: number }
+  'agent-leveled-up': {
+    agentId: number
+    agentSlug: string
+    newLevel: number
+    previousLevel: number
+  }
   /** questStore → React: available quest definitions were (re)loaded from the API. */
   'quests-updated': undefined
   /** Phaser → React: an agent is walking toward the player and will execute a task. */

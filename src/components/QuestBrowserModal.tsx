@@ -136,7 +136,9 @@ function QuestCard({ quest, index }: { quest: Quest; index: number }) {
             <div key={step.id} className="flex items-start gap-3">
               <div
                 className={`w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                  step.isComplete ? 'border-[#4a7c20] bg-[#5a9c28]' : 'border-[#9a6b28] bg-[#e8d5a8]'
+                  step.isComplete
+                    ? 'border-[#4a7c20] bg-[#5a9c28]'
+                    : 'border-[#9a6b28] bg-[#e8d5a8]'
                 }`}
               >
                 {step.isComplete && <CheckIcon />}

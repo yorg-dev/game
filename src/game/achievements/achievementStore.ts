@@ -108,7 +108,9 @@ function checkMetaAchievements(): void {
   if (baseIds.filter((id) => !!raw[id]).length >= 5) unlock('overachiever')
 
   // Master of Yorg: everything except itself
-  const allExceptMaster = availableAchievements.map((a) => a.id).filter((id) => id !== 'master-of-yorg')
+  const allExceptMaster = availableAchievements
+    .map((a) => a.id)
+    .filter((id) => id !== 'master-of-yorg')
   if (allExceptMaster.every((id) => !!raw[id])) unlock('master-of-yorg')
 }
 

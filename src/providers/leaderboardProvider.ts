@@ -5,9 +5,7 @@ const api = import.meta.env.VITE_API_URL as string
 
 export const leaderboardProvider = {
   async fetch(type: LeaderboardType, period: LeaderboardPeriod): Promise<Leaderboard> {
-    const { json } = await httpProvider(
-      `${api}/leaderboard?type=${type}&period=${period}`
-    )
+    const { json } = await httpProvider(`${api}/leaderboard?type=${type}&period=${period}`)
     const raw = json as {
       period: LeaderboardPeriod
       type: LeaderboardType

@@ -25,7 +25,11 @@ export function VoiceButton() {
     const unsub = agentChannelProvider.onMessage((msg) => {
       if (msg.type !== 'acknowledged') return
       const storedUser = (() => {
-        try { return JSON.parse(localStorage.getItem('user') ?? 'null') } catch { return null }
+        try {
+          return JSON.parse(localStorage.getItem('user') ?? 'null')
+        } catch {
+          return null
+        }
       })()
       EventBus.emit('voice-command', {
         agentId: msg.agentId,
