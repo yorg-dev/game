@@ -1,22 +1,27 @@
 import Phaser from 'phaser'
 import { EventBus } from '../EventBus'
 import logoUrl from '../../assets/objects/logo.jpeg'
+import landBackgroundUrl from '../../assets/land_background.png'
+import yorgLogoUrl from '../../assets/yorg_logo.png'
 
 // ---------------------------------------------------------------------------
-// Palette
+// Palette — matches Tailwind theme in index.css
 // ---------------------------------------------------------------------------
 
 const C = {
-  bg: 0x080818,
-  star: 0xffffff,
-  accent: 0xc8974c, // wood/tan — matches toolbar palette
-  menuNormal: '#8aa8c0',
-  menuHover: '#c0d8ec',
-  menuSelected: '#f0e0c0', // warm cream
-  tagline: '#a0b8c8',
-  hint: '#6a8a9a',
-  divider: 0x1a2535,
-  cursorGlow: 0xc8974c,
+  // Backdrop card
+  cardFill: 0x1e0e04,      // soil-950
+  cardBorder: 0x3d2414,    // soil-800
+
+  // Text
+  menuNormal: '#f8eecc',   // wood-100
+  menuSelected: '#a0d45e', // grass-300 — bright, pops on dark card
+  tagline: '#f0d890',      // wood-200
+  hint: '#e8c878',         // wood-300
+  divider: 0x3d2414,       // soil-800
+
+  // Cursor / accent
+  accent: '#c4924a',       // wood-500
 }
 
 // ---------------------------------------------------------------------------
@@ -57,10 +62,12 @@ export class TitleScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image('title-logo', logoUrl)
+    this.load.image('land-background', landBackgroundUrl)
+    this.load.image('yorg-logo', yorgLogoUrl)
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor(C.bg)
+    this.cameras.main.setBackgroundColor(0x000000)
     this.isTransitioning = false
     this.menuItems = []
 
@@ -75,7 +82,8 @@ export class TitleScene extends Phaser.Scene {
 
     this.cameras.main.fadeIn(900, 0, 0, 0)
 
-    this.createStars()
+    this.createBackground()
+    this.createCard()
     this.createLogo()
     this.createMenu()
     this.createHint()
@@ -117,31 +125,53 @@ export class TitleScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------------------
-  // Stars
+  // Background — blurred via postFX
   // ---------------------------------------------------------------------------
 
-  private createStars(): void {
+  private createBackground(): void {
     const { width: w, height: h } = this.scale
 
-    for (let i = 0; i < 90; i++) {
-      const x = Math.random() * w
-      const y = Math.random() * h
-      const size = Math.random() < 0.65 ? 1 : 2
-      const alpha = 0.15 + Math.random() * 0.55
+    const bg = this.add.image(w / 2, h / 2, 'land-background').setDepth(-2)
 
-      const star = this.add.rectangle(x, y, size, size, C.star, 1).setAlpha(alpha)
+    // Scale to cover the full canvas (cover, not stretch)
+    const scaleX = w / bg.width
+    const scaleY = h / bg.height
+    bg.setScale(Math.max(scaleX, scaleY))
 
-      // Each star twinkles independently
-      this.tweens.add({
-        targets: star,
-        alpha: { from: alpha * 0.25, to: Math.min(1, alpha + 0.3) },
-        duration: 1200 + Math.random() * 2800,
-        repeat: -1,
-        yoyo: true,
-        delay: Math.random() * 3000,
-        ease: 'Sine.easeInOut',
-      })
+    // Blur the background image so the card content stays crisp
+    try {
+      bg.postFX.addBlur(0, 2, 2, 1)
+    } catch {
+      // postFX not available (Canvas renderer fallback) — skip blur
     }
+
+    // Light global dim so the card reads against any background region
+    this.add.rectangle(w / 2, h / 2, w, h, 0x000000, 0.25).setDepth(-1)
+  }
+
+  // ---------------------------------------------------------------------------
+  // Frosted card backdrop
+  // ---------------------------------------------------------------------------
+
+  private createCard(): void {
+    const cx = this.scale.width / 2
+    const cy = this.scale.height / 2
+
+    const cardW = 380
+    const cardH = 410
+    const cardY = cy + 20 // slightly below centre to account for logo above
+
+    const g = this.add.graphics().setDepth(0).setAlpha(0)
+
+    // Fill
+    g.fillStyle(C.cardFill, 0.82)
+    g.fillRoundedRect(cx - cardW / 2, cardY - cardH / 2, cardW, cardH, 12)
+
+    // Border
+    g.lineStyle(1, C.cardBorder, 0.9)
+    g.strokeRoundedRect(cx - cardW / 2, cardY - cardH / 2, cardW, cardH, 12)
+
+    this.tweens.add({ targets: g, alpha: 1, duration: 500, delay: 100, ease: 'Power2' })
   }
 
   // ---------------------------------------------------------------------------
@@ -153,24 +183,24 @@ export class TitleScene extends Phaser.Scene {
     const cy = this.scale.height / 2
 
     // Logo image
-    /*
-    const logo = this.add.image(cx, cy - 110, 'title-logo')
-      .setDisplaySize(180, 180)
+    const logo = this.add
+      .image(cx, cy - 60, 'yorg-logo')
+      .setDisplaySize(220, 220)
       .setAlpha(0)
+      .setDepth(1)
 
     this.tweens.add({
-      targets:  logo,
-      alpha:    1,
-      y:        cy - 100,
+      targets: logo,
+      alpha: 1,
+      y: cy - 50,
       duration: 700,
-      delay:    150,
-      ease:     'Power2',
+      delay: 150,
+      ease: 'Power2',
     })
-    */
 
     // Tagline
     const tag = this.add
-      .text(cx, cy + 44, 'Build your world. Command your agents.', {
+      .text(cx, cy + 76, 'Build your business while having fun', {
         fontFamily: '"Courier New", monospace',
         fontSize: '13px',
         color: C.tagline,
@@ -178,13 +208,14 @@ export class TitleScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
       .setAlpha(0)
+      .setDepth(1)
 
     this.tweens.add({ targets: tag, alpha: 1, duration: 500, delay: 450, ease: 'Power2' })
 
     // Divider line
-    const div = this.add.graphics().setAlpha(0)
+    const div = this.add.graphics().setAlpha(0).setDepth(1)
     div.fillStyle(C.divider, 1)
-    div.fillRect(cx - 100, cy + 66, 200, 1)
+    div.fillRect(cx - 100, cy + 98, 200, 1)
 
     this.tweens.add({ targets: div, alpha: 1, duration: 400, delay: 550 })
   }
@@ -199,7 +230,7 @@ export class TitleScene extends Phaser.Scene {
 
     const defs: Array<Pick<MenuItem, 'label' | 'subLabel' | 'onSelect'>> = [
       {
-        label: 'NEW GAME',
+        label: 'NEW WORLD',
         subLabel: 'Start a fresh world',
         onSelect: () => this.startGame(),
       },
@@ -215,14 +246,14 @@ export class TitleScene extends Phaser.Scene {
       .text(0, 0, '▶', {
         fontFamily: '"Courier New", monospace',
         fontSize: '14px',
-        color: '#c8974c',
+        color: C.accent,
       })
       .setOrigin(1, 0.5)
       .setDepth(10)
       .setAlpha(0)
 
     defs.forEach((def, i) => {
-      const y = cy + 96 + i * 44
+      const y = cy + 116 + i * 50
 
       const txt = this.add
         .text(cx + 14, y, def.label, {
@@ -233,17 +264,19 @@ export class TitleScene extends Phaser.Scene {
         })
         .setOrigin(0, 0.5)
         .setAlpha(0)
+        .setDepth(1)
         .setInteractive({ useHandCursor: true })
 
       const sub = this.add
-        .text(cx + 14, y + 14, def.subLabel, {
+        .text(cx + 14, y + 16, def.subLabel, {
           fontFamily: '"Courier New", monospace',
-          fontSize: '9px',
+          fontSize: '10px',
           color: C.hint,
           letterSpacing: 1,
         })
         .setOrigin(0, 0.5)
         .setAlpha(0)
+        .setDepth(1)
 
       txt.on('pointerover', () => {
         if (!this.isTransitioning && this.selectedIndex !== i) {
@@ -322,42 +355,31 @@ export class TitleScene extends Phaser.Scene {
     const cx = this.scale.width / 2
     const cy = this.scale.height / 2
 
-    this.add
-      .text(cx, cy + 210, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
-        fontFamily: '"Courier New", monospace',
-        fontSize: '8px',
-        color: C.hint,
-        letterSpacing: 2,
-      })
-      .setOrigin(0.5)
-      .setAlpha(0)
-      // fade in last
-      .setAlpha(0)
-
-    // Use a tween since we set alpha 0 twice above — create a local ref
     const hint = this.add
-      .text(cx, cy + 210, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
+      .text(cx, cy + 230, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
         fontFamily: '"Courier New", monospace',
-        fontSize: '8px',
+        fontSize: '10px',
         color: C.hint,
         letterSpacing: 2,
       })
       .setOrigin(0.5)
       .setAlpha(0)
+      .setDepth(1)
 
-    this.tweens.add({ targets: hint, alpha: 1, duration: 400, delay: 1000 })
+    this.tweens.add({ targets: hint, alpha: 0.7, duration: 400, delay: 1000 })
 
     // Version tag bottom-right
     const vTag = this.add
       .text(this.scale.width - 12, this.scale.height - 10, 'v0.1.0', {
         fontFamily: '"Courier New", monospace',
-        fontSize: '8px',
+        fontSize: '10px',
         color: C.hint,
       })
       .setOrigin(1, 1)
       .setAlpha(0)
+      .setDepth(1)
 
-    this.tweens.add({ targets: vTag, alpha: 1, duration: 400, delay: 1200 })
+    this.tweens.add({ targets: vTag, alpha: 0.5, duration: 400, delay: 1200 })
   }
 
   // ---------------------------------------------------------------------------
