@@ -160,6 +160,10 @@ export interface GameEventMap {
   'achievements-updated': undefined
   /** Any component → App: open the achievements modal. */
   'show-achievements': undefined
+  /** Any component → App: open the experts directory modal. */
+  'show-experts': undefined
+  /** Any component → App: open the leaderboard modal. */
+  'show-leaderboard': undefined
 }
 
 type Listener<T> = (payload: T) => void

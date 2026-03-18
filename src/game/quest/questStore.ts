@@ -8,7 +8,6 @@
 // ---------------------------------------------------------------------------
 
 import { EventBus } from '../EventBus'
-import { questProvider } from '@/providers/questProvider'
 import { SAMPLE_QUESTS } from '@/mocks/quests'
 import type { Quest } from '@/models/Quest'
 
@@ -63,22 +62,12 @@ export function getQuestsWithProgress(): Quest[] {
 }
 
 /**
- * Fetch quest definitions from the API and update the in-memory cache.
+ * Update the in-memory quest definitions from data returned by the API.
  * Emits `quests-updated` so subscribed components re-render.
- * Safe to call multiple times — debounced by a simple in-flight guard.
  */
-let loadInFlight = false
-
-export async function loadQuests(): Promise<void> {
-  if (loadInFlight) return
-  loadInFlight = true
-  try {
-    const quests = await questProvider.getQuests()
-    availableQuests = quests
-    EventBus.emit('quests-updated', undefined)
-  } finally {
-    loadInFlight = false
-  }
+export function setQuests(quests: Quest[]): void {
+  availableQuests = quests
+  EventBus.emit('quests-updated', undefined)
 }
 
 /**

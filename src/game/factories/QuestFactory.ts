@@ -10,7 +10,7 @@ import { SAMPLE_QUESTS } from '@/mocks/quests'
 // "First launch" is tracked via localStorage so the tutorial only plays once.
 // ---------------------------------------------------------------------------
 
-const STORAGE_KEY = 'slaivs.tutorialSeen'
+const STORAGE_KEY = 'yorg.tutorialSeen'
 
 const TUTORIAL_DIALOG = [
   {

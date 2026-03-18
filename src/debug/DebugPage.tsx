@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { NewAgentModal } from '@/components/NewAgentModal'
-import { NewConnectionModal } from '@/components/NewConnectionModal'
-import { AgentPopover } from '@/components/AgentPopover'
-import { ConnectionPopover } from '@/components/ConnectionPopover'
-import { DialogBox } from '@/components/dialog/DialogBox'
-import { NotificationsModal } from '@/components/NotificationsModal'
+import { NewAgentModal } from '@/app/Agents/NewModal'
+import { NewConnectionModal } from '@/app/Connections/NewModal'
+import { AgentPopover } from '@/app/Agents/Popover'
+import { ConnectionPopover } from '@/app/Connections/Popover'
+import { DialogBox } from '@/app/Game/Dialog'
+import { NotificationsModal } from '@/app/Notifications/List'
 import { EventBus } from '@/game/EventBus'
 import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
 import { APPS } from '@/mocks/apps'
@@ -206,7 +206,7 @@ function NotificationsPanel() {
   )
 }
 
-const TUTORIAL_KEY = 'slaivs.tutorialSeen'
+const TUTORIAL_KEY = 'yorg.tutorialSeen'
 
 function QuestsPanel() {
   const [seen, setSeen] = useState(() => !!localStorage.getItem(TUTORIAL_KEY))

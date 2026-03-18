@@ -8,7 +8,6 @@
 // ---------------------------------------------------------------------------
 
 import { EventBus } from '../EventBus'
-import { achievementProvider } from '@/providers/achievementProvider'
 import { SAMPLE_ACHIEVEMENTS } from '@/mocks/achievements'
 import { getQuestsWithProgress } from '../quest/questStore'
 import type { Achievement } from '@/models/Achievement'
@@ -20,7 +19,6 @@ type Progress = Record<string, string>
 
 let availableAchievements: Achievement[] = SAMPLE_ACHIEVEMENTS
 let activeAgentCount = 0
-let loadInFlight = false
 
 // ── Storage helpers ──────────────────────────────────────────────────────────
 
@@ -52,18 +50,12 @@ export function getAchievementsWithProgress(): Achievement[] {
 }
 
 /**
- * Fetch achievement definitions from the API and update the in-memory cache.
+ * Update the in-memory achievement definitions from data returned by the API.
  * Emits `achievements-updated` so subscribed components re-render.
  */
-export async function loadAchievements(): Promise<void> {
-  if (loadInFlight) return
-  loadInFlight = true
-  try {
-    availableAchievements = await achievementProvider.getAchievements()
-    EventBus.emit('achievements-updated', undefined)
-  } finally {
-    loadInFlight = false
-  }
+export function setAchievements(achievements: Achievement[]): void {
+  availableAchievements = achievements
+  EventBus.emit('achievements-updated', undefined)
 }
 
 /**

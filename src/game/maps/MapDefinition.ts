@@ -43,9 +43,30 @@ export interface MapDefinition {
    */
   waterData?: number[][]
 
+  /**
+   * Optional dirt/path layer grid.  Values are 1-based tile IDs (i.e. dirt_01.png,
+   * 8 cols × 8 rows, 16×16 px frames).  -1 = no tile (transparent).
+   * Rendered above the ground layer but below features; no collision.
+   */
+  dirtData?: number[][]
+
+  /**
+   * Optional fence layer grid.  Values are 1-based tile IDs (i.e. fences.png,
+   * 4 cols × 4 rows, 16×16 px frames).  -1 = no tile (transparent).
+   * Rendered above the dirt layer; all non-empty tiles block movement.
+   */
+  fenceData?: number[][]
+
   /** Default player spawn in tile coordinates (col, row). */
   spawnTile: { col: number; row: number }
 
   /** Phaser backgroundColor string (hex or CSS colour). */
   bgColor?: string
+
+  /**
+   * Static decoration sprites drawn from biom.png (9 cols × 5 rows, 16×16 frames).
+   * Positions are in tile coordinates; GameScene converts to world pixels.
+   * Set collides: true for solid objects (trees, rocks) that block movement.
+   */
+  decorations?: Array<{ frame: number; row: number; col: number; collides?: boolean }>
 }

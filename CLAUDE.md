@@ -40,3 +40,24 @@ These commands are part of the broader spec kit system:
 **Creates**: Migration, model, factory, specs, API controller, serializer, ability, routes, seeds
 **Trigger**: "Add new feature with model [ModelName]"
 **Use case**: New model with full CRUD API and authorization
+
+### Context7
+
+This repo uses Context7 to search known package documentation.
+
+#### Stack Note
+
+This project uses **`ra-core`** only — NOT the `react-admin` package (no Material UI). For layouts, lists, forms, and UI components use **Shadcn Admin Kit** (`@/components/admin`), which is the shadcn/tailwind implementation of react-admin.
+
+#### Library IDs
+
+| Library | Context7 ID | Notes |
+|---------|-------------|-------|
+| Shadcn Admin Kit (layouts/UI) | `/marmelab/shadcn-admin-kit` | shadcn+tailwind react-admin components |
+| ra-core (hooks/context) | `/marmelab/react-admin` | 6600+ snippets — use for hooks like `useListContext`, `useRecordContext`, `ListBase`, etc. |
+| Phaser | `/websites/phaser_io` | 12180+ snippets, High reputation |
+
+#### Usage Examples
+
+- Look up a layout component: `use context7 for /marmelab/shadcn-admin-kit to look up the <List> component props`
+- Look up a hook: `use context7 for /marmelab/react-admin to look up useRecordContext`

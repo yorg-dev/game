@@ -8,7 +8,7 @@
 // ---------------------------------------------------------------------------
 
 const LS_KEY = 'deviceId'
-const IDB_DB = 'slaivs'
+const IDB_DB = 'yorg'
 const IDB_VER = 1
 const IDB_STORE = 'meta'
 const IDB_KEY = 'deviceId'

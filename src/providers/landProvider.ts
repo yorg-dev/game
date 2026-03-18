@@ -1,4 +1,5 @@
 import httpProvider from './httpProvider'
+import { dataProvider } from './dataProvider'
 import type { World } from '@/models/World'
 import type { Land } from '@/models/Land'
 import type { LandPlacement, PlacementEntityType } from '@/models/LandPlacement'
@@ -69,7 +70,12 @@ export const worldProvider = {
   async getWorlds(): Promise<World[]> {
     if (!api) return SAMPLE_WORLDS
     try {
-      return await getList<World>('worlds')
+      const { data } = await dataProvider.getList<World>('worlds', {
+        pagination: { page: 1, perPage: 100 },
+        sort: { field: 'id', order: 'ASC' },
+        filter: {},
+      })
+      return data
     } catch {
       return SAMPLE_WORLDS
     }
@@ -82,8 +88,8 @@ export const worldProvider = {
   async getWorld(id: string): Promise<World> {
     if (!api) return DEFAULT_WORLD
     try {
-      const { json } = await httpProvider(url(`worlds/${id}`))
-      return camelize(json) as World
+      const { data } = await dataProvider.getOne<World>('worlds', { id })
+      return data
     } catch {
       return SAMPLE_WORLDS.find((w) => w.id === id) ?? DEFAULT_WORLD
     }

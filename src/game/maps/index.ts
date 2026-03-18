@@ -1,11 +1,12 @@
 import type { MapDefinition } from './MapDefinition'
+import { TUTORIAL_MAP } from './tutorialMap'
 import { MEADOW_MAP } from './meadowMap'
 import { COAST_MAP } from './coastMap'
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 // Add new maps here.  The first entry is the default.
 
-export const MAP_REGISTRY: MapDefinition[] = [MEADOW_MAP, COAST_MAP]
+export const MAP_REGISTRY: MapDefinition[] = [TUTORIAL_MAP, MEADOW_MAP, COAST_MAP]
 
 // ── Active map ────────────────────────────────────────────────────────────────
 // GameScene reads this on create().  Call setActiveMap() before starting/

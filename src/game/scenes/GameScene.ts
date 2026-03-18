@@ -11,6 +11,9 @@ import chickenUrl from '../../assets/characters/chicken_sprites.png'
 import cowUrl from '../../assets/characters/cow_sprites.png'
 import grassUrl from '../../assets/tilesets/grass.png'
 import waterUrl from '../../assets/tilesets/water.png'
+import biomUrl from '../../assets/objects/biom.png'
+import dirtUrl from '../../assets/tilesets/dirt_01.png'
+import fencesUrl from '../../assets/tilesets/fences.png'
 import type { LandPlacement } from '@/models/LandPlacement'
 import type { Connection } from '@/models/Connection'
 import { IndoorScene } from './IndoorScene'
@@ -48,6 +51,8 @@ export class GameScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap
   private layer!: Phaser.Tilemaps.TilemapLayer
   private waterLayer: Phaser.Tilemaps.TilemapLayer | null = null
+  private fenceLayer: Phaser.Tilemaps.TilemapLayer | null = null
+  private decorationGroup!: Phaser.Physics.Arcade.StaticGroup
   private agents: Agent[] = []
   private player!: User
   private selectionIndicator!: Phaser.GameObjects.Graphics
@@ -84,6 +89,12 @@ export class GameScene extends Phaser.Scene {
     this.load.image('grass-tiles', grassUrl)
     // Water tileset: 64×16, frames 16×16 (4 cols × 1 row = 4 tiles)
     this.load.image('water-tiles', waterUrl)
+    // Biom decorations: 144×80, frames 16×16 (9 cols × 5 rows = 45 tiles)
+    this.load.spritesheet('biom', biomUrl, { frameWidth: 16, frameHeight: 16 })
+    // Dirt/path tileset: 128×128, frames 16×16 (8 cols × 8 rows = 64 tiles)
+    this.load.image('dirt-tiles', dirtUrl)
+    // Fence tileset: 64×64, frames 16×16 (4 cols × 4 rows = 16 tiles)
+    this.load.image('fence-tiles', fencesUrl)
     this.chest.preload()
     this.sign.preload()
     this.houses.preload()
@@ -95,6 +106,7 @@ export class GameScene extends Phaser.Scene {
 
     this.createTileset()
     this.layer = this.createMap()
+    this.createDecorations()
 
     // Physics + camera world bounds derived from the map definition so they
     // are always correct even when the features layer is empty.
@@ -162,6 +174,8 @@ export class GameScene extends Phaser.Scene {
     this.player = new User(this, spawnX, spawnY)
     this.physics.add.collider(this.player, this.layer)
     if (this.waterLayer) this.physics.add.collider(this.player, this.waterLayer)
+    if (this.fenceLayer) this.physics.add.collider(this.player, this.fenceLayer)
+    this.physics.add.collider(this.player, this.decorationGroup)
     this.physics.add.collider(this.player, this.houses.group)
     if (this.chest.sprite) this.physics.add.collider(this.player, this.chest.sprite)
     if (this.sign.sprite) this.physics.add.collider(this.player, this.sign.sprite)
@@ -784,6 +798,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------------------
+  // Decorations (biom.png sprites)
+  // ---------------------------------------------------------------------------
+
+  private createDecorations(): void {
+    const S = this.mapDef.tileSize
+    this.decorationGroup = this.physics.add.staticGroup()
+
+    for (const { frame, col, row, collides } of this.mapDef.decorations ?? []) {
+      const x = (col + 0.5) * S
+      const y = (row + 0.5) * S
+      if (collides) {
+        this.decorationGroup.create(x, y, 'biom', frame).setDepth(1)
+      } else {
+        this.add.image(x, y, 'biom', frame).setDepth(1)
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Tileset
   // ---------------------------------------------------------------------------
 
@@ -859,6 +892,43 @@ export class GameScene extends Phaser.Scene {
       )!
       this.waterLayer = waterMap.createLayer(0, waterTileset, 0, 0)!
       this.waterLayer.setCollisionByExclusion([-1])
+    }
+
+    // --- Dirt/path layer (optional, uses dirt_01.png) ---
+    if (this.mapDef.dirtData) {
+      const dirtMap = this.make.tilemap({
+        data: this.mapDef.dirtData,
+        tileWidth: tileSize,
+        tileHeight: tileSize,
+      })
+      const dirtTileset = dirtMap.addTilesetImage(
+        'dirt-tiles',
+        'dirt-tiles',
+        tileSize,
+        tileSize,
+        0,
+        0,
+      )!
+      dirtMap.createLayer(0, dirtTileset, 0, 0)!
+    }
+
+    // --- Fence layer (optional, uses fences.png; all non-empty tiles collide) ---
+    if (this.mapDef.fenceData) {
+      const fenceMap = this.make.tilemap({
+        data: this.mapDef.fenceData,
+        tileWidth: tileSize,
+        tileHeight: tileSize,
+      })
+      const fenceTileset = fenceMap.addTilesetImage(
+        'fence-tiles',
+        'fence-tiles',
+        tileSize,
+        tileSize,
+        0,
+        0,
+      )!
+      this.fenceLayer = fenceMap.createLayer(0, fenceTileset, 0, 0)!
+      this.fenceLayer.setCollisionByExclusion([-1])
     }
 
     // --- Feature overlay: dirt / stone on top ---

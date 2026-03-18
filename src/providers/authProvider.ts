@@ -24,9 +24,9 @@ function getStoredUser(): StoredUser | null {
 const authProvider = {
   //: AuthProvider = {
   checkAuth: () => {
-    const token: Token = localStorage.getItem('token')
-
-    return token ? Promise.resolve() : Promise.reject()
+    // Always resolve — the game manages its own auth flow via GameDashboard
+    // (guest session creation, login modal, etc.). Ra-core should not redirect.
+    return Promise.resolve()
   },
   checkError: (error: any) => {
     if (!error) return Promise.reject()
@@ -47,7 +47,7 @@ const authProvider = {
       })
     }
 
-    if (status === 401 || status === 403 || status === undefined) {
+    if (status === 401 || status === 403) {
       // localStorage.removeItem('token');
       return Promise.reject({
         logoutUser: false,
@@ -150,8 +150,8 @@ const authProvider = {
     localStorage.removeItem('user')
     clearDeviceId() // clears both localStorage and IndexedDB
   },
-  async canAccess(_params: any) {
-    return Promise.resolve()
+  async canAccess(_params: any): Promise<boolean> {
+    return true
   },
 }
 
