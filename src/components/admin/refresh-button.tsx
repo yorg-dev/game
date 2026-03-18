@@ -1,6 +1,6 @@
-import { useRefresh, useLoading } from "ra-core";
-import { Button } from "@/components/ui/button";
-import { LoaderCircle, RotateCw } from "lucide-react";
+import { useRefresh, useLoading } from 'ra-core'
+import { Button } from '@/components/ui/button'
+import { LoaderCircle, RotateCw } from 'lucide-react'
 
 /**
  * A button that refreshes the current view's data.
@@ -11,21 +11,16 @@ import { LoaderCircle, RotateCw } from "lucide-react";
  * @see {@link https://marmelab.com/shadcn-admin-kit/docs/refreshbutton/ RefreshButton documentation}
  */
 export const RefreshButton = () => {
-  const refresh = useRefresh();
-  const loading = useLoading();
+  const refresh = useRefresh()
+  const loading = useLoading()
 
   const handleRefresh = () => {
-    refresh();
-  };
+    refresh()
+  }
 
   return (
-    <Button
-      onClick={handleRefresh}
-      variant="ghost"
-      size="icon"
-      className="hidden sm:inline-flex"
-    >
+    <Button onClick={handleRefresh} variant="ghost" size="icon" className="hidden sm:inline-flex">
       {loading ? <LoaderCircle className="animate-spin" /> : <RotateCw />}
     </Button>
-  );
-};
+  )
+}

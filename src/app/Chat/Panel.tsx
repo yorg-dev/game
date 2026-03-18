@@ -54,15 +54,11 @@ function MessageList({
 }) {
   if (tab === 'agents' && agents.length === 0) {
     return (
-      <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">
-        No agents in this land
-      </p>
+      <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">No agents in this land</p>
     )
   }
   if (messages.length === 0) {
-    return (
-      <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">No messages yet</p>
-    )
+    return <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">No messages yet</p>
   }
   return (
     <div className="flex flex-col gap-2">
@@ -152,8 +148,12 @@ export function ChatPanel() {
   const openRef = useRef(open)
   const tabRef = useRef(activeTab)
 
-  useEffect(() => { openRef.current = open }, [open])
-  useEffect(() => { tabRef.current = activeTab }, [activeTab])
+  useEffect(() => {
+    openRef.current = open
+  }, [open])
+  useEffect(() => {
+    tabRef.current = activeTab
+  }, [activeTab])
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -213,7 +213,13 @@ export function ChatPanel() {
         if (replaced.some((m) => m.id === `${messageId}-agent`)) return replaced
         return [
           ...prev,
-          { id: `${messageId}-agent`, authorName: agentName, text, ts: Date.now(), fromSelf: false },
+          {
+            id: `${messageId}-agent`,
+            authorName: agentName,
+            text,
+            ts: Date.now(),
+            fromSelf: false,
+          },
         ]
       })
       if (!openRef.current || tabRef.current !== 'agents') {
@@ -261,7 +267,13 @@ export function ChatPanel() {
       if (agentId !== null) {
         setAgentMessages((prev) => [
           ...prev,
-          { id: `${messageId}-pending`, authorName: 'Agent', text: '…', ts: Date.now(), fromSelf: false },
+          {
+            id: `${messageId}-pending`,
+            authorName: 'Agent',
+            text: '…',
+            ts: Date.now(),
+            fromSelf: false,
+          },
         ])
         EventBus.emit('agent-message', { messageId, agentId, text: cleanText })
       } else {

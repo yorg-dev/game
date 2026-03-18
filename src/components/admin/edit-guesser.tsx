@@ -1,21 +1,21 @@
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import type { InferredTypeMap } from "ra-core";
+import type { ReactNode } from 'react'
+import { useEffect, useState } from 'react'
+import type { InferredTypeMap } from 'ra-core'
 import {
   EditBase,
   InferredElement,
   useResourceContext,
   useEditContext,
   getElementsFromRecords,
-} from "ra-core";
-import { capitalize, singularize } from "inflection";
-import { EditView } from "@/components/admin/edit";
-import { SimpleForm } from "@/components/admin/simple-form";
-import { TextInput } from "@/components/admin/text-input";
-import { BooleanInput } from "@/components/admin/boolean-input";
-import { ReferenceInput } from "@/components/admin/reference-input";
-import { AutocompleteInput } from "@/components/admin/autocomplete-input";
-import { ReferenceArrayInput } from "@/components/admin/reference-array-input";
+} from 'ra-core'
+import { capitalize, singularize } from 'inflection'
+import { EditView } from '@/components/admin/edit'
+import { SimpleForm } from '@/components/admin/simple-form'
+import { TextInput } from '@/components/admin/text-input'
+import { BooleanInput } from '@/components/admin/boolean-input'
+import { ReferenceInput } from '@/components/admin/reference-input'
+import { AutocompleteInput } from '@/components/admin/autocomplete-input'
+import { ReferenceArrayInput } from '@/components/admin/reference-array-input'
 
 /**
  * An edit page that automatically generates a form from your data.
@@ -42,77 +42,68 @@ export const EditGuesser = (props: EditGuesserProps) => {
     <EditBase>
       <EditViewGuesser {...props} />
     </EditBase>
-  );
-};
+  )
+}
 
 const EditViewGuesser = (props: EditGuesserProps) => {
-  const resource = useResourceContext();
+  const resource = useResourceContext()
 
   if (!resource) {
-    throw new Error(`Cannot use <EditGuesser> outside of a ResourceContext`);
+    throw new Error(`Cannot use <EditGuesser> outside of a ResourceContext`)
   }
 
-  const { record } = useEditContext();
-  const [child, setChild] = useState<ReactNode>(null);
-  const { enableLog = import.meta.env.MODE === "development", ...rest } = props;
+  const { record } = useEditContext()
+  const [child, setChild] = useState<ReactNode>(null)
+  const { enableLog = import.meta.env.MODE === 'development', ...rest } = props
 
   useEffect(() => {
-    setChild(null);
-  }, [resource]);
+    setChild(null)
+  }, [resource])
 
   useEffect(() => {
     if (record && !child) {
-      const inferredElements = getElementsFromRecords([record], editFieldTypes);
-      const inferredChild = new InferredElement(
-        editFieldTypes.form,
-        null,
-        inferredElements,
-      );
-      setChild(inferredChild.getElement());
+      const inferredElements = getElementsFromRecords([record], editFieldTypes)
+      const inferredChild = new InferredElement(editFieldTypes.form, null, inferredElements)
+      setChild(inferredChild.getElement())
 
-      if (!enableLog) return;
+      if (!enableLog) return
 
-      const representation = inferredChild.getRepresentation();
+      const representation = inferredChild.getRepresentation()
 
-      const components = ["Edit"]
+      const components = ['Edit']
         .concat(
           Array.from(
             new Set(
               Array.from(representation.matchAll(/<([^/\s>]+)/g))
                 .map((match) => match[1])
-                .filter((component) => component !== "span"),
+                .filter((component) => component !== 'span'),
             ),
           ),
         )
-        .sort();
+        .sort()
 
       // eslint-disable-next-line no-console
       console.log(
         `Guessed Edit:
 
 ${components
-  .map(
-    (component) =>
-      `import { ${component} } from "@/components/admin/${kebabCase(
-        component,
-      )}";`,
-  )
-  .join("\n")}
+  .map((component) => `import { ${component} } from "@/components/admin/${kebabCase(component)}";`)
+  .join('\n')}
 
 export const ${capitalize(singularize(resource))}Edit = () => (
     <Edit>
 ${representation}
     </Edit>
 );`,
-      );
+      )
     }
-  }, [record, child, resource, enableLog]);
+  }, [record, child, resource, enableLog])
 
-  return <EditView {...rest}>{child}</EditView>;
-};
+  return <EditView {...rest}>{child}</EditView>
+}
 
 interface EditGuesserProps {
-  enableLog?: boolean;
+  enableLog?: boolean
 }
 
 const editFieldTypes: InferredTypeMap = {
@@ -122,9 +113,7 @@ const editFieldTypes: InferredTypeMap = {
       _props: any,
       children: { getRepresentation: () => string }[],
     ) => `        <SimpleForm>
-${children
-  .map((child) => `            ${child.getRepresentation()}`)
-  .join("\n")}
+${children.map((child) => `            ${child.getRepresentation()}`).join('\n')}
         </SimpleForm>`,
   },
   reference: {
@@ -151,11 +140,11 @@ ${children
     component: (props: any) => <TextInput {...props} />,
     representation: (props: any) => `<TextInput source="${props.source}" />`,
   },
-};
+}
 
 const kebabCase = (name: string) => {
   return name
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase();
-};
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+}

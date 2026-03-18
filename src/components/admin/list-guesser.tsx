@@ -1,6 +1,6 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import type { RaRecord } from "ra-core";
+import * as React from 'react'
+import { useState, useEffect } from 'react'
+import type { RaRecord } from 'ra-core'
 import {
   ListBase,
   getElementsFromRecords,
@@ -8,18 +8,18 @@ import {
   useListContext,
   usePrevious,
   useResourceContext,
-} from "ra-core";
-import { useLocation } from "react-router";
-import type { ListProps, ListViewProps } from "@/components/admin/list";
-import { ListView } from "@/components/admin/list";
-import { capitalize, singularize } from "inflection";
-import { DataTable } from "@/components/admin/data-table";
-import { ArrayField } from "@/components/admin/array-field";
-import { BadgeField } from "@/components/admin/badge-field";
-import { ReferenceField } from "@/components/admin/reference-field";
-import { SingleFieldList } from "@/components/admin/single-field-list";
-import { ReferenceArrayField } from "@/components/admin/reference-array-field";
-import { GuesserEmpty } from "@/components/admin/guesser-empty";
+} from 'ra-core'
+import { useLocation } from 'react-router'
+import type { ListProps, ListViewProps } from '@/components/admin/list'
+import { ListView } from '@/components/admin/list'
+import { capitalize, singularize } from 'inflection'
+import { DataTable } from '@/components/admin/data-table'
+import { ArrayField } from '@/components/admin/array-field'
+import { BadgeField } from '@/components/admin/badge-field'
+import { ReferenceField } from '@/components/admin/reference-field'
+import { SingleFieldList } from '@/components/admin/single-field-list'
+import { ReferenceArrayField } from '@/components/admin/reference-array-field'
+import { GuesserEmpty } from '@/components/admin/guesser-empty'
 
 /**
  * A list page that automatically generates a DataTable from your data.
@@ -42,7 +42,7 @@ import { GuesserEmpty } from "@/components/admin/guesser-empty";
  * );
  */
 export const ListGuesser = <RecordType extends RaRecord = RaRecord>(
-  props: Omit<ListProps, "children"> & { enableLog?: boolean },
+  props: Omit<ListProps, 'children'> & { enableLog?: boolean },
 ) => {
   const {
     debounce,
@@ -56,15 +56,15 @@ export const ListGuesser = <RecordType extends RaRecord = RaRecord>(
     resource,
     sort,
     ...rest
-  } = props;
+  } = props
   // force a rerender of this component when any list parameter changes
   // otherwise the ListBase won't be rerendered when the sort changes
   // and the following check won't be performed
-  useLocation();
+  useLocation()
   // keep previous data, unless the resource changes
-  const resourceFromContext = useResourceContext(props);
-  const previousResource = usePrevious(resourceFromContext);
-  const keepPreviousData = previousResource === resourceFromContext;
+  const resourceFromContext = useResourceContext(props)
+  const previousResource = usePrevious(resourceFromContext)
+  const keepPreviousData = previousResource === resourceFromContext
   return (
     <ListBase<RecordType>
       debounce={debounce}
@@ -77,60 +77,51 @@ export const ListGuesser = <RecordType extends RaRecord = RaRecord>(
       perPage={perPage}
       resource={resource}
       queryOptions={{
-        placeholderData: (previousData) =>
-          keepPreviousData ? previousData : undefined,
+        placeholderData: (previousData) => (keepPreviousData ? previousData : undefined),
       }}
       sort={sort}
     >
       <ListViewGuesser {...rest} />
     </ListBase>
-  );
-};
+  )
+}
 
-const ListViewGuesser = (
-  props: Omit<ListViewProps, "children"> & { enableLog?: boolean },
-) => {
-  const { data } = useListContext();
-  const resource = useResourceContext();
-  const [child, setChild] = useState<React.ReactElement | null>(null);
-  const { enableLog = import.meta.env.MODE === "development", ...rest } = props;
+const ListViewGuesser = (props: Omit<ListViewProps, 'children'> & { enableLog?: boolean }) => {
+  const { data } = useListContext()
+  const resource = useResourceContext()
+  const [child, setChild] = useState<React.ReactElement | null>(null)
+  const { enableLog = import.meta.env.MODE === 'development', ...rest } = props
 
   useEffect(() => {
-    setChild(null);
-  }, [resource]);
+    setChild(null)
+  }, [resource])
 
   useEffect(() => {
     if (data && data.length > 0 && !child) {
-      const inferredElements = getElementsFromRecords(data, listFieldTypes);
-      const inferredChild = new InferredElement(
-        listFieldTypes.table,
-        null,
-        inferredElements,
-      );
-      const inferredChildElement = inferredChild.getElement();
-      const representation = inferredChild.getRepresentation();
+      const inferredElements = getElementsFromRecords(data, listFieldTypes)
+      const inferredChild = new InferredElement(listFieldTypes.table, null, inferredElements)
+      const inferredChildElement = inferredChild.getElement()
+      const representation = inferredChild.getRepresentation()
       if (!resource) {
-        throw new Error(
-          "Cannot use <ListGuesser> outside of a ResourceContext",
-        );
+        throw new Error('Cannot use <ListGuesser> outside of a ResourceContext')
       }
       if (!inferredChildElement || !representation) {
-        return;
+        return
       }
 
-      setChild(inferredChildElement);
+      setChild(inferredChildElement)
 
-      const components = ["List"]
+      const components = ['List']
         .concat(
           Array.from(
             new Set(
               Array.from(representation.matchAll(/<([^/\s\\.>]+)/g))
                 .map((match) => match[1])
-                .filter((component) => component !== "span"),
+                .filter((component) => component !== 'span'),
             ),
           ),
         )
-        .sort();
+        .sort()
 
       if (enableLog) {
         // eslint-disable-next-line no-console
@@ -138,40 +129,30 @@ const ListViewGuesser = (
           `Guessed List:
 
 ${components
-  .map(
-    (component) =>
-      `import { ${component} } from "@/components/admin/${kebabCase(
-        component,
-      )}";`,
-  )
-  .join("\n")}
+  .map((component) => `import { ${component} } from "@/components/admin/${kebabCase(component)}";`)
+  .join('\n')}
 
 export const ${capitalize(singularize(resource))}List = () => (
     <List>
 ${inferredChild.getRepresentation()}
     </List>
 );`,
-        );
+        )
       }
     }
-  }, [data, child, resource, enableLog]);
+  }, [data, child, resource, enableLog])
 
-  return <ListView {...rest}>{child}</ListView>;
-};
+  return <ListView {...rest}>{child}</ListView>
+}
 
 const listFieldTypes = {
   table: {
     component: (props: any) => {
-      return <DataTable {...props} />;
+      return <DataTable {...props} />
     },
-    representation: (
-      _props: any,
-      children: { getRepresentation: () => string }[],
-    ) =>
+    representation: (_props: any, children: { getRepresentation: () => string }[]) =>
       `        <DataTable>
-${children
-  .map((child) => `            ${child.getRepresentation()}`)
-  .join("\n")}
+${children.map((child) => `            ${child.getRepresentation()}`).join('\n')}
         </DataTable>`,
   },
 
@@ -188,7 +169,7 @@ ${children
   },
   array: {
     component: ({ children, ...props }: any) => {
-      const childrenArray = React.Children.toArray(children);
+      const childrenArray = React.Children.toArray(children)
       return (
         <DataTable.Col source={props.source}>
           <ArrayField source={props.source}>
@@ -203,7 +184,7 @@ ${children
             </SingleFieldList>
           </ArrayField>
         </DataTable.Col>
-      );
+      )
     },
     representation: (props: any, children: any) =>
       `<DataTable.Col source="${props.source}">
@@ -229,14 +210,13 @@ ${children
   },
   string: {
     component: DataTable.Col,
-    representation: (props: any) =>
-      `<DataTable.Col source="${props.source}" />`,
+    representation: (props: any) => `<DataTable.Col source="${props.source}" />`,
   },
-};
+}
 
 const kebabCase = (name: string) => {
   return name
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase();
-};
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+}

@@ -1,20 +1,20 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
   PaginationLink,
-} from "@/components/ui/pagination";
+} from '@/components/ui/pagination'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useListPaginationContext, Translate, useTranslate } from "ra-core";
+} from '@/components/ui/select'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { useListPaginationContext, Translate, useTranslate } from 'ra-core'
 
 /**
  * A pagination component with page numbers and rows per page selector.
@@ -41,37 +41,27 @@ export const ListPagination = ({
   rowsPerPageOptions = [5, 10, 25, 50],
   className,
 }: {
-  rowsPerPageOptions?: number[];
-  className?: string;
+  rowsPerPageOptions?: number[]
+  className?: string
 }) => {
-  const translate = useTranslate();
-  const {
-    hasPreviousPage,
-    hasNextPage,
-    page,
-    perPage,
-    setPerPage,
-    total,
-    setPage,
-  } = useListPaginationContext();
+  const translate = useTranslate()
+  const { hasPreviousPage, hasNextPage, page, perPage, setPerPage, total, setPage } =
+    useListPaginationContext()
 
-  const pageStart = (page - 1) * perPage + 1;
-  const pageEnd = hasNextPage ? page * perPage : total;
+  const pageStart = (page - 1) * perPage + 1
+  const pageEnd = hasNextPage ? page * perPage : total
 
-  const boundaryCount = 1;
-  const siblingCount = 1;
-  const count = total ? Math.ceil(total / perPage) : 1;
+  const boundaryCount = 1
+  const siblingCount = 1
+  const count = total ? Math.ceil(total / perPage) : 1
 
   const range = (start: number, end: number) => {
-    const length = end - start + 1;
-    return Array.from({ length }, (_, i) => start + i);
-  };
+    const length = end - start + 1
+    return Array.from({ length }, (_, i) => start + i)
+  }
 
-  const startPages = range(1, Math.min(boundaryCount, count));
-  const endPages = range(
-    Math.max(count - boundaryCount + 1, boundaryCount + 1),
-    count,
-  );
+  const startPages = range(1, Math.min(boundaryCount, count))
+  const endPages = range(Math.max(count - boundaryCount + 1, boundaryCount + 1), count)
 
   const siblingsStart = Math.max(
     Math.min(
@@ -82,7 +72,7 @@ export const ListPagination = ({
     ),
     // Greater than startPages
     boundaryCount + 2,
-  );
+  )
 
   const siblingsEnd = Math.min(
     Math.max(
@@ -93,31 +83,27 @@ export const ListPagination = ({
     ),
     // Less than endPages
     count - boundaryCount - 1,
-  );
+  )
 
-  const siblingPages = range(siblingsStart, siblingsEnd);
+  const siblingPages = range(siblingsStart, siblingsEnd)
 
   const pageChangeHandler = (newPage: number) => {
     return (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      setPage(newPage);
-    };
-  };
+      event.preventDefault()
+      setPage(newPage)
+    }
+  }
 
   return (
-    <div
-      className={`flex items-center justify-end space-x-2 gap-4 ${className}`}
-    >
+    <div className={`flex items-center justify-end space-x-2 gap-4 ${className}`}>
       <div className="hidden md:flex items-center space-x-2">
         <p className="text-sm font-medium">
-          <Translate i18nKey="ra.navigation.page_rows_per_page">
-            Rows per page
-          </Translate>
+          <Translate i18nKey="ra.navigation.page_rows_per_page">Rows per page</Translate>
         </p>
         <Select
           value={perPage.toString()}
           onValueChange={(value) => {
-            setPerPage(Number(value));
+            setPerPage(Number(value))
           }}
         >
           <SelectTrigger className="h-8 w-fit">
@@ -141,9 +127,7 @@ export const ListPagination = ({
             total: total === -1 ? pageEnd : total,
           }}
         >
-          {total != null
-            ? `${pageStart}-${pageEnd} of ${total === -1 ? pageEnd : total}`
-            : null}
+          {total != null ? `${pageStart}-${pageEnd} of ${total === -1 ? pageEnd : total}` : null}
         </Translate>
       </div>
       <Pagination className="-w-full -mx-auto">
@@ -153,8 +137,8 @@ export const ListPagination = ({
               <PaginationLink
                 href="#"
                 onClick={pageChangeHandler(page - 1)}
-                aria-label={translate("ra.navigation.previous", {
-                  _: "Previous",
+                aria-label={translate('ra.navigation.previous', {
+                  _: 'Previous',
                 })}
               >
                 <ChevronLeftIcon />
@@ -162,8 +146,8 @@ export const ListPagination = ({
             ) : (
               <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium size-9">
                 <ChevronLeftIcon
-                  aria-label={translate("ra.navigation.previous", {
-                    _: "Previous",
+                  aria-label={translate('ra.navigation.previous', {
+                    _: 'Previous',
                   })}
                   size="16"
                   className="text-muted-foreground"
@@ -241,17 +225,17 @@ export const ListPagination = ({
                 onClick={pageChangeHandler(page + 1)}
                 size="default"
                 className={cn(
-                  "gap-1 px-2.5 sm:pr-2.5",
-                  !hasNextPage ? "opacity-50 cursor-not-allowed" : "",
+                  'gap-1 px-2.5 sm:pr-2.5',
+                  !hasNextPage ? 'opacity-50 cursor-not-allowed' : '',
                 )}
-                aria-label={translate("ra.navigation.next", { _: "Next" })}
+                aria-label={translate('ra.navigation.next', { _: 'Next' })}
               >
                 <ChevronRightIcon />
               </PaginationLink>
             ) : (
               <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium size-9">
                 <ChevronRightIcon
-                  aria-label={translate("ra.navigation.next", { _: "Next" })}
+                  aria-label={translate('ra.navigation.next', { _: 'Next' })}
                   size="16"
                   className="text-muted-foreground"
                 />
@@ -261,5 +245,5 @@ export const ListPagination = ({
         </PaginationContent>
       </Pagination>
     </div>
-  );
-};
+  )
+}

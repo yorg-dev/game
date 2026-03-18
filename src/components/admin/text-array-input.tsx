@@ -1,27 +1,17 @@
-import * as React from "react";
-import { X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import {
-  FormControl,
-  FormError,
-  FormField,
-  FormLabel,
-} from "@/components/admin/form";
-import type { InputProps } from "ra-core";
-import {
-  useInput,
-  useResourceContext,
-  FieldTitle,
-  useTranslate,
-} from "ra-core";
-import { InputHelperText } from "./input-helper-text";
+import * as React from 'react'
+import { X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { FormControl, FormError, FormField, FormLabel } from '@/components/admin/form'
+import type { InputProps } from 'ra-core'
+import { useInput, useResourceContext, FieldTitle, useTranslate } from 'ra-core'
+import { InputHelperText } from './input-helper-text'
 
 export type TextArrayInputProps = InputProps & {
-  className?: string;
-  placeholder?: string;
-};
+  className?: string
+  placeholder?: string
+}
 
-const emptyArray: string[] = [];
+const emptyArray: string[] = []
 
 /**
  * Form input for editing an array of strings, like tags or email addresses.
@@ -61,8 +51,8 @@ export const TextArrayInput = (props: TextArrayInputProps) => {
     source,
     validate,
     ...rest
-  } = props;
-  const resource = useResourceContext(props);
+  } = props
+  const resource = useResourceContext(props)
   const { id, field, isRequired } = useInput({
     defaultValue,
     format: format ?? ((v) => v ?? emptyArray),
@@ -72,54 +62,44 @@ export const TextArrayInput = (props: TextArrayInputProps) => {
     parse,
     source,
     validate,
-  });
-  const translate = useTranslate();
+  })
+  const translate = useTranslate()
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [inputValue, setInputValue] = React.useState("");
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [inputValue, setInputValue] = React.useState('')
 
-  const values: string[] = field.value ?? emptyArray;
+  const values: string[] = field.value ?? emptyArray
 
   const handleAddValue = (text: string) => {
-    const trimmed = text.trim();
+    const trimmed = text.trim()
     if (trimmed) {
-      field.onChange([...values, trimmed]);
+      field.onChange([...values, trimmed])
     }
-    setInputValue("");
-  };
+    setInputValue('')
+  }
 
   const handleRemoveValue = (index: number) => {
-    field.onChange(values.filter((_, i) => i !== index));
-  };
+    field.onChange(values.filter((_, i) => i !== index))
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
+    if (e.key === 'Enter') {
+      e.preventDefault()
       if (inputValue.trim()) {
-        handleAddValue(inputValue);
+        handleAddValue(inputValue)
       }
-    } else if (
-      e.key === "Backspace" &&
-      inputValue === "" &&
-      values.length > 0 &&
-      !readOnly
-    ) {
-      field.onChange(values.slice(0, -1));
-    } else if (e.key === "Escape") {
-      inputRef.current?.blur();
+    } else if (e.key === 'Backspace' && inputValue === '' && values.length > 0 && !readOnly) {
+      field.onChange(values.slice(0, -1))
+    } else if (e.key === 'Escape') {
+      inputRef.current?.blur()
     }
-  };
+  }
 
   return (
     <FormField id={id} className={className} name={field.name}>
       {label !== false && (
         <FormLabel>
-          <FieldTitle
-            label={label}
-            source={source}
-            resource={resource}
-            isRequired={isRequired}
-          />
+          <FieldTitle label={label} source={source} resource={resource} isRequired={isRequired} />
         </FormLabel>
       )}
       <FormControl>
@@ -134,23 +114,21 @@ export const TextArrayInput = (props: TextArrayInputProps) => {
                 <button
                   className="ml-1 cursor-pointer rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleRemoveValue(index);
+                    if (e.key === 'Enter') {
+                      handleRemoveValue(index)
                     }
                   }}
                   onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    e.preventDefault()
+                    e.stopPropagation()
                   }}
                   onClick={(e) => {
-                    e.preventDefault();
-                    handleRemoveValue(index);
+                    e.preventDefault()
+                    handleRemoveValue(index)
                   }}
                   disabled={disabled || readOnly}
                 >
-                  <span className="sr-only">
-                    {translate("ra.action.remove", { _: "Remove" })}
-                  </span>
+                  <span className="sr-only">{translate('ra.action.remove', { _: 'Remove' })}</span>
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
@@ -162,9 +140,9 @@ export const TextArrayInput = (props: TextArrayInputProps) => {
               onKeyDown={handleKeyDown}
               onBlur={() => {
                 if (inputValue.trim()) {
-                  handleAddValue(inputValue);
+                  handleAddValue(inputValue)
                 }
-                field.onBlur?.();
+                field.onBlur?.()
               }}
               placeholder={values.length === 0 ? placeholder : undefined}
               disabled={disabled}
@@ -177,5 +155,5 @@ export const TextArrayInput = (props: TextArrayInputProps) => {
       <InputHelperText helperText={helperText} />
       <FormError />
     </FormField>
-  );
-};
+  )
+}

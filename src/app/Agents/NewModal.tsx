@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
+import { useGetList } from 'ra-core'
 import type { AgentTemplate } from '@/models/AgentTemplate'
 
 interface Props {
@@ -34,15 +34,27 @@ function CloseButton({ onCancel }: { onCancel: () => void }) {
 }
 
 function TemplateGrid({
+  templates,
   selected,
   onSelect,
 }: {
+  templates: AgentTemplate[]
   selected: AgentTemplate | null
   onSelect: (t: AgentTemplate) => void
 }) {
+  if (templates.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+        <p className="text-2xl">🤖</p>
+        <p className="text-sm font-bold text-[#3d2010]">No agent templates available</p>
+        <p className="text-xs text-[#9a6b28]">Check back later</p>
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-2 gap-2 p-5 max-h-72 overflow-y-auto">
-      {AGENT_TEMPLATES.filter((t) => t.isPublished).map((t) => (
+      {templates.map((t) => (
         <button
           key={t.id}
           type="button"
@@ -81,6 +93,12 @@ export function NewAgentModal({ onSubmit, onCancel }: Props) {
   const [template, setTemplate] = useState<AgentTemplate | null>(null)
   const [name, setName] = useState('')
 
+  const { data: templates = [] } = useGetList<AgentTemplate>('agent_templates', {
+    filter: { isPublished: true },
+    pagination: { page: 1, perPage: 50 },
+    sort: { field: 'name', order: 'ASC' },
+  })
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim() || !template) return
@@ -108,19 +126,25 @@ export function NewAgentModal({ onSubmit, onCancel }: Props) {
               1 · Choose template
             </span>
             <span>›</span>
-            <span className={step === 'name' ? 'font-bold' : 'opacity-50'}>2 · Name your agent</span>
+            <span className={step === 'name' ? 'font-bold' : 'opacity-50'}>
+              2 · Name your agent
+            </span>
           </div>
         </div>
 
         {/* Step 1: template grid */}
         {step === 'choose-template' && (
           <>
-            <TemplateGrid selected={template} onSelect={setTemplate} />
+            <TemplateGrid templates={templates} selected={template} onSelect={setTemplate} />
             <div className="flex items-center justify-end gap-2 px-5 py-4 border-t-4 border-[#7a5230] bg-[#dcc898]">
               <button onClick={onCancel} className={btnGhost}>
                 Cancel
               </button>
-              <button disabled={!template} onClick={() => template && setStep('name')} className={btnPrimary}>
+              <button
+                disabled={!template}
+                onClick={() => template && setStep('name')}
+                className={btnPrimary}
+              >
                 Next ›
               </button>
             </div>

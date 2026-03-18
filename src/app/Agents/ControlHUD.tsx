@@ -14,7 +14,9 @@ export function ControlHUD() {
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5]">
-      <span className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">Controlling</span>
+      <span className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+        Controlling
+      </span>
       <span className="text-sm font-bold text-[#3d2010]">{agent.name}</span>
       <button
         onClick={() => EventBus.emit('release-agent', undefined)}

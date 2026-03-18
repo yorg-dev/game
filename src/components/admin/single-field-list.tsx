@@ -1,10 +1,6 @@
-import {
-  RecordContextProvider,
-  RecordRepresentation,
-  useListContext,
-} from "ra-core";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { RecordContextProvider, RecordRepresentation, useListContext } from 'ra-core'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 /**
  * Renders a horizontal list of records from a ListContext, displaying each as a badge.
@@ -44,25 +40,25 @@ export const SingleFieldList = <RecordType = any,>({
   render,
   className,
 }: {
-  children?: React.ReactNode;
-  render?: (record: RecordType, index: number) => React.ReactNode;
-  className?: string;
+  children?: React.ReactNode
+  render?: (record: RecordType, index: number) => React.ReactNode
+  className?: string
 }) => {
-  const { data } = useListContext();
+  const { data } = useListContext()
 
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className={cn('flex gap-2', className)}>
       {data?.map((record, index) => (
         <RecordContextProvider key={index} value={record}>
           {render ? render(record, index) : children || <DefaultChildren />}
         </RecordContextProvider>
       ))}
     </div>
-  );
-};
+  )
+}
 
 const DefaultChildren = () => (
   <Badge variant="outline">
     <RecordRepresentation />
   </Badge>
-);
+)

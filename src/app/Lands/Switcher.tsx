@@ -3,7 +3,6 @@ import { landProvider, landPlacementProvider } from '@/providers/landProvider'
 import { getActiveLand, setActiveLand, viewerPermissions } from '@/providers/activeLand'
 import { EventBus } from '@/game/EventBus'
 import type { Land } from '@/models/Land'
-import { SAMPLE_CONNECTIONS } from '@/mocks/connections'
 import { CreateLandModal } from './CreateModal'
 import { InviteLandModal } from './InviteModal'
 
@@ -80,7 +79,7 @@ export function LandSwitcher() {
     setOpen(false)
     try {
       const placements = await landPlacementProvider.getPlacements(land.id)
-      const connections = [...SAMPLE_CONNECTIONS]
+      const connections: import('@/models/Connection').Connection[] = []
       const landObjects = land.objects ?? getActiveLand().landObjects
       const { canInteract, canManage } = viewerPermissions(land)
       const state = { land, placements, connections, landObjects, canInteract, canManage }

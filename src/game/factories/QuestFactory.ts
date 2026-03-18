@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { EventBus } from '../EventBus'
+import { getQuestsWithProgress } from '../quest/questStore'
 import type { Quest } from '@/models/Quest'
-import { SAMPLE_QUESTS } from '@/mocks/quests'
 
 // ---------------------------------------------------------------------------
 // QuestFactory
@@ -33,7 +33,7 @@ const TUTORIAL_DIALOG = [
 export class QuestFactory {
   private readonly scene: Phaser.Scene
 
-  private _quests: Quest[] = []
+  private _quests = getQuestsWithProgress()
 
   get quests(): Quest[] {
     return this._quests
@@ -46,7 +46,7 @@ export class QuestFactory {
   // Called from GameScene.create() after the scene is fully set up.
   // Loads quests and triggers the tutorial dialog on first visit.
   start(): void {
-    this._quests = SAMPLE_QUESTS.map((q) => ({ ...q, steps: q.steps.map((s) => ({ ...s })) }))
+    this._quests = getQuestsWithProgress()
 
     if (this.isFirstVisit()) {
       // Small delay so the scene finishes rendering before the dialog box opens.

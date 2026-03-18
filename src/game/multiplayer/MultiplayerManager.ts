@@ -4,6 +4,7 @@ import { RemotePlayer } from '../entities/RemotePlayer'
 import type { Direction } from '../entities/Character'
 import type { PlayerState } from '@/providers/wsProvider'
 import { EventBus } from '@/game/EventBus'
+import authProvider from '@/providers/authProvider'
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -20,7 +21,7 @@ function resolveWsUrl(): string | null {
 
   if (!base) return null
 
-  const token = localStorage.getItem('token')
+  const token = authProvider.getToken()
   if (!token) return base
 
   return `${base}?token=${encodeURIComponent(token)}`
@@ -41,16 +42,11 @@ function getLocalIdentity(): { playerId: string; name: string } {
     sessionStorage.setItem('tabId', tabId)
   }
 
-  try {
-    const raw = localStorage.getItem('user')
-    if (raw) {
-      const user = JSON.parse(raw)
-      const userId = String(user.id ?? user.email ?? 'unknown')
-      const name = user.email ? (user.email as string).split('@')[0] : userId.slice(0, 8)
-      return { playerId: `${userId}:${tabId}`, name }
-    }
-  } catch {
-    // fall through to anonymous
+  const user = authProvider.getCurrentUser()
+  if (user) {
+    const userId = String(user.id ?? user.email ?? 'unknown')
+    const name = user.email ? (user.email as string).split('@')[0] : userId.slice(0, 8)
+    return { playerId: `${userId}:${tabId}`, name }
   }
 
   // Guest / anonymous

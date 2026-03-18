@@ -1,8 +1,8 @@
-import * as React from "react";
-import { Trash } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { humanize, singularize } from "inflection";
-import type { UseDeleteOptions, RedirectionSideEffect } from "ra-core";
+import * as React from 'react'
+import { Trash } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { humanize, singularize } from 'inflection'
+import type { UseDeleteOptions, RedirectionSideEffect } from 'ra-core'
 import {
   useDeleteWithUndoController,
   useGetRecordRepresentation,
@@ -10,25 +10,19 @@ import {
   useRecordContext,
   useResourceContext,
   useTranslate,
-} from "ra-core";
+} from 'ra-core'
 
 export type DeleteButtonProps = {
-  label?: string;
-  size?: "default" | "sm" | "lg" | "icon";
-  onClick?: React.ReactEventHandler<HTMLButtonElement>;
-  mutationOptions?: UseDeleteOptions;
-  redirect?: RedirectionSideEffect;
-  resource?: string;
-  successMessage?: string;
-  className?: string;
-  variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
-};
+  label?: string
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+  onClick?: React.ReactEventHandler<HTMLButtonElement>
+  mutationOptions?: UseDeleteOptions
+  redirect?: RedirectionSideEffect
+  resource?: string
+  successMessage?: string
+  className?: string
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+}
 
 /**
  * A button that deletes a record with undo capability.
@@ -53,13 +47,13 @@ export const DeleteButton = (props: DeleteButtonProps) => {
     onClick,
     size,
     mutationOptions,
-    redirect = "list",
+    redirect = 'list',
     successMessage,
-    variant = "outline",
-    className = "cursor-pointer hover:bg-destructive/10! text-destructive! border-destructive! focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
-  } = props;
-  const record = useRecordContext(props);
-  const resource = useResourceContext(props);
+    variant = 'outline',
+    className = 'cursor-pointer hover:bg-destructive/10! text-destructive! border-destructive! focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
+  } = props
+  const record = useRecordContext(props)
+  const resource = useResourceContext(props)
 
   const { isPending, handleDelete } = useDeleteWithUndoController({
     record,
@@ -68,10 +62,10 @@ export const DeleteButton = (props: DeleteButtonProps) => {
     onClick,
     mutationOptions,
     successMessage,
-  });
-  const translate = useTranslate();
-  const getRecordRepresentation = useGetRecordRepresentation(resource);
-  let recordRepresentation = getRecordRepresentation(record);
+  })
+  const translate = useTranslate()
+  const getRecordRepresentation = useGetRecordRepresentation(resource)
+  let recordRepresentation = getRecordRepresentation(record)
   const resourceName = translate(`resources.${resource}.forcedCaseName`, {
     smart_count: 1,
     _: humanize(
@@ -81,20 +75,20 @@ export const DeleteButton = (props: DeleteButtonProps) => {
       }),
       true,
     ),
-  });
+  })
   // We don't support React elements for this
   if (React.isValidElement(recordRepresentation)) {
-    recordRepresentation = `#${record?.id}`;
+    recordRepresentation = `#${record?.id}`
   }
   const label = useResourceTranslation({
     resourceI18nKey: `resources.${resource}.action.delete`,
-    baseI18nKey: "ra.action.delete",
+    baseI18nKey: 'ra.action.delete',
     options: {
       name: resourceName,
       recordRepresentation,
     },
     userText: labelProp,
-  });
+  })
 
   return (
     <Button
@@ -102,12 +96,12 @@ export const DeleteButton = (props: DeleteButtonProps) => {
       type="button"
       onClick={handleDelete}
       disabled={isPending}
-      aria-label={typeof label === "string" ? label : undefined}
+      aria-label={typeof label === 'string' ? label : undefined}
       size={size}
       className={className}
     >
       <Trash />
       {label}
     </Button>
-  );
-};
+  )
+}

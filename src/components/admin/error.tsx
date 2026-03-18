@@ -1,14 +1,14 @@
-import type { FallbackProps } from "react-error-boundary";
-import { useResetErrorBoundaryOnLocationChange, Translate } from "ra-core";
-import { CircleAlert, History } from "lucide-react";
+import type { FallbackProps } from 'react-error-boundary'
+import { useResetErrorBoundaryOnLocationChange, Translate } from 'ra-core'
+import { CircleAlert, History } from 'lucide-react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import type { HtmlHTMLAttributes, ErrorInfo } from "react";
+} from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
+import type { HtmlHTMLAttributes, ErrorInfo } from 'react'
 
 /**
  * App-wide error component for displaying error boundaries.
@@ -19,19 +19,19 @@ import type { HtmlHTMLAttributes, ErrorInfo } from "react";
  * @see {@link https://marmelab.com/shadcn-admin-kit/docs/error Error documentation}
  */
 export const Error = (props: InternalErrorProps & {}) => {
-  const { error, errorInfo, resetErrorBoundary, ...rest } = props;
+  const { error, errorInfo, resetErrorBoundary, ...rest } = props
 
-  useResetErrorBoundaryOnLocationChange(resetErrorBoundary);
+  useResetErrorBoundaryOnLocationChange(resetErrorBoundary)
 
   const errorMessage: string =
-    typeof error === "object" &&
+    typeof error === 'object' &&
     error !== null &&
-    "message" in error &&
-    typeof error.message === "string"
-      ? (error.message ?? "")
-      : typeof error === "string"
+    'message' in error &&
+    typeof error.message === 'string'
+      ? (error.message ?? '')
+      : typeof error === 'string'
         ? error
-        : String(error ?? "Unknown error");
+        : String(error ?? 'Unknown error')
 
   return (
     <div className="flex flex-col items-center md:p-16 gap-5" {...rest}>
@@ -42,12 +42,9 @@ export const Error = (props: InternalErrorProps & {}) => {
       <div>
         <Translate i18nKey="ra.message.error" />
       </div>
-      {import.meta.env.MODE !== "production" && (
+      {import.meta.env.MODE !== 'production' && (
         <>
-          <Accordion
-            type="multiple"
-            className="mt-1 p-2 bg-secondary w-full lg:w-150"
-          >
+          <Accordion type="multiple" className="mt-1 p-2 bg-secondary w-full lg:w-150">
             <AccordionItem value="error">
               <AccordionTrigger className="py-2">
                 <Translate i18nKey={errorMessage}>{errorMessage}</Translate>
@@ -58,13 +55,11 @@ export const Error = (props: InternalErrorProps & {}) => {
             </AccordionItem>
           </Accordion>
 
-          <p className="text-center ">
-            Need help with this error? Try the following:
-          </p>
+          <p className="text-center ">Need help with this error? Try the following:</p>
           <div>
             <ul className="list-disc">
               <li>
-                Check the{" "}
+                Check the{' '}
                 <a
                   className="text-primary underline-offset-4 hover:underline"
                   href="https://marmelab.com/shadcn-admin-kit/docs"
@@ -73,17 +68,17 @@ export const Error = (props: InternalErrorProps & {}) => {
                 </a>
               </li>
               <li>
-                Search on{" "}
+                Search on{' '}
                 <a
                   className="text-primary underline-offset-4 hover:underline"
                   href="https://stackoverflow.com/questions/tagged/shadcn-admin-kit"
                 >
                   StackOverflow
-                </a>{" "}
+                </a>{' '}
                 for community answers
               </li>
               <li>
-                Get help from the core team via{" "}
+                Get help from the core team via{' '}
                 <a
                   className="text-primary underline-offset-4 hover:underline"
                   href="https://marmelab.com/shadcn-admin-kit/"
@@ -102,20 +97,19 @@ export const Error = (props: InternalErrorProps & {}) => {
         </Button>
       </div>
     </div>
-  );
-};
-
-interface InternalErrorProps
-  extends Omit<HtmlHTMLAttributes<HTMLDivElement>, "title">,
-    FallbackProps {
-  className?: string;
-  errorInfo?: ErrorInfo;
+  )
 }
 
-export interface ErrorProps extends Pick<FallbackProps, "error"> {
-  errorInfo?: ErrorInfo;
+interface InternalErrorProps
+  extends Omit<HtmlHTMLAttributes<HTMLDivElement>, 'title'>, FallbackProps {
+  className?: string
+  errorInfo?: ErrorInfo
+}
+
+export interface ErrorProps extends Pick<FallbackProps, 'error'> {
+  errorInfo?: ErrorInfo
 }
 
 function goBack() {
-  window.history.go(-1);
+  window.history.go(-1)
 }

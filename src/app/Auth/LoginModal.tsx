@@ -16,7 +16,9 @@ const inputClass =
   'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] transition-colors'
 
 export function LoginModal({ onSuccess, onCancel, defaultTab = 'login' }: Props) {
-  const authProvider = useAuthProvider() as AuthProvider & { register?: (params: { email: string; password: string }) => Promise<void> }
+  const authProvider = useAuthProvider() as AuthProvider & {
+    register?: (params: { email: string; password: string }) => Promise<void>
+  }
   const [tab, setTab] = useState<'login' | 'register'>(defaultTab)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

@@ -10,18 +10,18 @@ import yorgLogoUrl from '../../assets/yorg_logo.png'
 
 const C = {
   // Backdrop card
-  cardFill: 0x1e0e04,      // soil-950
-  cardBorder: 0x3d2414,    // soil-800
+  cardFill: 0x1e0e04, // soil-950
+  cardBorder: 0x3d2414, // soil-800
 
   // Text
-  menuNormal: '#f8eecc',   // wood-100
+  menuNormal: '#f8eecc', // wood-100
   menuSelected: '#a0d45e', // grass-300 — bright, pops on dark card
-  tagline: '#f0d890',      // wood-200
-  hint: '#e8c878',         // wood-300
-  divider: 0x3d2414,       // soil-800
+  tagline: '#f0d890', // wood-200
+  hint: '#e8c878', // wood-300
+  divider: 0x3d2414, // soil-800
 
   // Cursor / accent
-  accent: '#c4924a',       // wood-500
+  accent: '#c4924a', // wood-500
 }
 
 // ---------------------------------------------------------------------------
@@ -71,15 +71,6 @@ export class TitleScene extends Phaser.Scene {
     this.isTransitioning = false
     this.menuItems = []
 
-    // Skip the menu only for returning users (had a token before this page load).
-    // New guest sessions created during init() must still see the title screen.
-    // sessionStorage._returningUser is set synchronously in App.tsx init() before
-    // any async work, so it reliably reflects pre-load auth state.
-    if (localStorage.getItem('token') && sessionStorage.getItem('_returningUser') === '1') {
-      this.startGame()
-      return
-    }
-
     this.cameras.main.fadeIn(900, 0, 0, 0)
 
     this.createBackground()
@@ -89,12 +80,12 @@ export class TitleScene extends Phaser.Scene {
     this.createHint()
     this.setupInput()
 
-    // Auto-start only for invite-link visitors (?landId=...) once their
-    // guest session is ready. Direct visits always stay on the title screen.
-    const hasInviteLink = new URLSearchParams(window.location.search).has('landId')
-    const unsubSession = EventBus.on('session-ready', () => {
+    // Auto-start authenticated users (returning or invite link).
+    // Dashboard emits session-ready with the auth state resolved via ra-core —
+    // no direct localStorage reads here.
+    const unsubSession = EventBus.on('session-ready', ({ authenticated }) => {
       unsubSession()
-      if (!this.isTransitioning && localStorage.getItem('token') && hasInviteLink) {
+      if (!this.isTransitioning && authenticated) {
         this.startGame()
       }
     })
@@ -230,14 +221,14 @@ export class TitleScene extends Phaser.Scene {
 
     const defs: Array<Pick<MenuItem, 'label' | 'subLabel' | 'onSelect'>> = [
       {
-        label: 'NEW WORLD',
-        subLabel: 'Start a fresh world',
-        onSelect: () => this.startGame(),
+        label: 'SIGN IN',
+        subLabel: 'Continue with your account',
+        onSelect: () => this.requestLogin('login'),
       },
       {
-        label: 'LOAD WORLD',
-        subLabel: 'Continue from a save',
-        onSelect: () => this.requestLogin(),
+        label: 'CREATE ACCOUNT',
+        subLabel: 'Start your journey',
+        onSelect: () => this.requestLogin('register'),
       },
     ]
 
@@ -397,7 +388,7 @@ export class TitleScene extends Phaser.Scene {
   // Transitions
   // ---------------------------------------------------------------------------
 
-  private requestLogin(): void {
+  private requestLogin(tab: 'login' | 'register' = 'login'): void {
     if (this.isTransitioning) return
     this.isTransitioning = true
 
@@ -413,7 +404,7 @@ export class TitleScene extends Phaser.Scene {
       this.isTransitioning = false
     })
 
-    EventBus.emit('show-login', undefined)
+    EventBus.emit('show-login', { tab })
   }
 
   private startGame(): void {

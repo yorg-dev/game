@@ -1,8 +1,8 @@
-import { CircleX } from "lucide-react";
-import { Translate } from "ra-core";
-import { useNavigate } from "react-router";
+import { CircleX } from 'lucide-react'
+import { Translate } from 'ra-core'
+import { useNavigate } from 'react-router'
 
-import { Button } from "../ui/button";
+import { Button } from '../ui/button'
 
 /**
  * A button that navigates back to the previous page.
@@ -29,8 +29,8 @@ import { Button } from "../ui/button";
  *   </Edit>
  * );
  */
-export function CancelButton(props: React.ComponentProps<"button">) {
-  const navigate = useNavigate();
+export function CancelButton(props: React.ComponentProps<'button'>) {
+  const navigate = useNavigate()
   return (
     <Button
       type="button"
@@ -42,5 +42,5 @@ export function CancelButton(props: React.ComponentProps<"button">) {
       <CircleX />
       <Translate i18nKey="ra.action.cancel">Cancel</Translate>
     </Button>
-  );
+  )
 }

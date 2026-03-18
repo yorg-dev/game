@@ -1,8 +1,8 @@
-import * as React from "react";
-import { useCallback } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import * as React from 'react'
+import { useCallback } from 'react'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -10,23 +10,10 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import {
-  FormControl,
-  FormError,
-  FormField,
-  FormLabel,
-} from "@/components/admin/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import type {
-  ChoicesProps,
-  InputProps,
-  SupportCreateSuggestionOptions,
-} from "ra-core";
+} from '@/components/ui/command'
+import { FormControl, FormError, FormField, FormLabel } from '@/components/admin/form'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import type { ChoicesProps, InputProps, SupportCreateSuggestionOptions } from 'ra-core'
 import {
   useChoices,
   useChoicesContext,
@@ -36,9 +23,9 @@ import {
   FieldTitle,
   useEvent,
   useSupportCreateSuggestion,
-} from "ra-core";
-import { InputHelperText } from "./input-helper-text";
-import { PopoverProps } from "@radix-ui/react-popover";
+} from 'ra-core'
+import { InputHelperText } from './input-helper-text'
+import { PopoverProps } from '@radix-ui/react-popover'
 
 /**
  * Form control that lets users choose a value from a list using a dropdown with autocompletion.
@@ -75,19 +62,17 @@ import { PopoverProps } from "@radix-ui/react-popover";
  * );
  */
 export const AutocompleteInput = (
-  props: Omit<InputProps, "source"> &
-    Omit<SupportCreateSuggestionOptions, "handleChange" | "filter"> &
-    Partial<Pick<InputProps, "source">> &
+  props: Omit<InputProps, 'source'> &
+    Omit<SupportCreateSuggestionOptions, 'handleChange' | 'filter'> &
+    Partial<Pick<InputProps, 'source'>> &
     ChoicesProps & {
-      className?: string;
-      disableValue?: string;
-      filterToQuery?: (searchText: string) => any;
-      translateChoice?: boolean;
-      placeholder?: string;
-      inputText?:
-        | React.ReactNode
-        | ((option: any | undefined) => React.ReactNode);
-    } & Pick<PopoverProps, "modal">,
+      className?: string
+      disableValue?: string
+      filterToQuery?: (searchText: string) => any
+      translateChoice?: boolean
+      placeholder?: string
+      inputText?: React.ReactNode | ((option: any | undefined) => React.ReactNode)
+    } & Pick<PopoverProps, 'modal'>,
 ) => {
   const {
     filterToQuery = DefaultFilterToQuery,
@@ -100,69 +85,65 @@ export const AutocompleteInput = (
     onCreate,
     optionText,
     modal,
-  } = props;
+  } = props
   const {
     allChoices = [],
     source,
     resource,
     isFromReference,
     setFilters,
-  } = useChoicesContext(props);
-  const { id, field, isRequired } = useInput({ ...props, source });
-  const translate = useTranslate();
-  const { placeholder = translate("ra.action.search", { _: "Search..." }) } =
-    props;
+  } = useChoicesContext(props)
+  const { id, field, isRequired } = useInput({ ...props, source })
+  const translate = useTranslate()
+  const { placeholder = translate('ra.action.search', { _: 'Search...' }) } = props
 
-  const getRecordRepresentation = useGetRecordRepresentation(resource);
+  const getRecordRepresentation = useGetRecordRepresentation(resource)
   const { getChoiceText, getChoiceValue } = useChoices({
-    optionText:
-      props.optionText ?? (isFromReference ? getRecordRepresentation : "name"),
-    optionValue: props.optionValue ?? "id",
+    optionText: props.optionText ?? (isFromReference ? getRecordRepresentation : 'name'),
+    optionValue: props.optionValue ?? 'id',
     disableValue: props.disableValue,
     translateChoice: props.translateChoice ?? !isFromReference,
-  });
+  })
 
-  const [filterValue, setFilterValue] = React.useState("");
+  const [filterValue, setFilterValue] = React.useState('')
 
-  const [open, setOpen] = React.useState(false);
-  const selectedChoice = allChoices.find(
-    (choice) => getChoiceValue(choice) === field.value,
-  );
+  const [open, setOpen] = React.useState(false)
+  const selectedChoice = allChoices.find((choice) => getChoiceValue(choice) === field.value)
 
   const getInputText = useCallback(
     (selectedChoice: any) => {
-      if (typeof inputText === "function") {
-        return inputText(selectedChoice);
+      if (typeof inputText === 'function') {
+        return inputText(selectedChoice)
       }
       if (inputText !== undefined) {
-        return inputText;
+        return inputText
       }
-      return getChoiceText(selectedChoice);
+      return getChoiceText(selectedChoice)
     },
     [inputText, getChoiceText],
-  );
+  )
 
   const handleOpenChange = useEvent((isOpen: boolean) => {
-    setOpen(isOpen);
+    setOpen(isOpen)
     // Reset the filter when the popover is closed
     if (!isOpen) {
-      setFilters(filterToQuery(""));
+      setFilters(filterToQuery(''))
     }
-  });
+  })
 
   const handleChange = useCallback(
     (choice: any) => {
       if (field.value === getChoiceValue(choice) && !isRequired) {
-        field.onChange("");
-        setFilterValue("");
+        field.onChange('')
+        setFilterValue('')
         if (isFromReference) {
-          setFilters(filterToQuery(""));
+          setFilters(filterToQuery(''))
         }
-        setOpen(false);
-        return;
+        setOpen(false)
+        return
       }
-      field.onChange(getChoiceValue(choice));
-      setOpen(false);
+      field.onChange(getChoiceValue(choice))
+      setOpen(false)
     },
     [
       field,
@@ -174,7 +155,7 @@ export const AutocompleteInput = (
       filterToQuery,
       setOpen,
     ],
-  );
+  )
 
   const {
     getCreateItem,
@@ -191,15 +172,13 @@ export const AutocompleteInput = (
     handleChange,
     optionText,
     filter: filterValue,
-  });
+  })
 
   const createItem =
-    (create || onCreate) && (filterValue !== "" || createLabel)
-      ? getCreateItem(filterValue)
-      : null;
-  let finalChoices = allChoices;
+    (create || onCreate) && (filterValue !== '' || createLabel) ? getCreateItem(filterValue) : null
+  let finalChoices = allChoices
   if (createItem) {
-    finalChoices = [...finalChoices, createItem];
+    finalChoices = [...finalChoices, createItem]
   }
 
   return (
@@ -239,11 +218,11 @@ export const AutocompleteInput = (
                   placeholder="Search..."
                   value={filterValue}
                   onValueChange={(filter) => {
-                    setFilterValue(filter);
+                    setFilterValue(filter)
                     // We don't want the ChoicesContext to filter the choices if the input
                     // is not from a reference as it would also filter out the selected values
                     if (isFromReference) {
-                      setFilters(filterToQuery(filter));
+                      setFilters(filterToQuery(filter))
                     }
                   }}
                 />
@@ -251,9 +230,8 @@ export const AutocompleteInput = (
                   <CommandEmpty>No matching item found.</CommandEmpty>
                   <CommandGroup>
                     {finalChoices.map((choice) => {
-                      const isCreateItem =
-                        !!createItem && choice?.id === createItem.id;
-                      const disabled = getOptionDisabled(choice);
+                      const isCreateItem = !!createItem && choice?.id === createItem.id
+                      const disabled = getOptionDisabled(choice)
 
                       return (
                         <CommandItem
@@ -271,15 +249,13 @@ export const AutocompleteInput = (
                         >
                           <Check
                             className={cn(
-                              "mr-2 h-4 w-4",
-                              field.value === getChoiceValue(choice)
-                                ? "opacity-100"
-                                : "opacity-0",
+                              'mr-2 h-4 w-4',
+                              field.value === getChoiceValue(choice) ? 'opacity-100' : 'opacity-0',
                             )}
                           />
                           {getChoiceText(isCreateItem ? createItem : choice)}
                         </CommandItem>
-                      );
+                      )
                     })}
                   </CommandGroup>
                 </CommandList>
@@ -292,7 +268,7 @@ export const AutocompleteInput = (
       </FormField>
       {createElement}
     </>
-  );
-};
+  )
+}
 
-const DefaultFilterToQuery = (searchText: string) => ({ q: searchText });
+const DefaultFilterToQuery = (searchText: string) => ({ q: searchText })

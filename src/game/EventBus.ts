@@ -102,8 +102,8 @@ export interface GameEventMap {
   'land-ready': ActiveLandState
   /** Phaser → React: player clicked the bulletin board sign — open notifications. */
   'sign-clicked': undefined
-  /** App → all: a session token is now available (guest or real). */
-  'session-ready': undefined
+  /** App → all: auth state resolved. `authenticated` is true for real (non-guest) users. */
+  'session-ready': { authenticated: boolean }
   /** ProfileButton → all: user signed out — return to TitleScene. */
   logout: undefined
   /** AgentChannel → game: a voice command was confirmed by the server. */

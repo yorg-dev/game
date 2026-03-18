@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { RecordContextProvider } from 'ra-core'
 import { EventBus } from '@/game/EventBus'
-import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
+import { findAgentTemplate } from '@/game/agentTemplates/agentTemplateStore'
 import { agentLevelProvider } from '@/providers/agentLevelProvider'
 import { agentChannelProvider } from '@/providers/agentChannelProvider'
 import type { AgentLevel } from '@/models/AgentLevel'
@@ -23,7 +23,7 @@ export function AgentPopover() {
   // Open popover when an agent is clicked in the game
   useEffect(() => {
     return EventBus.on('agent-clicked', ({ id, name, templateId, tab }) => {
-      const template = AGENT_TEMPLATES.find((t) => t.id === templateId)
+      const template = findAgentTemplate(templateId)
       if (!template) return
       setAgent({ id, name, template })
       setTab(tab ?? 'overview')
@@ -282,9 +282,7 @@ export function AgentPopover() {
           </div>
 
           {/* ── Tab content ──────────────────────────────────────────── */}
-          {tab === 'overview' && (
-            <AgentOverview onClose={handleClose} onRemove={handleRemove} />
-          )}
+          {tab === 'overview' && <AgentOverview onClose={handleClose} onRemove={handleRemove} />}
           {tab === 'chat' && (
             <AgentChat
               agentId={agent.id}

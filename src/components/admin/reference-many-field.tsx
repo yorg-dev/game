@@ -1,10 +1,6 @@
-import type { ReactNode } from "react";
-import type {
-  RaRecord,
-  UseReferenceManyFieldControllerParams,
-  ListControllerResult,
-} from "ra-core";
-import { ReferenceManyFieldBase, useListContext } from "ra-core";
+import type { ReactNode } from 'react'
+import type { RaRecord, UseReferenceManyFieldControllerParams, ListControllerResult } from 'ra-core'
+import { ReferenceManyFieldBase, useListContext } from 'ra-core'
 
 /**
  * Displays multiple related records that reference the current record via a foreign key.
@@ -40,8 +36,7 @@ export const ReferenceManyField = <
 >(
   props: ReferenceManyFieldProps<RecordType, ReferenceRecordType>,
 ) => {
-  const { children, empty, error, loading, pagination, render, ...rest } =
-    props;
+  const { children, empty, error, loading, pagination, render, ...rest } = props
 
   return (
     <ReferenceManyFieldBase {...rest}>
@@ -55,8 +50,8 @@ export const ReferenceManyField = <
         {children}
       </ReferenceManyFieldView>
     </ReferenceManyFieldBase>
-  );
-};
+  )
+}
 
 export interface ReferenceManyFieldProps<
   RecordType extends RaRecord = RaRecord,
@@ -66,35 +61,18 @@ export interface ReferenceManyFieldProps<
     UseReferenceManyFieldControllerParams<RecordType, ReferenceRecordType>,
     ReferenceManyFieldViewProps<ReferenceRecordType> {}
 
-const ReferenceManyFieldView = <
-  ReferenceRecordType extends RaRecord = RaRecord,
->(
+const ReferenceManyFieldView = <ReferenceRecordType extends RaRecord = RaRecord>(
   props: ReferenceManyFieldViewProps<ReferenceRecordType>,
 ) => {
-  const {
-    children,
-    empty,
-    error: errorElement,
-    loading,
-    pagination,
-    render,
-  } = props;
-  const listContext = useListContext();
-  const {
-    isPending,
-    error,
-    total,
-    hasPreviousPage,
-    hasNextPage,
-    data,
-    filterValues,
-  } = listContext;
+  const { children, empty, error: errorElement, loading, pagination, render } = props
+  const listContext = useListContext()
+  const { isPending, error, total, hasPreviousPage, hasNextPage, data, filterValues } = listContext
 
   if (isPending && loading !== false) {
-    return loading;
+    return loading
   }
   if (error && errorElement !== false) {
-    return errorElement;
+    return errorElement
   }
   if (
     (total === 0 ||
@@ -107,7 +85,7 @@ const ReferenceManyFieldView = <
         !Object.keys(filterValues).length)) &&
     empty !== false
   ) {
-    return empty;
+    return empty
   }
 
   return (
@@ -116,16 +94,14 @@ const ReferenceManyFieldView = <
       {children}
       {pagination}
     </>
-  );
-};
+  )
+}
 
-export interface ReferenceManyFieldViewProps<
-  ReferenceRecordType extends RaRecord = RaRecord,
-> {
-  children?: ReactNode;
-  empty?: ReactNode;
-  error?: ReactNode;
-  loading?: ReactNode;
-  pagination?: ReactNode;
-  render?: (props: ListControllerResult<ReferenceRecordType>) => ReactNode;
+export interface ReferenceManyFieldViewProps<ReferenceRecordType extends RaRecord = RaRecord> {
+  children?: ReactNode
+  empty?: ReactNode
+  error?: ReactNode
+  loading?: ReactNode
+  pagination?: ReactNode
+  render?: (props: ListControllerResult<ReferenceRecordType>) => ReactNode
 }

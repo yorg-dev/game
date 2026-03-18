@@ -8,7 +8,6 @@
 // ---------------------------------------------------------------------------
 
 import { EventBus } from '../EventBus'
-import { SAMPLE_ACHIEVEMENTS } from '@/mocks/achievements'
 import { getQuestsWithProgress } from '../quest/questStore'
 import type { Achievement } from '@/models/Achievement'
 
@@ -17,7 +16,7 @@ const STORAGE_KEY = 'yorg-achievements'
 // id → ISO unlock timestamp
 type Progress = Record<string, string>
 
-let availableAchievements: Achievement[] = SAMPLE_ACHIEVEMENTS
+let availableAchievements: Achievement[] = []
 let activeAgentCount = 0
 
 // ── Storage helpers ──────────────────────────────────────────────────────────

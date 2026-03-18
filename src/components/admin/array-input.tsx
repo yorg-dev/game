@@ -1,18 +1,18 @@
-import * as React from "react";
-import type { InputProps } from "ra-core";
+import * as React from 'react'
+import type { InputProps } from 'ra-core'
 import {
   FieldTitle,
   isRequired,
   useSourceContext,
   sanitizeInputRestProps,
   ArrayInputBase,
-} from "ra-core";
+} from 'ra-core'
 
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { Skeleton } from "../ui/skeleton";
-import { InputHelperText } from "@/components/admin/input-helper-text";
-import { FormError, FormField } from "@/components/admin/form";
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
+import { Skeleton } from '../ui/skeleton'
+import { InputHelperText } from '@/components/admin/input-helper-text'
+import { FormError, FormField } from '@/components/admin/form'
 
 /**
  * Creates a list of sub-forms for editing arrays of data embedded inside a record.
@@ -61,23 +61,18 @@ export const ArrayInput = (props: ArrayInputProps) => {
     source: arraySource,
     validate,
     ...rest
-  } = props;
+  } = props
 
-  const parentSourceContext = useSourceContext();
-  const finalSource = parentSourceContext.getSource(arraySource);
+  const parentSourceContext = useSourceContext()
+  const finalSource = parentSourceContext.getSource(arraySource)
 
   if (isPending) {
-    return <Skeleton className="w-full h-9" />;
+    return <Skeleton className="w-full h-9" />
   }
 
   return (
     <FormField
-      className={cn(
-        "ra-input",
-        `ra-input-${finalSource}`,
-        className,
-        "w-full flex flex-col gap-2",
-      )}
+      className={cn('ra-input', `ra-input-${finalSource}`, className, 'w-full flex flex-col gap-2')}
       name={finalSource}
       {...sanitizeInputRestProps(rest)}
     >
@@ -96,16 +91,13 @@ export const ArrayInput = (props: ArrayInputProps) => {
       <InputHelperText helperText={helperText} />
       <FormError />
     </FormField>
-  );
-};
+  )
+}
 
-export interface ArrayInputProps extends Omit<
-  InputProps,
-  "disabled" | "readOnly"
-> {
-  className?: string;
-  children: React.ReactNode;
-  isFetching?: boolean;
-  isLoading?: boolean;
-  isPending?: boolean;
+export interface ArrayInputProps extends Omit<InputProps, 'disabled' | 'readOnly'> {
+  className?: string
+  children: React.ReactNode
+  isFetching?: boolean
+  isLoading?: boolean
+  isPending?: boolean
 }

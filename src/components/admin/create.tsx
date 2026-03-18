@@ -1,9 +1,5 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbPage,
-} from "@/components/admin/breadcrumb";
-import type { CreateBaseProps } from "ra-core";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbPage } from '@/components/admin/breadcrumb'
+import type { CreateBaseProps } from 'ra-core'
 import {
   CreateBase,
   Translate,
@@ -12,12 +8,12 @@ import {
   useGetResourceLabel,
   useHasDashboard,
   useResourceContext,
-} from "ra-core";
-import type { ReactNode } from "react";
-import { Link } from "react-router";
-import { cn } from "@/lib/utils";
+} from 'ra-core'
+import type { ReactNode } from 'react'
+import { Link } from 'react-router'
+import { cn } from '@/lib/utils'
 
-export type CreateProps = CreateViewProps & CreateBaseProps;
+export type CreateProps = CreateViewProps & CreateBaseProps
 
 /**
  * A complete create page with breadcrumb, title, and actions.
@@ -57,15 +53,15 @@ export const Create = ({
       {children}
     </CreateView>
   </CreateBase>
-);
+)
 
 export type CreateViewProps = {
-  actions?: ReactNode;
-  disableBreadcrumb?: boolean;
-  children: ReactNode;
-  className?: string;
-  title?: ReactNode | string | false;
-};
+  actions?: ReactNode
+  disableBreadcrumb?: boolean
+  children: ReactNode
+  className?: string
+  title?: ReactNode | string | false
+}
 
 /**
  * The view component for Create pages with layout and UI.
@@ -79,22 +75,20 @@ export const CreateView = ({
   children,
   className,
 }: CreateViewProps) => {
-  const context = useCreateContext();
+  const context = useCreateContext()
 
-  const resource = useResourceContext();
+  const resource = useResourceContext()
   if (!resource) {
-    throw new Error(
-      "The CreateView component must be used within a ResourceContextProvider",
-    );
+    throw new Error('The CreateView component must be used within a ResourceContextProvider')
   }
-  const getResourceLabel = useGetResourceLabel();
-  const listLabel = getResourceLabel(resource, 2);
-  const createPath = useCreatePath();
+  const getResourceLabel = useGetResourceLabel()
+  const listLabel = getResourceLabel(resource, 2)
+  const createPath = useCreatePath()
   const listLink = createPath({
     resource,
-    type: "list",
-  });
-  const hasDashboard = useHasDashboard();
+    type: 'list',
+  })
+  const hasDashboard = useHasDashboard()
 
   return (
     <>
@@ -115,12 +109,7 @@ export const CreateView = ({
           </BreadcrumbPage>
         </Breadcrumb>
       )}
-      <div
-        className={cn(
-          "flex justify-between items-start flex-wrap gap-2 my-2",
-          className,
-        )}
-      >
+      <div className={cn('flex justify-between items-start flex-wrap gap-2 my-2', className)}>
         <h2 className="text-2xl font-bold tracking-tight">
           {title !== undefined ? title : context.defaultTitle}
         </h2>
@@ -128,5 +117,5 @@ export const CreateView = ({
       </div>
       <div className="my-2">{children}</div>
     </>
-  );
-};
+  )
+}

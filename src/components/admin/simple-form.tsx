@@ -1,11 +1,11 @@
-import * as React from "react";
-import type { ReactNode } from "react";
-import { Children } from "react";
-import type { FormProps } from "ra-core";
-import { Form } from "ra-core";
-import { cn } from "@/lib/utils";
-import { CancelButton } from "@/components/admin/cancel-button";
-import { SaveButton } from "@/components/admin/form";
+import * as React from 'react'
+import type { ReactNode } from 'react'
+import { Children } from 'react'
+import type { FormProps } from 'ra-core'
+import { Form } from 'ra-core'
+import { cn } from '@/lib/utils'
+import { CancelButton } from '@/components/admin/cancel-button'
+import { SaveButton } from '@/components/admin/form'
 
 /**
  * A simple form layout with vertical stacking, validation, and default toolbar.
@@ -32,14 +32,11 @@ export const SimpleForm = ({
   toolbar = defaultFormToolbar,
   ...rest
 }: SimpleFormProps) => (
-  <Form
-    className={cn(`flex flex-col gap-4 w-full max-w-lg`, className)}
-    {...rest}
-  >
+  <Form className={cn(`flex flex-col gap-4 w-full max-w-lg`, className)} {...rest}>
     {children}
     {toolbar}
   </Form>
-);
+)
 
 /**
  * A sticky form toolbar with default Cancel and Save buttons.
@@ -57,15 +54,11 @@ export const SimpleForm = ({
  *     </FormToolbar>
  * );
  */
-export const FormToolbar = ({
-  children,
-  className,
-  ...rest
-}: FormToolbarProps) => (
+export const FormToolbar = ({ children, className, ...rest }: FormToolbarProps) => (
   <div
     {...rest}
     className={cn(
-      "sticky pt-4 pb-4 md:block md:pt-2 md:pb-0 bottom-0 bg-linear-to-b from-transparent to-background to-10%",
+      'sticky pt-4 pb-4 md:block md:pt-2 md:pb-0 bottom-0 bg-linear-to-b from-transparent to-background to-10%',
       className,
     )}
     role="toolbar"
@@ -79,17 +72,17 @@ export const FormToolbar = ({
       children
     )}
   </div>
-);
+)
 
 export type SimpleFormProps = {
-  children: ReactNode;
-  className?: string;
-  toolbar?: ReactNode;
-} & FormProps;
+  children: ReactNode
+  className?: string
+  toolbar?: ReactNode
+} & FormProps
 
 export interface FormToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: ReactNode;
-  className?: string;
+  children?: ReactNode
+  className?: string
 }
 
-const defaultFormToolbar = <FormToolbar />;
+const defaultFormToolbar = <FormToolbar />

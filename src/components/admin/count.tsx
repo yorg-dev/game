@@ -1,13 +1,8 @@
-import type { SortPayload } from "ra-core";
-import {
-  useResourceContext,
-  useGetList,
-  useTimeout,
-  useCreatePath,
-} from "ra-core";
-import { CircleX, LoaderCircle } from "lucide-react";
+import type { SortPayload } from 'ra-core'
+import { useResourceContext, useGetList, useTimeout, useCreatePath } from 'ra-core'
+import { CircleX, LoaderCircle } from 'lucide-react'
 
-import { Link } from "react-router";
+import { Link } from 'react-router'
 
 /**
  * Fetches and displays the item count for a resource.
@@ -40,38 +35,38 @@ export const Count = (props: CountProps) => {
     resource: resourceFromProps,
     timeout = 1000,
     ...rest
-  } = props;
-  const resource = useResourceContext(props);
+  } = props
+  const resource = useResourceContext(props)
   if (!resource) {
     throw new Error(
-      "The Count component must be used inside a ResourceContext or must be passed a resource prop.",
-    );
+      'The Count component must be used inside a ResourceContext or must be passed a resource prop.',
+    )
   }
-  const oneSecondHasPassed = useTimeout(timeout);
-  const createPath = useCreatePath();
+  const oneSecondHasPassed = useTimeout(timeout)
+  const createPath = useCreatePath()
 
   const { total, isPending, error } = useGetList(resource, {
     filter,
     sort,
     pagination: { perPage: 1, page: 1 },
-  });
+  })
 
   const body = isPending ? (
     oneSecondHasPassed ? (
       <LoaderCircle className="animate-spin" />
     ) : (
-      ""
+      ''
     )
   ) : error ? (
     <CircleX color="error" />
   ) : (
     total
-  );
+  )
 
   return link ? (
     <Link
       to={{
-        pathname: createPath({ resource, type: "list" }),
+        pathname: createPath({ resource, type: 'list' }),
         search: filter ? `filter=${JSON.stringify(filter)}` : undefined,
       }}
       onClick={(e) => e.stopPropagation()}
@@ -81,14 +76,14 @@ export const Count = (props: CountProps) => {
     </Link>
   ) : (
     <span {...rest}>{body}</span>
-  );
-};
+  )
+}
 
 export interface CountProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  filter?: any;
-  sort?: SortPayload;
-  link?: boolean;
-  resource?: string;
-  timeout?: number;
+  filter?: any
+  sort?: SortPayload
+  link?: boolean
+  resource?: string
+  timeout?: number
 }

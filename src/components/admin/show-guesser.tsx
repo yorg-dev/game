@@ -1,23 +1,23 @@
-import type { ReactNode } from "react";
-import { useEffect, useState, isValidElement, Children } from "react";
-import type { InferredTypeMap } from "ra-core";
+import type { ReactNode } from 'react'
+import { useEffect, useState, isValidElement, Children } from 'react'
+import type { InferredTypeMap } from 'ra-core'
 import {
   ShowBase,
   InferredElement,
   getElementsFromRecords,
   useResourceContext,
   useShowContext,
-} from "ra-core";
-import { capitalize, singularize } from "inflection";
-import { ShowView } from "@/components/admin/show";
-import { RecordField } from "@/components/admin/record-field";
-import { DateField } from "./date-field";
-import { ReferenceField } from "@/components/admin/reference-field";
-import { NumberField } from "@/components/admin/number-field";
-import { ArrayField } from "@/components/admin/array-field";
-import { BadgeField } from "@/components/admin/badge-field";
-import { SingleFieldList } from "@/components/admin/single-field-list";
-import { ReferenceArrayField } from "@/components/admin/reference-array-field";
+} from 'ra-core'
+import { capitalize, singularize } from 'inflection'
+import { ShowView } from '@/components/admin/show'
+import { RecordField } from '@/components/admin/record-field'
+import { DateField } from './date-field'
+import { ReferenceField } from '@/components/admin/reference-field'
+import { NumberField } from '@/components/admin/number-field'
+import { ArrayField } from '@/components/admin/array-field'
+import { BadgeField } from '@/components/admin/badge-field'
+import { SingleFieldList } from '@/components/admin/single-field-list'
+import { ReferenceArrayField } from '@/components/admin/reference-array-field'
 
 /**
  * A show page that automatically generates fields from your data.
@@ -35,92 +35,77 @@ export const ShowGuesser = (props: ShowGuesserProps) => {
     <ShowBase>
       <ShowViewGuesser {...props} />
     </ShowBase>
-  );
-};
+  )
+}
 
 const ShowViewGuesser = (props: ShowGuesserProps) => {
-  const resource = useResourceContext();
+  const resource = useResourceContext()
 
   if (!resource) {
-    throw new Error(`Cannot use <ShowGuesser> outside of a ResourceContext`);
+    throw new Error(`Cannot use <ShowGuesser> outside of a ResourceContext`)
   }
 
-  const { record } = useShowContext();
-  const [child, setChild] = useState<ReactNode>(null);
-  const { enableLog = import.meta.env.MODE === "development", ...rest } = props;
+  const { record } = useShowContext()
+  const [child, setChild] = useState<ReactNode>(null)
+  const { enableLog = import.meta.env.MODE === 'development', ...rest } = props
 
   useEffect(() => {
-    setChild(null);
-  }, [resource]);
+    setChild(null)
+  }, [resource])
 
   useEffect(() => {
     if (record && !child) {
-      const inferredElements = getElementsFromRecords([record], showFieldTypes);
-      const inferredChild = new InferredElement(
-        showFieldTypes.show,
-        null,
-        inferredElements,
-      );
-      setChild(inferredChild.getElement());
+      const inferredElements = getElementsFromRecords([record], showFieldTypes)
+      const inferredChild = new InferredElement(showFieldTypes.show, null, inferredElements)
+      setChild(inferredChild.getElement())
 
-      if (!enableLog) return;
+      if (!enableLog) return
 
-      const representation = inferredChild.getRepresentation();
-      const components = ["Show"]
+      const representation = inferredChild.getRepresentation()
+      const components = ['Show']
         .concat(
           Array.from(
             new Set(
               Array.from(representation.matchAll(/<([^/\s>]+)/g))
                 .map((match) => match[1])
-                .filter(
-                  (component) => component !== "span" && component !== "div",
-                ),
+                .filter((component) => component !== 'span' && component !== 'div'),
             ),
           ),
         )
-        .sort();
+        .sort()
 
       // eslint-disable-next-line no-console
       console.log(
         `Guessed Show:
 
 ${components
-  .map(
-    (component) =>
-      `import { ${component} } from "@/components/admin/${kebabCase(
-        component,
-      )}";`,
-  )
-  .join("\n")}
+  .map((component) => `import { ${component} } from "@/components/admin/${kebabCase(component)}";`)
+  .join('\n')}
 
 export const ${capitalize(singularize(resource))}Show = () => (
     <Show>
 ${inferredChild.getRepresentation()}
     </Show>
 );`,
-      );
+      )
     }
-  }, [record, child, resource, enableLog]);
+  }, [record, child, resource, enableLog])
 
-  return <ShowView {...rest}>{child}</ShowView>;
-};
+  return <ShowView {...rest}>{child}</ShowView>
+}
 
 interface ShowGuesserProps {
-  enableLog?: boolean;
+  enableLog?: boolean
 }
 
 const showFieldTypes: InferredTypeMap = {
   show: {
-    component: (props: any) => (
-      <div className="flex flex-col gap-4">{props.children}</div>
-    ),
+    component: (props: any) => <div className="flex flex-col gap-4">{props.children}</div>,
     representation: (
       _props: any,
       children: { getRepresentation: () => string }[],
     ) => `        <div className="flex flex-col gap-4">
-${children
-  .map((child) => `            ${child.getRepresentation()}`)
-  .join("\n")}
+${children.map((child) => `            ${child.getRepresentation()}`).join('\n')}
         </div>`,
   },
   reference: {
@@ -136,7 +121,7 @@ ${children
   },
   array: {
     component: ({ children, ...props }: any) => {
-      const childrenArray = Children.toArray(children);
+      const childrenArray = Children.toArray(children)
       return (
         <RecordField source={props.source}>
           <ArrayField source={props.source}>
@@ -151,7 +136,7 @@ ${children
             </SingleFieldList>
           </ArrayField>
         </RecordField>
-      );
+      )
     },
     representation: (props: any, children: any) =>
       `<RecordField source="${props.source}">
@@ -179,7 +164,7 @@ ${children
     component: (props: any) => (
       <RecordField
         source={props.source}
-        render={(record) => (record[props.source] ? "Yes" : "No")}
+        render={(record) => (record[props.source] ? 'Yes' : 'No')}
       />
     ),
     representation: (props: any) =>
@@ -211,11 +196,11 @@ ${children
     component: (props: any) => <RecordField source={props.source} />,
     representation: (props: any) => `<RecordField source="${props.source}" />`,
   },
-};
+}
 
 const kebabCase = (name: string) => {
   return name
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase();
-};
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+}

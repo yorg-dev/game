@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { EventBus } from '@/game/EventBus'
-import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
-import { APPS } from '@/mocks/apps'
+import { findAgentTemplate } from '@/game/agentTemplates/agentTemplateStore'
 import type { AgentTemplate } from '@/models/AgentTemplate'
 import type { Connection } from '@/models/Connection'
 import { NewAgentModal } from '@/app/Agents/NewModal'
@@ -10,8 +9,7 @@ import { CreateAccountModal } from '@/app/Auth/CreateAccount'
 import { GameToolbar } from './Toolbar'
 import { DialogBox } from './Dialog'
 import type { DialogLine } from '@/game/dialog/DialogScript'
-import { EXTRA_HOUSE_POSITIONS, SAMPLE_CONNECTIONS } from '@/mocks/connections'
-import type { ApiConnection } from '@/providers/connectionsProvider'
+import type { ApiConnection } from '@/models/Connection'
 import type { Tool } from '@/models/Tool'
 
 interface AgentEntry {
@@ -104,7 +102,12 @@ function HotkeysModal({ onClose }: { onClose: () => void }) {
           className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
 
@@ -144,7 +147,7 @@ function HotkeysModal({ onClose }: { onClose: () => void }) {
 export function GameMenu({ canManage = false }: { canManage?: boolean }) {
   const [open, setOpen] = useState(false)
   const [agents, setAgents] = useState<AgentEntry[]>([])
-  const [connections, setConnections] = useState<Connection[]>([...SAMPLE_CONNECTIONS])
+  const [connections, setConnections] = useState<Connection[]>([])
   const [agentExpanded, setAgentExpanded] = useState(true)
   const [connExpanded, setConnExpanded] = useState(true)
   const [showAgentModal, setShowAgentModal] = useState(false)
@@ -165,12 +168,36 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
 
       switch (e.key) {
-        case 'n': case 'N': e.preventDefault(); setShowAgentModal(true); break
-        case 'c': case 'C': e.preventDefault(); setShowConnModal(true); break
-        case 'm': case 'M': e.preventDefault(); setOpen((v) => !v); break
-        case 't': case 'T': e.preventDefault(); setToolbarVisible((v) => !v); break
-        case 'l': case 'L': e.preventDefault(); EventBus.emit('show-leaderboard', undefined); break
-        case 'x': case 'X': e.preventDefault(); EventBus.emit('show-experts', undefined); break
+        case 'n':
+        case 'N':
+          e.preventDefault()
+          setShowAgentModal(true)
+          break
+        case 'c':
+        case 'C':
+          e.preventDefault()
+          setShowConnModal(true)
+          break
+        case 'm':
+        case 'M':
+          e.preventDefault()
+          setOpen((v) => !v)
+          break
+        case 't':
+        case 'T':
+          e.preventDefault()
+          setToolbarVisible((v) => !v)
+          break
+        case 'l':
+        case 'L':
+          e.preventDefault()
+          EventBus.emit('show-leaderboard', undefined)
+          break
+        case 'x':
+        case 'X':
+          e.preventDefault()
+          EventBus.emit('show-experts', undefined)
+          break
       }
     }
     window.addEventListener('keydown', onKeyDown)
@@ -179,16 +206,22 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
 
   useEffect(() => {
     const unsubSpawned = EventBus.on('agent-spawned', ({ id, name, templateId }) => {
-      const template = AGENT_TEMPLATES.find((t) => t.id === templateId)
+      const template = findAgentTemplate(templateId)
       if (!template) return
-      setAgents((prev) => prev.some((s) => s.id === id) ? prev : [...prev, { id, name, template }])
+      setAgents((prev) =>
+        prev.some((s) => s.id === id) ? prev : [...prev, { id, name, template }],
+      )
     })
     const unsubDialog = EventBus.on('dialog-start', ({ lines }) => setDialogLines(lines))
     const unsubRemoved = EventBus.on('agent-removed', ({ id }) =>
       setAgents((prev) => prev.filter((s) => s.id !== id)),
     )
-    const unsubReady = EventBus.on('scene-ready', () => EventBus.emit('request-agent-sync', undefined))
-    const unsubConns = EventBus.on('connections-loaded', ({ connections }) => setConnections(connections))
+    const unsubReady = EventBus.on('scene-ready', () =>
+      EventBus.emit('request-agent-sync', undefined),
+    )
+    const unsubConns = EventBus.on('connections-loaded', ({ connections }) =>
+      setConnections(connections),
+    )
     EventBus.emit('request-agent-sync', undefined)
     return () => {
       unsubSpawned()
@@ -205,7 +238,9 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
   }
 
   function handleNewConnection(appId: string, apiConnection: ApiConnection, _tool: Tool | null) {
-    const pos = EXTRA_HOUSE_POSITIONS[dynamicCount % EXTRA_HOUSE_POSITIONS.length]
+    const col = dynamicCount % 4
+    const row = Math.floor(dynamicCount / 4)
+    const pos = { x: 200 + col * 80, y: 200 + row * 80 }
     dynamicCount++
     const newConn: Connection = {
       id: apiConnection.id,
@@ -227,7 +262,11 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
   }
 
   function handleClickConnection(conn: Connection) {
-    EventBus.emit('connection-clicked', { connectionId: conn.id, appId: conn.appId, connection: conn })
+    EventBus.emit('connection-clicked', {
+      connectionId: conn.id,
+      appId: conn.appId,
+      connection: conn,
+    })
   }
 
   const closeButton = (
@@ -237,7 +276,12 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
       className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
     >
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+        <path
+          d="M10 2L2 10M2 2l8 8"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="square"
+        />
       </svg>
     </button>
   )
@@ -266,7 +310,9 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           style={{ width: '17rem' }}
         >
           <div className="relative flex items-center px-5 py-4 border-b-4 border-[#7a5230] bg-[#dcc898] shrink-0">
-            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">Menu</span>
+            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">
+              Menu
+            </span>
             {closeButton}
           </div>
           <div className="flex-1 flex flex-col gap-3 px-4 py-5">
@@ -274,21 +320,30 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
               Sign in to manage your land, add agents, and connect apps.
             </p>
             <button
-              onClick={() => { setOpen(false); EventBus.emit('show-login', { tab: 'register' }) }}
+              onClick={() => {
+                setOpen(false)
+                EventBus.emit('show-login', { tab: 'register' })
+              }}
               className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 transition-[filter]"
             >
               <span className="text-base leading-none">+</span>
               Create Land
             </button>
             <button
-              onClick={() => { setOpen(false); EventBus.emit('show-leaderboard', undefined) }}
+              onClick={() => {
+                setOpen(false)
+                EventBus.emit('show-leaderboard', undefined)
+              }}
               className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors"
             >
               <span className="text-base leading-none">🏆</span>
               Leaderboard
             </button>
             <button
-              onClick={() => { setOpen(false); EventBus.emit('show-experts', undefined) }}
+              onClick={() => {
+                setOpen(false)
+                EventBus.emit('show-experts', undefined)
+              }}
               className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors"
             >
               <span className="text-base leading-none">⭐</span>
@@ -305,7 +360,9 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           style={{ width: '17rem' }}
         >
           <div className="relative flex items-center px-5 py-4 border-b-4 border-[#7a5230] bg-[#dcc898] shrink-0">
-            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">Menu</span>
+            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">
+              Menu
+            </span>
             {closeButton}
           </div>
 
@@ -324,10 +381,20 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                     <p className="text-[#9a6b28] text-xs px-2 py-1.5 italic">No agents yet</p>
                   ) : (
                     agents.map((s) => (
-                      <div key={s.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28]">
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#7a5230]/40" style={{ background: s.template.color }} />
-                        <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">{s.name}</span>
-                        <span className="text-[10px] border border-[#9a6b28] bg-[#e8d5a8] text-[#7a5230] font-bold px-1.5 py-0 rounded shrink-0">{s.template.name}</span>
+                      <div
+                        key={s.id}
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28]"
+                      >
+                        <span
+                          className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#7a5230]/40"
+                          style={{ background: s.template.color }}
+                        />
+                        <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">
+                          {s.name}
+                        </span>
+                        <span className="text-[10px] border border-[#9a6b28] bg-[#e8d5a8] text-[#7a5230] font-bold px-1.5 py-0 rounded shrink-0">
+                          {s.template.name}
+                        </span>
                       </div>
                     ))
                   )}
@@ -355,21 +422,21 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                   {connections.length === 0 ? (
                     <p className="text-[#9a6b28] text-xs px-2 py-1.5 italic">No connections yet</p>
                   ) : (
-                    connections.map((conn) => {
-                      const app = APPS.find((a) => a.id === conn.appId)
-                      return (
-                        <button
-                          key={conn.id}
-                          onClick={() => handleClickConnection(conn)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] cursor-pointer text-left w-full hover:border-[#7a5230] hover:bg-[#c8b07a] transition-colors"
-                        >
-                          <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#7a5230]/30" style={{ background: app?.color ?? '#9a6b28' }} />
-                          <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">{app?.name ?? conn.appId}</span>
-                          <span className="text-[11px] font-bold text-[#9a6b28] truncate max-w-[5rem] shrink-0">{conn.label}</span>
-                          <span className={`w-2 h-2 rounded-full shrink-0 border border-[#7a5230]/30 ${STATUS_DOT[conn.status] ?? 'bg-[#9a6b28]'}`} />
-                        </button>
-                      )
-                    })
+                    connections.map((conn) => (
+                      <button
+                        key={conn.id}
+                        onClick={() => handleClickConnection(conn)}
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] cursor-pointer text-left w-full hover:border-[#7a5230] hover:bg-[#c8b07a] transition-colors"
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#7a5230]/30 bg-[#9a6b28]" />
+                        <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">
+                          {conn.label || conn.appId}
+                        </span>
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 border border-[#7a5230]/30 ${STATUS_DOT[conn.status] ?? 'bg-[#9a6b28]'}`}
+                        />
+                      </button>
+                    ))
                   )}
                   <button
                     onClick={() => setShowConnModal(true)}
@@ -397,7 +464,13 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                   onClick={() => setShowHotkeys(true)}
                   className="flex items-center gap-2 px-3 py-2 w-full rounded-lg border-2 border-[#9a6b28] bg-[#e8d5a8] text-left text-xs text-[#5a3810] font-bold hover:bg-[#c8b07a] hover:border-[#7a5230] transition-colors"
                 >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 text-[#7a5230]">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    className="shrink-0 text-[#7a5230]"
+                  >
                     <rect x="0.5" y="2.5" width="11" height="7" rx="1.5" stroke="currentColor" />
                     <rect x="2" y="4.5" width="2" height="1.5" rx="0.5" fill="currentColor" />
                     <rect x="5" y="4.5" width="2" height="1.5" rx="0.5" fill="currentColor" />
@@ -410,9 +483,19 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                   onClick={() => setShowCreateAccount(true)}
                   className="flex items-center gap-2 px-3 py-2 w-full rounded-lg border-2 border-[#9a6b28] bg-[#e8d5a8] text-left text-xs text-[#5a3810] font-bold hover:bg-[#c8b07a] hover:border-[#7a5230] transition-colors"
                 >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 text-[#7a5230]">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    className="shrink-0 text-[#7a5230]"
+                  >
                     <circle cx="6" cy="4" r="2.5" stroke="currentColor" />
-                    <path d="M1 11c0-2.21 2.239-4 5-4s5 1.79 5 4" stroke="currentColor" strokeLinecap="square" />
+                    <path
+                      d="M1 11c0-2.21 2.239-4 5-4s5 1.79 5 4"
+                      stroke="currentColor"
+                      strokeLinecap="square"
+                    />
                   </svg>
                   Save map / Create account
                 </button>
@@ -440,7 +523,10 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
         <NewAgentModal onSubmit={handleNewAgent} onCancel={() => setShowAgentModal(false)} />
       )}
       {canManage && showConnModal && (
-        <NewConnectionModal onSuccess={handleNewConnection} onCancel={() => setShowConnModal(false)} />
+        <NewConnectionModal
+          onSuccess={handleNewConnection}
+          onCancel={() => setShowConnModal(false)}
+        />
       )}
       {showCreateAccount && (
         <CreateAccountModal

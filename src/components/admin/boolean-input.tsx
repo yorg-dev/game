@@ -1,8 +1,8 @@
-import React, { useCallback } from "react";
-import { Switch } from "@/components/ui/switch";
-import { FormError, FormField, FormLabel } from "@/components/admin/form";
-import { useInput, FieldTitle } from "ra-core";
-import { InputHelperText } from "./input-helper-text";
+import React, { useCallback } from 'react'
+import { Switch } from '@/components/ui/switch'
+import { FormError, FormField, FormLabel } from '@/components/admin/form'
+import { useInput, FieldTitle } from 'ra-core'
+import { InputHelperText } from './input-helper-text'
 
 /**
  * Toggle switch for boolean (true/false) values.
@@ -49,7 +49,7 @@ export const BooleanInput = (props: BooleanInputProps) => {
     source,
     validate,
     ...rest
-  } = props;
+  } = props
   const { id, field, isRequired } = useInput({
     defaultValue,
     format,
@@ -58,21 +58,21 @@ export const BooleanInput = (props: BooleanInputProps) => {
     source,
     onBlur,
     onChange,
-    type: "checkbox",
+    type: 'checkbox',
     validate,
     disabled,
     readOnly,
     ...rest,
-  });
+  })
 
   const handleChange = useCallback(
     (checked: boolean) => {
-      field.onChange(checked);
+      field.onChange(checked)
       // Ensure field is considered as touched
-      field.onBlur();
+      field.onBlur()
     },
     [field],
-  );
+  )
 
   return (
     <FormField className={className} id={id} name={field.name}>
@@ -85,33 +85,28 @@ export const BooleanInput = (props: BooleanInputProps) => {
           disabled={disabled || readOnly}
         />
         <FormLabel htmlFor={id}>
-          <FieldTitle
-            label={label}
-            source={source}
-            resource={resource}
-            isRequired={isRequired}
-          />
+          <FieldTitle label={label} source={source} resource={resource} isRequired={isRequired} />
         </FormLabel>
       </div>
       <InputHelperText helperText={helperText} />
       <FormError />
     </FormField>
-  );
-};
+  )
+}
 
 export interface BooleanInputProps {
-  className?: string;
-  defaultValue?: boolean;
-  format?: (value: any) => any;
-  helperText?: React.ReactNode;
-  label?: React.ReactNode;
-  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
-  onChange?: (value: any) => void;
-  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
-  readOnly?: boolean;
-  disabled?: boolean;
-  parse?: (value: any) => any;
-  resource?: string;
-  source: string;
-  validate?: any;
+  className?: string
+  defaultValue?: boolean
+  format?: (value: any) => any
+  helperText?: React.ReactNode
+  label?: React.ReactNode
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void
+  onChange?: (value: any) => void
+  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void
+  readOnly?: boolean
+  disabled?: boolean
+  parse?: (value: any) => any
+  resource?: string
+  source: string
+  validate?: any
 }

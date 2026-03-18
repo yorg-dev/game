@@ -1,9 +1,9 @@
-import { genericMemo, useFieldValue, useTranslate } from "ra-core";
-import type { AnchorHTMLAttributes } from "react";
-import React from "react";
+import { genericMemo, useFieldValue, useTranslate } from 'ra-core'
+import type { AnchorHTMLAttributes } from 'react'
+import React from 'react'
 
-import { cn } from "@/lib/utils";
-import type { FieldProps } from "@/lib/field.type";
+import { cn } from '@/lib/utils'
+import type { FieldProps } from '@/lib/field.type'
 
 const EmailFieldImpl = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,34 +11,34 @@ const EmailFieldImpl = <
 >(
   inProps: EmailFieldProps<RecordType>,
 ) => {
-  const { className, empty, defaultValue, source, record, ...rest } = inProps;
-  const value = useFieldValue({ defaultValue, source, record });
-  const translate = useTranslate();
+  const { className, empty, defaultValue, source, record, ...rest } = inProps
+  const value = useFieldValue({ defaultValue, source, record })
+  const translate = useTranslate()
 
   if (value == null) {
     if (!empty) {
-      return null;
+      return null
     }
 
     return (
       <span className={className} {...rest}>
-        {typeof empty === "string" ? translate(empty, { _: empty }) : empty}
+        {typeof empty === 'string' ? translate(empty, { _: empty }) : empty}
       </span>
-    );
+    )
   }
 
   return (
     <a
-      className={cn("underline hover:no-underline", className)}
+      className={cn('underline hover:no-underline', className)}
       href={`mailto:${value}`}
       onClick={stopPropagation}
       {...rest}
     >
       {value}
     </a>
-  );
-};
-EmailFieldImpl.displayName = "EmailFieldImpl";
+  )
+}
+EmailFieldImpl.displayName = 'EmailFieldImpl'
 
 /**
  * Displays an email address as a clickable mailto link.
@@ -60,7 +60,7 @@ EmailFieldImpl.displayName = "EmailFieldImpl";
  *   </List>
  * );
  */
-export const EmailField = genericMemo(EmailFieldImpl);
+export const EmailField = genericMemo(EmailFieldImpl)
 
 export interface EmailFieldProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,5 +69,4 @@ export interface EmailFieldProps<
   extends FieldProps<RecordType>, AnchorHTMLAttributes<HTMLAnchorElement> {}
 
 // useful to prevent click bubbling in a DataTable with rowClick
-const stopPropagation = (e: React.MouseEvent<HTMLAnchorElement>) =>
-  e.stopPropagation();
+const stopPropagation = (e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()

@@ -24,7 +24,7 @@ export const GRASS = {
   top_right_inner_corner: 27,
   tr_corner: 2,
   r_border: 13,
-};
+}
 
 // ── Water layer ───────────────────────────────────────────────────────────────
 //
@@ -38,7 +38,7 @@ export const WATER = {
   two: 1,
   three: 2,
   four: 3,
-};
+}
 
 // ── Dirt layer ────────────────────────────────────────────────────────────────
 //
@@ -65,7 +65,7 @@ export const DIRT = {
   top_border: 26,
   top_right_corner: 27,
   top_left_corner: 25,
-};
+}
 
 // ── Fence layer ───────────────────────────────────────────────────────────────
 //
@@ -90,8 +90,7 @@ export const FENCE = {
   vertical_top: 0,
   vertical_middle: 4,
   vertical_bottom: 8,
-};
-
+}
 
 // ── Biom Layer ───────────────────────────────────────────────────────────────
 //
@@ -112,5 +111,4 @@ export const BIOM = {
   sunflower_bottom: 35,
   thin_tree_top: 0,
   thin_tree_bottom: 9,
-};
-
+}

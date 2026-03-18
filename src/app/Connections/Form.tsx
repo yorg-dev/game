@@ -1,4 +1,4 @@
-import { required } from "ra-core";
+import { required } from 'ra-core'
 import {
   BooleanInput,
   SimpleForm,
@@ -9,13 +9,13 @@ import {
   CancelButton,
   SaveButton,
   DeleteButton,
-} from "@/components/admin";
+} from '@/components/admin'
 
-const validate = [required()];
+const validate = [required()]
 
 interface Props {
-  defaultValues?: object;
-  mode: "create" | "edit";
+  defaultValues?: object
+  mode: 'create' | 'edit'
 }
 
 /*
@@ -36,7 +36,7 @@ const ConnectionForm = ({ defaultValues, mode }: Props) => {
   const toolbar = (
     <FormToolbar>
       <div className="flex flex-row gap-2 justify-between w-full">
-        {mode === "edit" && (
+        {mode === 'edit' && (
           <DeleteButton
             variant="ghost"
             className="cursor-pointer text-destructive hover:text-destructive"
@@ -48,7 +48,7 @@ const ConnectionForm = ({ defaultValues, mode }: Props) => {
         </div>
       </div>
     </FormToolbar>
-  );
+  )
 
   return (
     <SimpleForm defaultValues={defaultValues} toolbar={toolbar}>
@@ -62,8 +62,9 @@ const ConnectionForm = ({ defaultValues, mode }: Props) => {
         label="blaq.connections.controls.application.label"
         source="app_id"
         reference="apps"
-        sort={{ field: "name", order: "ASC" }}
-        perPage={1000}>
+        sort={{ field: 'name', order: 'ASC' }}
+        perPage={1000}
+      >
         <AutocompleteInput
           optionText="name"
           validate={validate}
@@ -77,7 +78,7 @@ const ConnectionForm = ({ defaultValues, mode }: Props) => {
         source="active"
       />
     </SimpleForm>
-  );
-};
+  )
+}
 
-export default ConnectionForm;
+export default ConnectionForm

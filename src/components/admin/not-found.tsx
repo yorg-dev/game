@@ -1,15 +1,15 @@
-import { History, SearchX } from "lucide-react";
-import { Translate, useAuthenticated } from "ra-core";
-import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/admin/loading";
+import { History, SearchX } from 'lucide-react'
+import { Translate, useAuthenticated } from 'ra-core'
+import { Button } from '@/components/ui/button'
+import { Loading } from '@/components/admin/loading'
 
 /**
  * Fallback page displayed when no route matches the current URL.
  */
 export const NotFound = () => {
-  const { isPending } = useAuthenticated();
+  const { isPending } = useAuthenticated()
   if (isPending) {
-    return <Loading />;
+    return <Loading />
   }
   return (
     <div className="flex min-h-[50vh] flex-1 flex-col items-center justify-center gap-2 text-center">
@@ -25,9 +25,9 @@ export const NotFound = () => {
         <Translate i18nKey="ra.action.back" />
       </Button>
     </div>
-  );
-};
+  )
+}
 
 function goBack() {
-  window.history.go(-1);
+  window.history.go(-1)
 }

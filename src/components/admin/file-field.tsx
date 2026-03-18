@@ -1,9 +1,9 @@
-import type { HTMLAttributes } from "react";
-import get from "lodash/get";
-import type { ExtractRecordPaths, HintedString } from "ra-core";
-import { useFieldValue, useTranslate } from "ra-core";
-import { cn } from "@/lib/utils";
-import type { FieldProps } from "@/lib/field.type";
+import type { HTMLAttributes } from 'react'
+import get from 'lodash/get'
+import type { ExtractRecordPaths, HintedString } from 'ra-core'
+import { useFieldValue, useTranslate } from 'ra-core'
+import { cn } from '@/lib/utils'
+import type { FieldProps } from '@/lib/field.type'
 
 /**
  * Displays a downloadable file link with customizable title and target.
@@ -30,48 +30,35 @@ export const FileField = <
 >(
   props: FileFieldProps<RecordType>,
 ) => {
-  const {
-    className,
-    empty,
-    title,
-    src,
-    target,
-    download,
-    defaultValue,
-    source,
-    record,
-    ...rest
-  } = props;
-  const sourceValue = useFieldValue({ defaultValue, source, record });
+  const { className, empty, title, src, target, download, defaultValue, source, record, ...rest } =
+    props
+  const sourceValue = useFieldValue({ defaultValue, source, record })
   const titleValue =
     useFieldValue({
       ...props,
       // @ts-expect-error We ignore here because title might be a custom label or undefined instead of a field name
       source: title,
-    })?.toString() ?? title;
-  const translate = useTranslate();
+    })?.toString() ?? title
+  const translate = useTranslate()
 
-  if (
-    sourceValue == null ||
-    (Array.isArray(sourceValue) && sourceValue.length === 0)
-  ) {
+  if (sourceValue == null || (Array.isArray(sourceValue) && sourceValue.length === 0)) {
     if (!empty) {
-      return null;
+      return null
     }
 
     return (
-      <div className={cn("inline-block", className)} {...rest}>
-        {typeof empty === "string" ? translate(empty, { _: empty }) : empty}
+      <div className={cn('inline-block', className)} {...rest}>
+        {typeof empty === 'string' ? translate(empty, { _: empty }) : empty}
       </div>
-    );
+    )
   }
 
   if (Array.isArray(sourceValue)) {
     return (
-      <ul className={cn("inline-block", className)} {...rest}>
+      <ul className={cn('inline-block', className)} {...rest}>
         {sourceValue.map((file, index) => {
-          const fileTitleValue = title ? get(file, title, title) : title;
-          const srcValue = src ? get(file, src, title) : title;
+          const fileTitleValue = title ? get(file, title, title) : title
+          const srcValue = src ? get(file, src, title) : title
 
           return (
             <li key={index}>
@@ -86,14 +73,14 @@ export const FileField = <
                 {fileTitleValue}
               </a>
             </li>
-          );
+          )
         })}
       </ul>
-    );
+    )
   }
 
   return (
-    <div className={cn("inline-block", className)} {...rest}>
+    <div className={cn('inline-block', className)} {...rest}>
       <a
         href={sourceValue?.toString()}
         title={titleValue}
@@ -105,8 +92,8 @@ export const FileField = <
         {titleValue}
       </a>
     </div>
-  );
-};
+  )
+}
 
 export interface FileFieldProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,8 +103,8 @@ export interface FileFieldProps<
   /**
    * The source of the link to the file, for an array of files.
    */
-  src?: string;
-  title?: HintedString<ExtractRecordPaths<RecordType>>;
-  target?: HTMLAnchorElement["target"];
-  download?: HTMLAnchorElement["download"];
+  src?: string
+  title?: HintedString<ExtractRecordPaths<RecordType>>
+  target?: HTMLAnchorElement['target']
+  download?: HTMLAnchorElement['download']
 }

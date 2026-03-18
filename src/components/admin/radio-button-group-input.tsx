@@ -1,17 +1,12 @@
-import * as React from "react";
-import type { ChoicesProps, InputProps } from "ra-core";
-import { FieldTitle, useChoices, useChoicesContext, useInput } from "ra-core";
-import { cn } from "@/lib/utils";
-import {
-  FormField,
-  FormControl,
-  FormLabel,
-  FormError,
-} from "@/components/admin/form";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Skeleton } from "@/components/ui/skeleton";
-import { InputHelperText } from "@/components/admin/input-helper-text";
+import * as React from 'react'
+import type { ChoicesProps, InputProps } from 'ra-core'
+import { FieldTitle, useChoices, useChoicesContext, useInput } from 'ra-core'
+import { cn } from '@/lib/utils'
+import { FormField, FormControl, FormLabel, FormError } from '@/components/admin/form'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Skeleton } from '@/components/ui/skeleton'
+import { InputHelperText } from '@/components/admin/input-helper-text'
 
 /**
  * Single-select input rendered as a list of radio buttons, arranged vertically or horizontally.
@@ -59,16 +54,16 @@ export const RadioButtonGroupInput = (inProps: RadioButtonGroupInputProps) => {
     readOnly,
 
     optionText,
-    optionValue = "id",
+    optionValue = 'id',
     translateChoice,
-    disableValue = "disabled",
+    disableValue = 'disabled',
 
     className,
     helperText,
     label,
     row,
     ...rest
-  } = inProps;
+  } = inProps
 
   const {
     allChoices,
@@ -83,18 +78,18 @@ export const RadioButtonGroupInput = (inProps: RadioButtonGroupInputProps) => {
     isPending: isPendingProp,
     resource: resourceProp,
     source: sourceProp,
-  });
+  })
 
   if (source === undefined) {
     throw new Error(
       `If you're not wrapping the RadioButtonGroupInput inside a ReferenceArrayInput, you must provide the source prop`,
-    );
+    )
   }
 
   if (!isPending && !fetchError && allChoices === undefined) {
     throw new Error(
       `If you're not wrapping the RadioButtonGroupInput inside a ReferenceArrayInput, you must provide the choices prop`,
-    );
+    )
   }
 
   const { id, field, isRequired } = useInput({
@@ -108,78 +103,66 @@ export const RadioButtonGroupInput = (inProps: RadioButtonGroupInputProps) => {
     disabled,
     readOnly,
     ...rest,
-  });
+  })
 
   const { getChoiceText, getChoiceValue, getDisableValue } = useChoices({
     optionText,
     optionValue,
     translateChoice,
     disableValue,
-  });
+  })
 
   if (isPending) {
-    return <Skeleton className="w-full h-9" />;
+    return <Skeleton className="w-full h-9" />
   }
 
   return (
     <FormField id={id} className={className} name={field.name}>
       {label && (
         <FormLabel>
-          <FieldTitle
-            label={label}
-            source={source}
-            resource={resource}
-            isRequired={isRequired}
-          />
+          <FieldTitle label={label} source={source} resource={resource} isRequired={isRequired} />
         </FormLabel>
       )}
 
       <FormControl>
         <RadioGroup
           {...rest}
-          value={field.value || ""}
+          value={field.value || ''}
           onValueChange={field.onChange}
-          className={cn("flex", row ? "flex-row gap-4" : "flex-col gap-2")}
+          className={cn('flex', row ? 'flex-row gap-4' : 'flex-col gap-2')}
           disabled={disabled || readOnly}
         >
           {allChoices?.map((choice) => {
-            const value = getChoiceValue(choice);
-            const isDisabled = disabled || readOnly || getDisableValue(choice);
+            const value = getChoiceValue(choice)
+            const isDisabled = disabled || readOnly || getDisableValue(choice)
 
             return (
               <div key={value} className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={value}
-                  id={`${id}-${value}`}
-                  disabled={isDisabled}
-                />
+                <RadioGroupItem value={value} id={`${id}-${value}`} disabled={isDisabled} />
                 <Label
                   htmlFor={`${id}-${value}`}
                   className={cn(
-                    "text-sm font-normal cursor-pointer",
-                    isDisabled && "opacity-50 cursor-not-allowed",
+                    'text-sm font-normal cursor-pointer',
+                    isDisabled && 'opacity-50 cursor-not-allowed',
                   )}
                 >
                   {getChoiceText(choice)}
                 </Label>
               </div>
-            );
+            )
           })}
         </RadioGroup>
       </FormControl>
       <InputHelperText helperText={helperText} />
       <FormError />
     </FormField>
-  );
-};
+  )
+}
 
 export interface RadioButtonGroupInputProps
   extends
     Partial<InputProps>,
     ChoicesProps,
-    Omit<
-      React.ComponentProps<typeof RadioGroup>,
-      "defaultValue" | "onBlur" | "onChange" | "type"
-    > {
-  row?: boolean;
+    Omit<React.ComponentProps<typeof RadioGroup>, 'defaultValue' | 'onBlur' | 'onChange' | 'type'> {
+  row?: boolean
 }

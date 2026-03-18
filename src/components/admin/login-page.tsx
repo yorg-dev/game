@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Form, required, useLogin, useNotify } from "ra-core";
-import type { SubmitHandler, FieldValues } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { TextInput } from "@/components/admin/text-input";
-import { Notification } from "@/components/admin/notification";
+import { useState } from 'react'
+import { Form, required, useLogin, useNotify } from 'ra-core'
+import type { SubmitHandler, FieldValues } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import { TextInput } from '@/components/admin/text-input'
+import { Notification } from '@/components/admin/notification'
 
 /**
  * Login page displayed when authentication is enabled and the user is not authenticated.
@@ -15,39 +15,39 @@ import { Notification } from "@/components/admin/notification";
  * @see {@link https://marmelab.com/shadcn-admin-kit/docs/security Security documentation}
  */
 export const LoginPage = (props: { redirectTo?: string }) => {
-  const { redirectTo } = props;
-  const [loading, setLoading] = useState(false);
-  const login = useLogin();
-  const notify = useNotify();
+  const { redirectTo } = props
+  const [loading, setLoading] = useState(false)
+  const login = useLogin()
+  const notify = useNotify()
 
   const handleSubmit: SubmitHandler<FieldValues> = (values) => {
-    setLoading(true);
+    setLoading(true)
     login(values, redirectTo)
       .then(() => {
-        setLoading(false);
+        setLoading(false)
       })
       .catch((error) => {
-        setLoading(false);
+        setLoading(false)
         notify(
-          typeof error === "string"
+          typeof error === 'string'
             ? error
-            : typeof error === "undefined" || !error.message
-              ? "ra.auth.sign_in_error"
+            : typeof error === 'undefined' || !error.message
+              ? 'ra.auth.sign_in_error'
               : error.message,
           {
-            type: "error",
+            type: 'error',
             messageArgs: {
               _:
-                typeof error === "string"
+                typeof error === 'string'
                   ? error
                   : error && error.message
                     ? error.message
                     : undefined,
             },
           },
-        );
-      });
-  };
+        )
+      })
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -72,9 +72,8 @@ export const LoginPage = (props: { redirectTo?: string }) => {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Shadcn Admin Kit has allowed us to quickly create and
-                evolve a powerful tool that otherwise would have taken months of
-                time and effort to develop.&rdquo;
+                &ldquo;Shadcn Admin Kit has allowed us to quickly create and evolve a powerful tool
+                that otherwise would have taken months of time and effort to develop.&rdquo;
               </p>
               <footer className="text-sm">John Doe</footer>
             </blockquote>
@@ -89,23 +88,9 @@ export const LoginPage = (props: { redirectTo?: string }) => {
               </p>
             </div>
             <Form className="space-y-8" onSubmit={handleSubmit}>
-              <TextInput
-                label="Email"
-                source="email"
-                type="email"
-                validate={required()}
-              />
-              <TextInput
-                label="Password"
-                source="password"
-                type="password"
-                validate={required()}
-              />
-              <Button
-                type="submit"
-                className="cursor-pointer"
-                disabled={loading}
-              >
+              <TextInput label="Email" source="email" type="email" validate={required()} />
+              <TextInput label="Password" source="password" type="password" validate={required()} />
+              <Button type="submit" className="cursor-pointer" disabled={loading}>
                 Sign in
               </Button>
             </Form>
@@ -114,5 +99,5 @@ export const LoginPage = (props: { redirectTo?: string }) => {
       </div>
       <Notification />
     </div>
-  );
-};
+  )
+}

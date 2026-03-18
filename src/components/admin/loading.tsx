@@ -1,5 +1,5 @@
-import { Translate, useTimeout } from "ra-core";
-import { Spinner } from "./spinner";
+import { Translate, useTimeout } from 'ra-core'
+import { Spinner } from './spinner'
 
 /**
  * Loading indicator used for slow element or page loads.
@@ -12,12 +12,12 @@ import { Spinner } from "./spinner";
  */
 export const Loading = (props: LoadingProps) => {
   const {
-    loadingPrimary = "ra.page.loading",
-    loadingSecondary = "ra.message.loading",
+    loadingPrimary = 'ra.page.loading',
+    loadingSecondary = 'ra.message.loading',
     delay = 1000,
     ...rest
-  } = props;
-  const oneSecondHasPassed = useTimeout(delay);
+  } = props
+  const oneSecondHasPassed = useTimeout(delay)
   return oneSecondHasPassed ? (
     <div className="flex flex-col justify-center items-center h-full" {...rest}>
       <div className="text-center font-sans color-muted pt-1 pb-1">
@@ -30,11 +30,11 @@ export const Loading = (props: LoadingProps) => {
         </p>
       </div>
     </div>
-  ) : null;
-};
+  ) : null
+}
 
 export interface LoadingProps {
-  loadingPrimary?: string;
-  loadingSecondary?: string;
-  delay?: number;
+  loadingPrimary?: string
+  loadingSecondary?: string
+  delay?: number
 }

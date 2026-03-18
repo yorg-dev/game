@@ -1,5 +1,6 @@
 // import { AuthProvider } from "ra-core";
 import { getDeviceId, clearDeviceId } from './deviceId'
+import { EventBus } from '@/game/EventBus'
 
 const API_URL = import.meta.env.VITE_API_URL as string
 
@@ -23,10 +24,12 @@ function getStoredUser(): StoredUser | null {
 
 const authProvider = {
   //: AuthProvider = {
-  checkAuth: () => {
-    // Always resolve — the game manages its own auth flow via GameDashboard
-    // (guest session creation, login modal, etc.). Ra-core should not redirect.
-    return Promise.resolve()
+  checkAuth: async () => {
+    const user = getStoredUser()
+    if (!user || user.guest) {
+      EventBus.emit('show-login', { tab: 'login' })
+      throw new Error('Not authenticated')
+    }
   },
   checkError: (error: any) => {
     if (!error) return Promise.reject()
@@ -48,12 +51,8 @@ const authProvider = {
     }
 
     if (status === 401 || status === 403) {
-      // localStorage.removeItem('token');
-      return Promise.reject({
-        logoutUser: false,
-        message: 'Not Authorized.',
-        redirectTo: '/server/unauthorized',
-      })
+      EventBus.emit('show-login', { tab: 'login' })
+      return Promise.reject({ logoutUser: false, message: false })
     }
 
     return Promise.resolve()
@@ -134,6 +133,13 @@ const authProvider = {
     if (!user) return true
     return user.guest === true
   },
+
+  getToken: (): string | null => {
+    const token = localStorage.getItem('token')
+    return token && token !== 'undefined' ? token : null
+  },
+
+  getCurrentUser: (): StoredUser | null => getStoredUser(),
 
   logout: async () => {
     // Invalidate the server session (clears the session cookie) before wiping localStorage.

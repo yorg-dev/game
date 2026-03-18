@@ -1,6 +1,5 @@
 import { useRecordContext } from 'ra-core'
 import { EventBus } from '@/game/EventBus'
-import { APPS } from '@/mocks/apps'
 import type { SelectedAgent } from './types'
 
 interface AgentOverviewProps {
@@ -41,7 +40,9 @@ export function AgentOverview({ onClose, onRemove }: AgentOverviewProps) {
               >
                 {skill.order}
               </span>
-              <span className="flex-1 text-sm text-[#3d2010] font-mono truncate">{skill.skillId}</span>
+              <span className="flex-1 text-sm text-[#3d2010] font-mono truncate">
+                {skill.skillId}
+              </span>
               {!skill.isRequired && (
                 <span className="text-[10px] text-[#9a6b28] shrink-0 font-bold">optional</span>
               )}
@@ -52,23 +53,19 @@ export function AgentOverview({ onClose, onRemove }: AgentOverviewProps) {
 
       {/* Required Apps */}
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">Required Apps</p>
+        <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+          Required Apps
+        </p>
         <div className="flex flex-wrap gap-2">
-          {template.requiredIntegrations.map((appId) => {
-            const app = APPS.find((a) => a.id === appId)
-            return (
-              <div
-                key={appId}
-                className="flex items-center gap-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-1.5"
-              >
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ background: app?.color ?? '#9a6b28' }}
-                />
-                <span className="text-sm font-bold text-[#3d2010]">{app?.name ?? appId}</span>
-              </div>
-            )
-          })}
+          {template.requiredIntegrations.map((appId) => (
+            <div
+              key={appId}
+              className="flex items-center gap-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-1.5"
+            >
+              <span className="w-2 h-2 rounded-full shrink-0 bg-[#9a6b28]" />
+              <span className="text-sm font-bold text-[#3d2010]">{appId}</span>
+            </div>
+          ))}
         </div>
       </div>
 

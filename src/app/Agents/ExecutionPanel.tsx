@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { EventBus } from '@/game/EventBus'
-import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
+import { findAgentTemplate } from '@/game/agentTemplates/agentTemplateStore'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,7 +33,14 @@ interface ExecutionState {
 
 function SpinnerIcon() {
   return (
-    <svg className="animate-spin" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+    <svg
+      className="animate-spin"
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden="true"
+    >
       <circle
         cx="5"
         cy="5"
@@ -68,7 +75,7 @@ export function AgentExecutionPanel() {
       'agent-executing',
       ({ agentId, agentName, templateId, command, steps }) => {
         if (dismissTimer.current) clearTimeout(dismissTimer.current)
-        const template = AGENT_TEMPLATES.find((t) => t.id === templateId)
+        const template = findAgentTemplate(templateId)
         setState({
           agentId,
           agentName,
@@ -145,14 +152,21 @@ export function AgentExecutionPanel() {
           className="w-5 h-5 flex items-center justify-center text-[#9a6b28] hover:text-[#3d2010] transition-colors shrink-0"
         >
           <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-            <path d="M1 1l6 6M7 1l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+            <path
+              d="M1 1l6 6M7 1l-6 6"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
       </div>
 
       {/* ── Command label ───────────────────────────────────────────────────── */}
       <div className="px-4 pt-2.5 pb-2 border-b-2 border-[#c8b07a]">
-        <p className="text-[9px] font-bold text-[#7a5230] uppercase tracking-widest mb-0.5">Command</p>
+        <p className="text-[9px] font-bold text-[#7a5230] uppercase tracking-widest mb-0.5">
+          Command
+        </p>
         <p className="text-xs text-[#3d2010] font-medium leading-snug line-clamp-2">
           &ldquo;{state.command}&rdquo;
         </p>

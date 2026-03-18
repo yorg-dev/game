@@ -1,9 +1,9 @@
-import { genericMemo, useFieldValue, useTranslate } from "ra-core";
-import type { AnchorHTMLAttributes } from "react";
-import * as React from "react";
+import { genericMemo, useFieldValue, useTranslate } from 'ra-core'
+import type { AnchorHTMLAttributes } from 'react'
+import * as React from 'react'
 
-import { cn } from "@/lib/utils";
-import type { FieldProps } from "@/lib/field.type";
+import { cn } from '@/lib/utils'
+import type { FieldProps } from '@/lib/field.type'
 
 /**
  * Displays a URL as a clickable hyperlink.
@@ -32,44 +32,36 @@ const UrlFieldImpl = <
 >(
   inProps: UrlFieldProps<RecordType>,
 ) => {
-  const {
-    empty,
-    className,
-    defaultValue,
-    source,
-    record,
-    resource: _,
-    ...rest
-  } = inProps;
-  const value = useFieldValue({ defaultValue, source, record });
-  const translate = useTranslate();
+  const { empty, className, defaultValue, source, record, resource: _, ...rest } = inProps
+  const value = useFieldValue({ defaultValue, source, record })
+  const translate = useTranslate()
 
   if (value == null) {
     if (!empty) {
-      return null;
+      return null
     }
 
     return (
       <span className={className} {...rest}>
-        {typeof empty === "string" ? translate(empty, { _: empty }) : empty}
+        {typeof empty === 'string' ? translate(empty, { _: empty }) : empty}
       </span>
-    );
+    )
   }
 
   return (
     <a
-      className={cn("underline hover:no-underline", className)}
+      className={cn('underline hover:no-underline', className)}
       href={value}
       onClick={stopPropagation}
       {...rest}
     >
       {value}
     </a>
-  );
-};
-UrlFieldImpl.displayName = "UrlFieldImpl";
+  )
+}
+UrlFieldImpl.displayName = 'UrlFieldImpl'
 
-export const UrlField = genericMemo(UrlFieldImpl);
+export const UrlField = genericMemo(UrlFieldImpl)
 
 export interface UrlFieldProps<
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,5 +70,4 @@ export interface UrlFieldProps<
   extends FieldProps<RecordType>, AnchorHTMLAttributes<HTMLAnchorElement> {}
 
 // useful to prevent click bubbling in a DataTable with rowClick
-const stopPropagation = (e: React.MouseEvent<HTMLAnchorElement>) =>
-  e.stopPropagation();
+const stopPropagation = (e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()

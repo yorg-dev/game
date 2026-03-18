@@ -58,10 +58,14 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
       <div className="text-2xl leading-none">{earned ? achievement.icon : '🔒'}</div>
 
       <div>
-        <p className={`text-xs font-bold leading-tight ${earned ? 'text-[#3d2010]' : 'text-[#7a5230]'}`}>
+        <p
+          className={`text-xs font-bold leading-tight ${earned ? 'text-[#3d2010]' : 'text-[#7a5230]'}`}
+        >
           {achievement.title}
         </p>
-        <span className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded border ${s.badge}`}>
+        <span
+          className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded border ${s.badge}`}
+        >
           {s.label}
         </span>
       </div>
@@ -69,7 +73,9 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
       <p className="text-[10px] text-[#7a5230] leading-snug">{achievement.description}</p>
 
       {earned && achievement.unlockedAt && (
-        <p className="text-[9px] font-mono text-[#9a6b28] mt-auto">{formatDate(achievement.unlockedAt)}</p>
+        <p className="text-[9px] font-mono text-[#9a6b28] mt-auto">
+          {formatDate(achievement.unlockedAt)}
+        </p>
       )}
     </div>
   )
@@ -146,7 +152,12 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
           className="w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M10 2L2 10M2 2l8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+            <path
+              d="M10 2L2 10M2 2l8 8"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="square"
+            />
           </svg>
         </button>
       </div>
@@ -219,7 +230,9 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
 
       {/* ── Progress bar ────────────────────────────────────────────── */}
       <div className="shrink-0 border-t-4 border-[#7a5230] bg-[#dcc898] px-5 py-3 flex items-center gap-3">
-        <span className="text-[10px] font-bold text-[#7a5230] uppercase tracking-wider shrink-0">Progress</span>
+        <span className="text-[10px] font-bold text-[#7a5230] uppercase tracking-wider shrink-0">
+          Progress
+        </span>
         <div className="flex-1 h-2 rounded-full bg-[#c8b07a] border border-[#9a6b28] overflow-hidden">
           <div
             className="h-full rounded-full bg-[#c8974c] transition-all duration-500"
@@ -232,7 +245,9 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
           />
         </div>
         <span className="text-[10px] font-bold text-[#7a5230] shrink-0 tabular-nums">
-          {achievements.length > 0 ? `${Math.round((earned.length / achievements.length) * 100)}%` : '0%'}
+          {achievements.length > 0
+            ? `${Math.round((earned.length / achievements.length) * 100)}%`
+            : '0%'}
         </span>
       </div>
     </div>

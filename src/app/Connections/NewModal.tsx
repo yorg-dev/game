@@ -1,8 +1,37 @@
 import { useState } from 'react'
 import { useGetList, useCreate } from 'ra-core'
 import type { App } from '@/models/App'
-import type { ApiConnection } from '@/providers/connectionsProvider'
+import type { ApiConnection } from '@/models/Connection'
 import type { Tool } from '@/models/Tool'
+
+const AI_PROVIDER_APPS: App[] = [
+  {
+    id: 'anthropic',
+    name: 'Claude (Anthropic)',
+    description: 'Use your own Anthropic API key for agent chat',
+    category: 'ai',
+    authType: 'api_key',
+    requiredCredentials: [],
+    color: '#D97706',
+    isAvailable: true,
+    connectionType: 'anthropic',
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    description: 'Use your own OpenAI API key for agent chat',
+    category: 'ai',
+    authType: 'api_key',
+    requiredCredentials: [],
+    color: '#10A37F',
+    isAvailable: true,
+    connectionType: 'openai',
+  },
+]
+
+function isAiProvider(app: App | null): boolean {
+  return app?.connectionType === 'anthropic' || app?.connectionType === 'openai'
+}
 
 interface Props {
   onSuccess: (appId: string, connection: ApiConnection, tool: Tool | null) => void
@@ -53,9 +82,7 @@ function AppGrid({
 }) {
   return (
     <div className="grid grid-cols-3 gap-2 p-5 max-h-80 overflow-y-auto">
-      {loading && (
-        <p className="col-span-3 text-center text-sm text-[#7a5230] py-6">Loading…</p>
-      )}
+      {loading && <p className="col-span-3 text-center text-sm text-[#7a5230] py-6">Loading…</p>}
       {apps.map((a) => (
         <button
           key={a.id}
@@ -91,20 +118,24 @@ function CredentialsForm({
   app,
   label,
   credentials,
+  aiModel,
   saving,
   error,
   onLabelChange,
   onCredentialChange,
+  onAiModelChange,
   onBack,
   onSubmit,
 }: {
   app: App
   label: string
   credentials: Record<string, string>
+  aiModel: string
   saving: boolean
   error: string | null
   onLabelChange: (v: string) => void
   onCredentialChange: (key: string, value: string) => void
+  onAiModelChange: (v: string) => void
   onBack: () => void
   onSubmit: (e: React.FormEvent) => void
 }) {
@@ -139,28 +170,65 @@ function CredentialsForm({
           />
         </div>
 
-        {app.requiredCredentials.length > 0 && (
+        {isAiProvider(app) ? (
           <div className="flex flex-col gap-3">
             <p className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
-              Credentials
+              AI Provider
             </p>
-            {app.requiredCredentials.map((key) => (
-              <div key={key} className="flex flex-col gap-1.5">
-                <label className="text-xs text-[#7a5230] font-mono font-bold">{key}</label>
-                <input
-                  type={
-                    key.toLowerCase().includes('secret') || key.toLowerCase().includes('token')
-                      ? 'password'
-                      : 'text'
-                  }
-                  value={credentials[key] ?? ''}
-                  onChange={(e) => onCredentialChange(key, e.target.value)}
-                  placeholder={`Enter ${key}`}
-                  className={`${inputClass} font-mono`}
-                />
-              </div>
-            ))}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-[#7a5230] font-mono font-bold">API Key</label>
+              <input
+                type="password"
+                value={credentials['api_key'] ?? ''}
+                onChange={(e) => onCredentialChange('api_key', e.target.value)}
+                placeholder={`Enter your ${app.name} API key`}
+                className={`${inputClass} font-mono`}
+                autoComplete="off"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-[#7a5230] font-mono font-bold">
+                Model <span className="text-[#9a6b28] normal-case font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={aiModel}
+                onChange={(e) => onAiModelChange(e.target.value)}
+                placeholder={
+                  app.connectionType === 'openai' ? 'gpt-4o-mini' : 'claude-haiku-4-5-20251001'
+                }
+                className={`${inputClass} font-mono`}
+              />
+            </div>
+            <p className="text-xs text-[#9a6b28] italic">
+              Your key is stored securely and never returned. Only one AI provider can be active at
+              a time.
+            </p>
           </div>
+        ) : (
+          (app.requiredCredentials ?? []).length > 0 && (
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+                Credentials
+              </p>
+              {(app.requiredCredentials ?? []).map((key) => (
+                <div key={key} className="flex flex-col gap-1.5">
+                  <label className="text-xs text-[#7a5230] font-mono font-bold">{key}</label>
+                  <input
+                    type={
+                      key.toLowerCase().includes('secret') || key.toLowerCase().includes('token')
+                        ? 'password'
+                        : 'text'
+                    }
+                    value={credentials[key] ?? ''}
+                    onChange={(e) => onCredentialChange(key, e.target.value)}
+                    placeholder={`Enter ${key}`}
+                    className={`${inputClass} font-mono`}
+                  />
+                </div>
+              ))}
+            </div>
+          )
         )}
 
         {error && (
@@ -287,11 +355,14 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
   const [app, setApp] = useState<App | null>(null)
   const [label, setLabel] = useState('')
   const [credentials, setCredentials] = useState<Record<string, string>>({})
+  const [aiModel, setAiModel] = useState('')
   const [webhookUrl, setWebhookUrl] = useState('')
   const [webhookName, setWebhookName] = useState('')
   const [createdConnection, setCreatedConnection] = useState<ApiConnection | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const allApps = [...AI_PROVIDER_APPS, ...apps]
 
   function handleChooseApp(selected: App) {
     setApp(selected)
@@ -300,7 +371,12 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
   function handleNext() {
     if (!app) return
     setLabel(app.name)
-    setCredentials(Object.fromEntries(app.requiredCredentials.map((k) => [k, ''])))
+    if (isAiProvider(app)) {
+      setCredentials({ api_key: '' })
+      setAiModel('')
+    } else {
+      setCredentials(Object.fromEntries((app.requiredCredentials ?? []).map((k) => [k, ''])))
+    }
     setError(null)
     setStep('credentials')
   }
@@ -311,20 +387,25 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
     setSaving(true)
     setError(null)
     try {
-      const connection = await createConnection(
-        'connections',
-        {
-          data: {
-            name: label.trim(),
-            connection_type: app.connectionType ?? 'webhook',
-            options: credentials,
-          },
-        },
-        { returnPromise: true },
-      )
+      const aiProvider = isAiProvider(app)
+      const data: Record<string, unknown> = {
+        name: label.trim(),
+        connection_type: app.connectionType ?? 'webhook',
+      }
+      if (aiProvider) {
+        data.credentials = credentials['api_key'] ?? ''
+        data.options = aiModel.trim() ? { model: aiModel.trim() } : {}
+      } else {
+        data.options = credentials
+      }
+      const connection = await createConnection('connections', { data }, { returnPromise: true })
       setCreatedConnection((connection as ApiConnection) ?? null)
-      setWebhookName(`${app.name} Webhook`)
-      setStep('webhook')
+      if (aiProvider) {
+        onSuccess(app.id, connection as ApiConnection, null)
+      } else {
+        setWebhookName(`${app.name} Webhook`)
+        setStep('webhook')
+      }
     } catch (err: any) {
       setError(err?.message ?? 'Failed to create connection')
     } finally {
@@ -420,7 +501,7 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
         {step === 'choose-app' && (
           <>
             <AppGrid
-              apps={apps}
+              apps={allApps}
               loading={appsLoading}
               selected={app}
               onSelect={handleChooseApp}
@@ -442,12 +523,14 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
             app={app}
             label={label}
             credentials={credentials}
+            aiModel={aiModel}
             saving={saving}
             error={error}
             onLabelChange={setLabel}
             onCredentialChange={(key, value) =>
               setCredentials((prev) => ({ ...prev, [key]: value }))
             }
+            onAiModelChange={setAiModel}
             onBack={() => setStep('choose-app')}
             onSubmit={handleConnect}
           />

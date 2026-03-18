@@ -2,10 +2,17 @@ import type { Land } from '@/models/Land'
 import type { LandPlacement } from '@/models/LandPlacement'
 import type { LandObject } from '@/models/LandObject'
 import type { Connection } from '@/models/Connection'
-import { DEFAULT_LAND } from '@/mocks/lands'
-import { SAMPLE_LAND_PLACEMENTS } from '@/mocks/landPlacements'
-import { SAMPLE_LAND_OBJECTS } from '@/mocks/landObjects'
-import { SAMPLE_CONNECTIONS } from '@/mocks/connections'
+
+const PLACEHOLDER_LAND: Land = {
+  id: '',
+  worldId: '',
+  name: '',
+  ownerId: '',
+  ownerType: 'user',
+  isPublic: false,
+  createdAt: '',
+  updatedAt: '',
+}
 
 // ---------------------------------------------------------------------------
 // Active Land store
@@ -29,13 +36,11 @@ export interface ActiveLandState {
   canManage: boolean
 }
 
-// Initialised from mock data so GameScene always has something to render
-// even before App.tsx finishes its async fetch.
 let _state: ActiveLandState = {
-  land: DEFAULT_LAND,
-  placements: SAMPLE_LAND_PLACEMENTS,
-  landObjects: DEFAULT_LAND.objects ?? SAMPLE_LAND_OBJECTS,
-  connections: SAMPLE_CONNECTIONS,
+  land: PLACEHOLDER_LAND,
+  placements: [],
+  landObjects: [],
+  connections: [],
   canInteract: false,
   canManage: false,
 }

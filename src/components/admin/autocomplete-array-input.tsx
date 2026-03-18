@@ -1,20 +1,10 @@
-import * as React from "react";
-import { X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  FormControl,
-  FormError,
-  FormField,
-  FormLabel,
-} from "@/components/admin/form";
-import { Command as CommandPrimitive } from "cmdk";
-import type { ChoicesProps, InputProps } from "ra-core";
+import * as React from 'react'
+import { X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
+import { FormControl, FormError, FormField, FormLabel } from '@/components/admin/form'
+import { Command as CommandPrimitive } from 'cmdk'
+import type { ChoicesProps, InputProps } from 'ra-core'
 import {
   useChoices,
   useChoicesContext,
@@ -23,9 +13,9 @@ import {
   useTranslate,
   FieldTitle,
   useEvent,
-} from "ra-core";
-import { InputHelperText } from "./input-helper-text";
-import { useCallback } from "react";
+} from 'ra-core'
+import { InputHelperText } from './input-helper-text'
+import { useCallback } from 'react'
 
 /**
  * Form control that lets users choose multiple values from a list using a dropdown with autocompletion.
@@ -62,85 +52,79 @@ import { useCallback } from "react";
  * );
  */
 export const AutocompleteArrayInput = (
-  props: Omit<InputProps, "source"> &
-    Partial<Pick<InputProps, "source">> &
+  props: Omit<InputProps, 'source'> &
+    Partial<Pick<InputProps, 'source'>> &
     ChoicesProps & {
-      className?: string;
-      disableValue?: string;
-      filterToQuery?: (searchText: string) => any;
-      translateChoice?: boolean;
-      placeholder?: string;
-      inputText?:
-        | React.ReactNode
-        | ((option: any | undefined) => React.ReactNode);
+      className?: string
+      disableValue?: string
+      filterToQuery?: (searchText: string) => any
+      translateChoice?: boolean
+      placeholder?: string
+      inputText?: React.ReactNode | ((option: any | undefined) => React.ReactNode)
     },
 ) => {
-  const { filterToQuery = DefaultFilterToQuery, inputText } = props;
+  const { filterToQuery = DefaultFilterToQuery, inputText } = props
   const {
     allChoices = [],
     source,
     resource,
     isFromReference,
     setFilters,
-  } = useChoicesContext(props);
-  const { id, field, isRequired } = useInput({ ...props, source });
-  const translate = useTranslate();
-  const { placeholder = translate("ra.action.search", { _: "Search..." }) } =
-    props;
+  } = useChoicesContext(props)
+  const { id, field, isRequired } = useInput({ ...props, source })
+  const translate = useTranslate()
+  const { placeholder = translate('ra.action.search', { _: 'Search...' }) } = props
 
-  const getRecordRepresentation = useGetRecordRepresentation(resource);
+  const getRecordRepresentation = useGetRecordRepresentation(resource)
   const { getChoiceText, getChoiceValue } = useChoices({
-    optionText:
-      props.optionText ?? (isFromReference ? getRecordRepresentation : "name"),
-    optionValue: props.optionValue ?? "id",
+    optionText: props.optionText ?? (isFromReference ? getRecordRepresentation : 'name'),
+    optionValue: props.optionValue ?? 'id',
     disableValue: props.disableValue,
     translateChoice: props.translateChoice ?? !isFromReference,
-  });
+  })
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [open, setOpen] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [open, setOpen] = React.useState(false)
 
   const handleUnselect = useEvent((choice: any) => {
-    field.onChange(
-      field.value.filter((v: any) => v !== getChoiceValue(choice)),
-    );
-  });
+    field.onChange(field.value.filter((v: any) => v !== getChoiceValue(choice)))
+  })
 
   const handleKeyDown = useEvent((e: React.KeyboardEvent<HTMLDivElement>) => {
-    const input = inputRef.current;
+    const input = inputRef.current
     if (input) {
-      if (e.key === "Delete" || e.key === "Backspace") {
-        if (input.value === "") {
-          field.onChange(field.value.slice(0, -1));
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (input.value === '') {
+          field.onChange(field.value.slice(0, -1))
         }
       }
       // This is not a default behavior of the <input /> field
-      if (e.key === "Escape") {
-        input.blur();
+      if (e.key === 'Escape') {
+        input.blur()
       }
     }
-  });
+  })
 
   const availableChoices = allChoices.filter(
     (choice) => !field.value.includes(getChoiceValue(choice)),
-  );
+  )
   const selectedChoices = allChoices.filter((choice) =>
     field.value.includes(getChoiceValue(choice)),
-  );
-  const [filterValue, setFilterValue] = React.useState("");
+  )
+  const [filterValue, setFilterValue] = React.useState('')
 
   const getInputText = useCallback(
     (selectedChoice: any) => {
-      if (typeof inputText === "function") {
-        return inputText(selectedChoice);
+      if (typeof inputText === 'function') {
+        return inputText(selectedChoice)
       }
       if (inputText !== undefined) {
-        return inputText;
+        return inputText
       }
-      return getChoiceText(selectedChoice);
+      return getChoiceText(selectedChoice)
     },
     [inputText, getChoiceText],
-  );
+  )
 
   return (
     <FormField className={props.className} id={id} name={field.name}>
@@ -168,22 +152,22 @@ export const AutocompleteArrayInput = (
                   <button
                     className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleUnselect(choice);
+                      if (e.key === 'Enter') {
+                        handleUnselect(choice)
                       }
                     }}
                     onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                      e.preventDefault()
+                      e.stopPropagation()
                     }}
                     onClick={(e) => {
-                      e.preventDefault();
-                      handleUnselect(choice);
+                      e.preventDefault()
+                      handleUnselect(choice)
                     }}
                   >
                     <span className="sr-only">
-                      {translate("ra.action.remove", {
-                        _: "Remove",
+                      {translate('ra.action.remove', {
+                        _: 'Remove',
                       })}
                     </span>
                     <X className="h-3 w-3" />
@@ -195,11 +179,11 @@ export const AutocompleteArrayInput = (
                 ref={inputRef}
                 value={filterValue}
                 onValueChange={(filter) => {
-                  setFilterValue(filter);
+                  setFilterValue(filter)
                   // We don't want the ChoicesContext to filter the choices if the input
                   // is not from a reference as it would also filter out the selected values
                   if (isFromReference) {
-                    setFilters(filterToQuery(filter), undefined, true);
+                    setFilters(filterToQuery(filter), undefined, true)
                   }
                 }}
                 onBlur={() => setOpen(false)}
@@ -219,24 +203,21 @@ export const AutocompleteArrayInput = (
                         <CommandItem
                           key={getChoiceValue(choice)}
                           onMouseDown={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                            e.preventDefault()
+                            e.stopPropagation()
                           }}
                           onSelect={() => {
-                            setFilterValue("");
+                            setFilterValue('')
                             if (isFromReference) {
-                              setFilters(filterToQuery(""));
+                              setFilters(filterToQuery(''))
                             }
-                            field.onChange([
-                              ...field.value,
-                              getChoiceValue(choice),
-                            ]);
+                            field.onChange([...field.value, getChoiceValue(choice)])
                           }}
                           className="cursor-pointer"
                         >
                           {getChoiceText(choice)}
                         </CommandItem>
-                      );
+                      )
                     })}
                   </CommandGroup>
                 </div>
@@ -248,7 +229,7 @@ export const AutocompleteArrayInput = (
       <InputHelperText helperText={props.helperText} />
       <FormError />
     </FormField>
-  );
-};
+  )
+}
 
-const DefaultFilterToQuery = (searchText: string) => ({ q: searchText });
+const DefaultFilterToQuery = (searchText: string) => ({ q: searchText })

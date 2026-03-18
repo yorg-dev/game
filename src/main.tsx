@@ -7,11 +7,5 @@ import { DebugPage } from './debug/DebugPage.tsx'
 const isDebug = window.location.hash.startsWith('#/debug')
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    {isDebug ? (
-      <DebugPage />
-    ) : (
-      <App />
-    )}
-  </StrictMode>,
+  <StrictMode>{isDebug ? <DebugPage /> : <App />}</StrictMode>,
 )

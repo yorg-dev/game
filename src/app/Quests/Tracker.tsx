@@ -188,10 +188,42 @@ export function QuestTracker() {
             className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-dashed border-[#b8955a] text-xs text-[#9a6b28] font-bold hover:border-[#7a5230] hover:text-[#5a3810] hover:bg-[#dcc898] transition-colors"
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <rect x="0.5" y="0.5" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-              <rect x="6" y="0.5" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-              <rect x="0.5" y="6" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-              <rect x="6" y="6" width="3.5" height="3.5" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
+              <rect
+                x="0.5"
+                y="0.5"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="6"
+                y="0.5"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="0.5"
+                y="6"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="6"
+                y="6"
+                width="3.5"
+                height="3.5"
+                rx="0.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
             </svg>
             Browse all quests
           </button>

@@ -1,6 +1,5 @@
 import Phaser from 'phaser'
 import { EventBus } from '../EventBus'
-import { getApp } from '@/mocks/apps'
 import { getConnectionDialog } from '../dialog/dialogs'
 import type { Connection } from '@/models/Connection'
 import { getActiveLand } from '@/providers/activeLand'
@@ -28,20 +27,6 @@ interface HouseEntry {
   label: Phaser.GameObjects.Text
   connection: Connection
   halfH: number // half sprite height — used for door proximity offset
-}
-
-// small_house.png: 3 cols × 3 rows, 64×64 frames.
-// Frame index assigned by AppCategory so each type gets a distinct house colour.
-const CATEGORY_FRAME: Record<string, number> = {
-  ecommerce: 0, // green roof
-  support: 1, // yellow roof
-  email: 2, // pink/red roof
-  finance: 3, // blue roof
-  crm: 4, // purple roof
-  social: 5, // light pink roof
-  prospecting: 6, // yellow-green roof
-  ai: 7, // orange roof
-  // frame 8 (grey) reserved as fallback
 }
 
 const HOUSE_HALF = 32 // half of 64 px sprite
@@ -177,12 +162,11 @@ export class ConnectionHouseFactory {
   }
 
   private spawnHouse(connection: Connection, x: number, y: number): void {
-    const app = getApp(connection.appId)
-    const displayName = app?.name ?? connection.appId
+    const displayName = connection.label || connection.appId
 
     const isHome = connection.id === 'home'
     const texture = isHome ? 'grey-brick-house' : 'small-house'
-    const frame = isHome ? 0 : (CATEGORY_FRAME[app?.category ?? ''] ?? 8)
+    const frame = isHome ? 0 : 8 // default grey; category coloring requires app metadata
     const halfH = isHome ? 40 : HOUSE_HALF // 80/2 vs 64/2
 
     const sprite = this._group.create(x, y, texture, frame) as Phaser.Physics.Arcade.Image
@@ -322,8 +306,7 @@ export class ConnectionHouseFactory {
         label: 'Talk',
         color: 0x885522,
         onClick: () => {
-          const app = getApp(connection.appId)
-          const script = getConnectionDialog(connection.id, app?.name ?? connection.appId)
+          const script = getConnectionDialog(connection.id, connection.label || connection.appId)
           this.onDialogOpen()
           EventBus.emit('dialog-start', { lines: script.lines })
         },

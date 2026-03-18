@@ -1,9 +1,5 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbPage,
-} from "@/components/admin/breadcrumb";
-import type { ListBaseProps, ListControllerResult, RaRecord } from "ra-core";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbPage } from '@/components/admin/breadcrumb'
+import type { ListBaseProps, ListControllerResult, RaRecord } from 'ra-core'
 import {
   FilterContext,
   ListBase,
@@ -13,14 +9,14 @@ import {
   useResourceContext,
   useResourceDefinition,
   useTranslate,
-} from "ra-core";
-import type { ReactElement, ReactNode } from "react";
-import { Link } from "react-router";
-import { cn } from "@/lib/utils";
-import { CreateButton } from "@/components/admin/create-button";
-import { ExportButton } from "@/components/admin/export-button";
-import { ListPagination } from "@/components/admin/list-pagination";
-import { FilterButton, FilterForm } from "@/components/admin/filter-form";
+} from 'ra-core'
+import type { ReactElement, ReactNode } from 'react'
+import { Link } from 'react-router'
+import { cn } from '@/lib/utils'
+import { CreateButton } from '@/components/admin/create-button'
+import { ExportButton } from '@/components/admin/export-button'
+import { ListPagination } from '@/components/admin/list-pagination'
+import { FilterButton, FilterForm } from '@/components/admin/filter-form'
 
 /**
  * A complete list page with breadcrumb, title, filters, and pagination.
@@ -50,9 +46,7 @@ import { FilterButton, FilterForm } from "@/components/admin/filter-form";
  *   </List>
  * );
  */
-export const List = <RecordType extends RaRecord = RaRecord>(
-  props: ListProps<RecordType>,
-) => {
+export const List = <RecordType extends RaRecord = RaRecord>(props: ListProps<RecordType>) => {
   const {
     debounce,
     disableAuthentication,
@@ -67,7 +61,7 @@ export const List = <RecordType extends RaRecord = RaRecord>(
     sort,
     storeKey,
     ...rest
-  } = props;
+  } = props
 
   return (
     <ListBase<RecordType>
@@ -86,8 +80,8 @@ export const List = <RecordType extends RaRecord = RaRecord>(
     >
       <ListView<RecordType> {...rest} />
     </ListBase>
-  );
-};
+  )
+}
 
 export interface ListProps<RecordType extends RaRecord = RaRecord>
   extends ListBaseProps<RecordType>, ListViewProps<RecordType> {}
@@ -107,24 +101,22 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
     title,
     children,
     actions,
-  } = props;
-  const translate = useTranslate();
-  const resource = useResourceContext();
+  } = props
+  const translate = useTranslate()
+  const resource = useResourceContext()
   if (!resource) {
-    throw new Error(
-      "The ListView component must be used within a ResourceContextProvider",
-    );
+    throw new Error('The ListView component must be used within a ResourceContextProvider')
   }
-  const getResourceLabel = useGetResourceLabel();
-  const resourceLabel = getResourceLabel(resource, 2);
+  const getResourceLabel = useGetResourceLabel()
+  const resourceLabel = getResourceLabel(resource, 2)
   const finalTitle =
     title !== undefined
       ? title
-      : translate("ra.page.list", {
+      : translate('ra.page.list', {
           name: resourceLabel,
-        });
-  const { hasCreate } = useResourceDefinition({ resource });
-  const hasDashboard = useHasDashboard();
+        })
+  const { hasCreate } = useResourceDefinition({ resource })
+  const hasDashboard = useHasDashboard()
 
   return (
     <>
@@ -143,9 +135,7 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
 
       <FilterContext.Provider value={filters}>
         <div className="flex justify-between items-start flex-wrap gap-2 my-2">
-          <h2 className="text-2xl font-bold tracking-tight mb-2">
-            {finalTitle}
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight mb-2">{finalTitle}</h2>
           {actions ?? (
             <div className="flex items-center gap-2">
               {filters && filters.length > 0 ? <FilterButton /> : null}
@@ -156,29 +146,29 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
         </div>
         <FilterForm />
 
-        <div className={cn("my-2", props.className)}>{children}</div>
+        <div className={cn('my-2', props.className)}>{children}</div>
         {pagination}
       </FilterContext.Provider>
     </>
-  );
-};
+  )
+}
 
-const defaultPagination = <ListPagination />;
+const defaultPagination = <ListPagination />
 
 export const Empty = () => {
-  const translate = useTranslate();
-  const resource = useResourceContext();
-  const getResourceLabel = useGetResourceLabel();
-  const { hasCreate } = useResourceDefinition({ resource });
+  const translate = useTranslate()
+  const resource = useResourceContext()
+  const getResourceLabel = useGetResourceLabel()
+  const { hasCreate } = useResourceDefinition({ resource })
   if (!resource) {
-    return null;
+    return null
   }
   const resourceName = translate(`resources.${resource}.forcedCaseName`, {
     smart_count: 0,
     _: resource ? getResourceLabel(resource, 0) : undefined,
-  });
-  const emptyMessage = translate("ra.page.empty", { name: resourceName });
-  const inviteMessage = translate("ra.page.invite");
+  })
+  const emptyMessage = translate('ra.page.empty', { name: resourceName })
+  const inviteMessage = translate('ra.page.invite')
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center">
@@ -198,16 +188,16 @@ export const Empty = () => {
         </>
       ) : null}
     </div>
-  );
-};
+  )
+}
 
 export interface ListViewProps<RecordType extends RaRecord = RaRecord> {
-  children?: ReactNode;
-  disableBreadcrumb?: boolean;
-  render?: (props: ListControllerResult<RecordType, Error>) => ReactNode;
-  actions?: ReactElement | false;
-  filters?: ReactNode[];
-  pagination?: ReactNode;
-  title?: ReactNode | string | false;
-  className?: string;
+  children?: ReactNode
+  disableBreadcrumb?: boolean
+  render?: (props: ListControllerResult<RecordType, Error>) => ReactNode
+  actions?: ReactElement | false
+  filters?: ReactNode[]
+  pagination?: ReactNode
+  title?: ReactNode | string | false
+  className?: string
 }

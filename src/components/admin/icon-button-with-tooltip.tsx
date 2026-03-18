@@ -1,14 +1,9 @@
-import { useTranslate } from "ra-core";
-import * as React from "react";
-import type { MouseEvent } from "react";
+import { useTranslate } from 'ra-core'
+import * as React from 'react'
+import type { MouseEvent } from 'react'
 
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /**
  * A button with a tooltip that ensures the tooltip is closed on click to avoid ghost tooltips.
@@ -29,26 +24,26 @@ export const IconButtonWithTooltip = ({
   disabled,
   ...props
 }: IconButtonWithTooltipProps) => {
-  const translate = useTranslate();
-  const [open, setOpen] = React.useState(false);
+  const translate = useTranslate()
+  const [open, setOpen] = React.useState(false)
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   const handleOpen = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
-  let translatedLabel = label;
-  if (typeof label === "string") {
-    translatedLabel = translate(label, { _: label });
+  let translatedLabel = label
+  if (typeof label === 'string') {
+    translatedLabel = translate(label, { _: label })
   }
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    handleClose();
-    onClick?.(event);
-  };
+    handleClose()
+    onClick?.(event)
+  }
 
   return (
     <TooltipProvider>
@@ -58,9 +53,7 @@ export const IconButtonWithTooltip = ({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={
-              typeof translatedLabel === "string" ? translatedLabel : undefined
-            }
+            aria-label={typeof translatedLabel === 'string' ? translatedLabel : undefined}
             onClick={handleClick}
             disabled={disabled}
             onMouseEnter={handleOpen}
@@ -75,10 +68,10 @@ export const IconButtonWithTooltip = ({
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  );
-};
+  )
+}
 
-export interface IconButtonWithTooltipProps extends React.ComponentProps<"button"> {
-  label: React.ReactNode;
-  children: React.ReactNode;
+export interface IconButtonWithTooltipProps extends React.ComponentProps<'button'> {
+  label: React.ReactNode
+  children: React.ReactNode
 }

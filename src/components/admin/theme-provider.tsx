@@ -1,13 +1,13 @@
-import { useEffect } from "react";
-import { useStore } from "ra-core";
+import { useEffect } from 'react'
+import { useStore } from 'ra-core'
 
-import { ThemeProviderContext, type Theme } from "./theme-context";
+import { ThemeProviderContext, type Theme } from './theme-context'
 
 type ThemeProviderProps = {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-};
+  children: React.ReactNode
+  defaultTheme?: Theme
+  storageKey?: string
+}
 
 /**
  * Theme provider that enables light, dark, and system theme modes.
@@ -16,38 +16,37 @@ type ThemeProviderProps = {
  */
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
-  storageKey = "theme",
+  defaultTheme = 'system',
+  storageKey = 'theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useStore<Theme>(storageKey, defaultTheme);
+  const [theme, setTheme] = useStore<Theme>(storageKey, defaultTheme)
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const root = window.document.documentElement
 
-    root.classList.remove("light", "dark");
+    root.classList.remove('light', 'dark')
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
 
-      root.classList.add(systemTheme);
-      return;
+      root.classList.add(systemTheme)
+      return
     }
 
-    root.classList.add(theme);
-  }, [theme]);
+    root.classList.add(theme)
+  }, [theme])
 
   const value = {
     theme,
     setTheme,
-  };
+  }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
-  );
+  )
 }

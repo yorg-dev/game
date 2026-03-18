@@ -1,32 +1,16 @@
-import * as React from "react";
-import type {
-  ComponentType,
-  ReactElement,
-  ReactNode,
-  HTMLAttributes,
-} from "react";
-import { Children, isValidElement, useEffect } from "react";
-import type { InputProps } from "ra-core";
-import {
-  FieldTitle,
-  RecordContextProvider,
-  shallowEqual,
-  useInput,
-  useTranslate,
-} from "ra-core";
-import type {
-  DropzoneOptions,
-  FileRejection,
-  DropEvent,
-  DropzoneInputProps,
-} from "react-dropzone";
-import { useDropzone } from "react-dropzone";
-import { XCircle } from "lucide-react";
+import * as React from 'react'
+import type { ComponentType, ReactElement, ReactNode, HTMLAttributes } from 'react'
+import { Children, isValidElement, useEffect } from 'react'
+import type { InputProps } from 'ra-core'
+import { FieldTitle, RecordContextProvider, shallowEqual, useInput, useTranslate } from 'ra-core'
+import type { DropzoneOptions, FileRejection, DropEvent, DropzoneInputProps } from 'react-dropzone'
+import { useDropzone } from 'react-dropzone'
+import { XCircle } from 'lucide-react'
 
-import { cn } from "@/lib/utils";
-import { FormError, FormField, FormLabel } from "@/components/admin/form";
-import { InputHelperText } from "@/components/admin/input-helper-text";
-import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils'
+import { FormError, FormField, FormLabel } from '@/components/admin/form'
+import { InputHelperText } from '@/components/admin/input-helper-text'
+import { Button } from '@/components/ui/button'
 
 /**
  * File upload input with drag-and-drop support and preview capabilities.
@@ -89,41 +73,41 @@ export const FileInput = (props: FileInputProps) => {
     validateFileRemoval,
 
     placeholder,
-    labelMultiple = "ra.input.file.upload_several",
-    labelSingle = "ra.input.file.upload_single",
+    labelMultiple = 'ra.input.file.upload_several',
+    labelSingle = 'ra.input.file.upload_single',
     removeIcon,
     ...rest
-  } = props;
-  const { onDrop: onDropProp } = options;
-  const translate = useTranslate();
+  } = props
+  const { onDrop: onDropProp } = options
+  const translate = useTranslate()
 
   // turn a browser dropped file structure into expected structure
   const transformFile = (file: unknown) => {
     if (!(file instanceof File)) {
-      return file;
+      return file
     }
 
-    const preview = URL.createObjectURL(file);
+    const preview = URL.createObjectURL(file)
     const transformedFile: TransformedFile = {
       rawFile: file,
       src: preview,
       title: file.name,
-    };
+    }
 
-    return transformedFile;
-  };
+    return transformedFile
+  }
 
   const transformFiles = (files: unknown[]) => {
     if (!files) {
-      return multiple ? [] : null;
+      return multiple ? [] : null
     }
 
     if (Array.isArray(files)) {
-      return files.map(transformFile);
+      return files.map(transformFile)
     }
 
-    return transformFile(files);
-  };
+    return transformFile(files)
+  }
 
   const {
     id,
@@ -144,8 +128,8 @@ export const FileInput = (props: FileInputProps) => {
     validate,
     readOnly,
     disabled,
-  });
-  const files = value ? (Array.isArray(value) ? value : [value]) : [];
+  })
+  const files = value ? (Array.isArray(value) ? value : [value]) : []
 
   const onDrop = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,51 +137,49 @@ export const FileInput = (props: FileInputProps) => {
     rejectedFiles: FileRejection[],
     event: DropEvent,
   ) => {
-    const updatedFiles = multiple ? [...files, ...newFiles] : [...newFiles];
+    const updatedFiles = multiple ? [...files, ...newFiles] : [...newFiles]
 
     if (multiple) {
-      onChange(updatedFiles);
-      onBlur();
+      onChange(updatedFiles)
+      onBlur()
     } else {
-      onChange(updatedFiles[0]);
-      onBlur();
+      onChange(updatedFiles[0])
+      onBlur()
     }
 
     if (onDropProp) {
-      onDropProp(newFiles, rejectedFiles, event);
+      onDropProp(newFiles, rejectedFiles, event)
     }
-  };
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onRemove = (file: any) => async () => {
     if (validateFileRemoval) {
       try {
-        await validateFileRemoval(file);
+        await validateFileRemoval(file)
       } catch {
-        return;
+        return
       }
     }
 
     if (multiple) {
-      const filteredFiles = files.filter(
-        (stateFile) => !shallowEqual(stateFile, file),
-      );
-      onChange(filteredFiles);
-      onBlur();
+      const filteredFiles = files.filter((stateFile) => !shallowEqual(stateFile, file))
+      onChange(filteredFiles)
+      onBlur()
     } else {
-      onChange(null);
-      onBlur();
+      onChange(null)
+      onBlur()
     }
 
     if (onRemoveProp) {
-      onRemoveProp(file);
+      onRemoveProp(file)
     }
-  };
+  }
 
   const childrenElement =
     children && isValidElement(Children.only(children))
       ? (Children.only(children) as ReactElement)
-      : undefined;
+      : undefined
 
   const { getRootProps, getInputProps } = useDropzone({
     accept,
@@ -207,35 +189,25 @@ export const FileInput = (props: FileInputProps) => {
     disabled: disabled || readOnly,
     ...options,
     onDrop,
-  });
+  })
 
   return (
-    <FormField
-      id={id}
-      name={name}
-      className={cn("w-full", className)}
-      {...rest}
-    >
+    <FormField id={id} name={name} className={cn('w-full', className)} {...rest}>
       <FormLabel
         htmlFor={id}
-        className={disabled || readOnly ? "cursor-default" : "cursor-pointer"}
+        className={disabled || readOnly ? 'cursor-default' : 'cursor-pointer'}
       >
-        <FieldTitle
-          label={label}
-          source={source}
-          resource={resource}
-          isRequired={isRequired}
-        />
+        <FieldTitle label={label} source={source} resource={resource} isRequired={isRequired} />
       </FormLabel>
 
       <div
         {...getRootProps({
           className: cn(
-            "border-2 border-dashed border-muted rounded-lg p-6 text-center transition-colors",
-            "hover:border-sidebar-ring focus:outline-none",
+            'border-2 border-dashed border-muted rounded-lg p-6 text-center transition-colors',
+            'hover:border-sidebar-ring focus:outline-none',
             disabled || readOnly
-              ? "bg-muted cursor-not-allowed"
-              : "bg-muted text-muted-foreground cursor-pointer",
+              ? 'bg-muted cursor-not-allowed'
+              : 'bg-muted text-muted-foreground cursor-pointer',
           ),
         })}
       >
@@ -270,41 +242,39 @@ export const FileInput = (props: FileInputProps) => {
                 onRemove={onRemove(file)}
                 removeIcon={removeIcon}
               >
-                <RecordContextProvider value={file}>
-                  {childrenElement}
-                </RecordContextProvider>
+                <RecordContextProvider value={file}>{childrenElement}</RecordContextProvider>
               </FileInputPreview>
             ))
           }
         </div>
       )}
     </FormField>
-  );
-};
+  )
+}
 
-export type FileInputProps = Omit<InputProps, "type"> & {
-  accept?: DropzoneOptions["accept"];
-  className?: string;
-  children?: ReactNode;
-  labelMultiple?: string;
-  labelSingle?: string;
-  maxSize?: DropzoneOptions["maxSize"];
-  minSize?: DropzoneOptions["minSize"];
-  multiple?: DropzoneOptions["multiple"];
-  options?: DropzoneOptions;
+export type FileInputProps = Omit<InputProps, 'type'> & {
+  accept?: DropzoneOptions['accept']
+  className?: string
+  children?: ReactNode
+  labelMultiple?: string
+  labelSingle?: string
+  maxSize?: DropzoneOptions['maxSize']
+  minSize?: DropzoneOptions['minSize']
+  multiple?: DropzoneOptions['multiple']
+  options?: DropzoneOptions
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onRemove?: (file: any) => void;
-  placeholder?: ReactNode;
-  removeIcon?: ComponentType<{ className?: string }>;
-  inputProps?: DropzoneInputProps & React.ComponentProps<"input">;
+  onRemove?: (file: any) => void
+  placeholder?: ReactNode
+  removeIcon?: ComponentType<{ className?: string }>
+  inputProps?: DropzoneInputProps & React.ComponentProps<'input'>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validateFileRemoval?(file: any): boolean | Promise<boolean>;
-};
+  validateFileRemoval?(file: any): boolean | Promise<boolean>
+}
 
 export interface TransformedFile {
-  rawFile: File;
-  src: string;
-  title: string;
+  rawFile: File
+  src: string
+  title: string
 }
 
 /**
@@ -322,41 +292,41 @@ export const FileInputPreview = (props: FileInputPreviewProps) => {
     removeIcon: RemoveIcon = XCircle,
 
     ...rest
-  } = props;
+  } = props
 
-  const translate = useTranslate();
+  const translate = useTranslate()
 
   useEffect(() => {
     return () => {
-      const preview = file.rawFile ? file.rawFile.preview : file.preview;
+      const preview = file.rawFile ? file.rawFile.preview : file.preview
 
       if (preview) {
-        window.URL.revokeObjectURL(preview);
+        window.URL.revokeObjectURL(preview)
       }
-    };
-  }, [file]);
+    }
+  }, [file])
 
   return (
-    <div className={cn("flex flex-row gap-1", className)} {...rest}>
+    <div className={cn('flex flex-row gap-1', className)} {...rest}>
       <Button
         type="button"
         variant="ghost"
         size="icon"
         className="h-6 w-6 rounded-full shadow-sm cursor-pointer"
         onClick={onRemove}
-        aria-label={translate("ra.action.delete")}
-        title={translate("ra.action.delete")}
+        aria-label={translate('ra.action.delete')}
+        title={translate('ra.action.delete')}
       >
         <RemoveIcon className="h-4 w-4" />
       </Button>
       {children}
     </div>
-  );
-};
+  )
+}
 
 export interface FileInputPreviewProps extends HTMLAttributes<HTMLDivElement> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  file: any;
-  onRemove: () => void;
-  removeIcon?: React.ComponentType<{ className?: string }>;
+  file: any
+  onRemove: () => void
+  removeIcon?: React.ComponentType<{ className?: string }>
 }

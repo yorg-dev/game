@@ -158,9 +158,7 @@ export function LeaderboardList() {
 
           {!loading &&
             !error &&
-            data.map((entry) => (
-              <RankRow key={entry.id} entry={entry} isCurrentUser={false} />
-            ))}
+            data.map((entry) => <RankRow key={entry.id} entry={entry} isCurrentUser={false} />)}
         </div>
       </div>
     </div>

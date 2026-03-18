@@ -1,6 +1,6 @@
-import * as React from "react";
-import { createPortal } from "react-dom";
-import { Separator } from "@/components/ui/separator";
+import * as React from 'react'
+import { createPortal } from 'react-dom'
+import { Separator } from '@/components/ui/separator'
 import {
   Breadcrumb as BaseBreadcrumb,
   BreadcrumbEllipsis,
@@ -8,8 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/breadcrumb'
+import { Button } from '@/components/ui/button'
 import {
   Drawer,
   DrawerClose,
@@ -19,9 +19,9 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Translate } from "ra-core";
+} from '@/components/ui/drawer'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { Translate } from 'ra-core'
 
 /**
  * A breadcrumb navigation component with mobile drawer support.
@@ -56,10 +56,10 @@ import { Translate } from "ra-core";
  * );
  */
 export const Breadcrumb = ({ children, ref }: BreadcrumbProps) => {
-  const breadcrumbPortal = document.getElementById("breadcrumb");
-  const isMobile = useIsMobile();
-  const [open, setOpen] = React.useState(false);
-  if (!breadcrumbPortal) return null;
+  const breadcrumbPortal = document.getElementById('breadcrumb')
+  const isMobile = useIsMobile()
+  const [open, setOpen] = React.useState(false)
+  if (!breadcrumbPortal) return null
   return createPortal(
     <>
       <Separator
@@ -114,9 +114,7 @@ export const Breadcrumb = ({ children, ref }: BreadcrumbProps) => {
                 child && (
                   <React.Fragment key={index}>
                     {child}
-                    {index < React.Children.count(children) - 1 ? (
-                      <BreadcrumbSeparator />
-                    ) : null}
+                    {index < React.Children.count(children) - 1 ? <BreadcrumbSeparator /> : null}
                   </React.Fragment>
                 ),
             )
@@ -125,11 +123,11 @@ export const Breadcrumb = ({ children, ref }: BreadcrumbProps) => {
       </BaseBreadcrumb>
     </>,
     breadcrumbPortal,
-  );
-};
-Breadcrumb.Item = BreadcrumbItem;
-Breadcrumb.PageItem = BreadcrumbPage;
+  )
+}
+Breadcrumb.Item = BreadcrumbItem
+Breadcrumb.PageItem = BreadcrumbPage
 
-export { BreadcrumbItem, BreadcrumbPage };
+export { BreadcrumbItem, BreadcrumbPage }
 
-export type BreadcrumbProps = React.ComponentProps<"nav">;
+export type BreadcrumbProps = React.ComponentProps<'nav'>

@@ -1,9 +1,5 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbPage,
-} from "@/components/admin/breadcrumb";
-import type { ShowBaseProps } from "ra-core";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbPage } from '@/components/admin/breadcrumb'
+import type { ShowBaseProps } from 'ra-core'
 import {
   ShowBase,
   Translate,
@@ -14,14 +10,13 @@ import {
   useGetResourceLabel,
   useResourceContext,
   useResourceDefinition,
-} from "ra-core";
-import type { ReactNode } from "react";
-import { Link } from "react-router";
-import { cn } from "@/lib/utils";
-import { EditButton } from "@/components/admin/edit-button";
+} from 'ra-core'
+import type { ReactNode } from 'react'
+import { Link } from 'react-router'
+import { cn } from '@/lib/utils'
+import { EditButton } from '@/components/admin/edit-button'
 
-export interface ShowProps
-  extends ShowViewProps, Omit<ShowBaseProps, "children"> {}
+export interface ShowProps extends ShowViewProps, Omit<ShowBaseProps, 'children'> {}
 
 /**
  * A complete show page with breadcrumb, title, and default actions.
@@ -80,15 +75,15 @@ export const Show = ({
       {children}
     </ShowView>
   </ShowBase>
-);
+)
 
 export interface ShowViewProps {
-  actions?: ReactNode;
-  disableBreadcrumb?: boolean;
-  children: ReactNode;
-  className?: string;
-  emptyWhileLoading?: boolean;
-  title?: ReactNode | string | false;
+  actions?: ReactNode
+  disableBreadcrumb?: boolean
+  children: ReactNode
+  className?: string
+  emptyWhileLoading?: boolean
+  title?: ReactNode | string | false
 }
 
 /**
@@ -116,33 +111,31 @@ export const ShowView = ({
   emptyWhileLoading,
   title,
 }: ShowViewProps) => {
-  const context = useShowContext();
+  const context = useShowContext()
 
-  const resource = useResourceContext();
+  const resource = useResourceContext()
   if (!resource) {
-    throw new Error(
-      "The ShowView component must be used within a ResourceContextProvider",
-    );
+    throw new Error('The ShowView component must be used within a ResourceContextProvider')
   }
-  const getResourceLabel = useGetResourceLabel();
-  const listLabel = getResourceLabel(resource, 2);
-  const createPath = useCreatePath();
+  const getResourceLabel = useGetResourceLabel()
+  const listLabel = getResourceLabel(resource, 2)
+  const createPath = useCreatePath()
   const listLink = createPath({
     resource,
-    type: "list",
-  });
+    type: 'list',
+  })
 
-  const getRecordRepresentation = useGetRecordRepresentation(resource);
-  const recordRepresentation = getRecordRepresentation(context.record);
+  const getRecordRepresentation = useGetRecordRepresentation(resource)
+  const recordRepresentation = getRecordRepresentation(context.record)
 
-  const { hasEdit } = useResourceDefinition({ resource });
-  const hasDashboard = useHasDashboard();
+  const { hasEdit } = useResourceDefinition({ resource })
+  const hasDashboard = useHasDashboard()
 
   if (context.isLoading || !context.record) {
-    return null;
+    return null
   }
   if (!context.record && emptyWhileLoading) {
-    return null;
+    return null
   }
 
   return (
@@ -162,22 +155,15 @@ export const ShowView = ({
           <BreadcrumbPage>{recordRepresentation}</BreadcrumbPage>
         </Breadcrumb>
       )}
-      <div
-        className={cn(
-          "flex justify-between items-start flex-wrap gap-2 my-2",
-          className,
-        )}
-      >
+      <div className={cn('flex justify-between items-start flex-wrap gap-2 my-2', className)}>
         <h2 className="text-2xl font-bold tracking-tight">
           {title !== undefined ? title : context.defaultTitle}
         </h2>
         {actions ?? (
-          <div className="flex justify-end items-center">
-            {hasEdit ? <EditButton /> : null}
-          </div>
+          <div className="flex justify-end items-center">{hasEdit ? <EditButton /> : null}</div>
         )}
       </div>
       <div className="my-2">{children}</div>
     </>
-  );
-};
+  )
+}

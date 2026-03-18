@@ -6,8 +6,7 @@ import { ConnectionPopover } from '@/app/Connections/Popover'
 import { DialogBox } from '@/app/Game/Dialog'
 import { NotificationsModal } from '@/app/Notifications/List'
 import { EventBus } from '@/game/EventBus'
-import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
-import { APPS } from '@/mocks/apps'
+import { getAgentTemplates } from '@/game/agentTemplates/agentTemplateStore'
 import type { Connection } from '@/models/Connection'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -116,12 +115,24 @@ function NewConnectionPanel() {
 }
 
 function AgentPopoverPanel() {
+  const templates = getAgentTemplates()
   const [activeId, setActiveId] = useState(0)
 
   function open(tab: 'overview' | 'chat') {
-    const t = AGENT_TEMPLATES[activeId]
+    const t = templates[activeId]
     if (!t) return
     EventBus.emit('agent-clicked', { id: 1, name: 'Debug Agent', templateId: t.id, tab })
+  }
+
+  if (templates.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-4">
+        <p className="text-sm text-gray-400">
+          No templates loaded — open the game first to populate templates.
+        </p>
+        <AgentPopover />
+      </div>
+    )
   }
 
   return (
@@ -133,7 +144,7 @@ function AgentPopoverPanel() {
           onChange={(e) => setActiveId(Number(e.target.value))}
           className="bg-gray-800 text-gray-200 text-sm px-3 py-1.5 rounded border border-gray-600 focus:outline-none"
         >
-          {AGENT_TEMPLATES.map((t, i) => (
+          {templates.map((t, i) => (
             <option key={t.id} value={i}>
               {t.name}
             </option>
@@ -150,32 +161,16 @@ function AgentPopoverPanel() {
 }
 
 function ConnectionPopoverPanel() {
-  const [appIndex, setAppIndex] = useState(0)
-  const available = APPS.filter((a) => a.isAvailable)
-
   function open() {
-    const app = available[appIndex]
-    if (!app) return
-    const conn: Connection = { ...MOCK_CONNECTION, appId: app.id, label: `${app.name} — Demo` }
-    EventBus.emit('connection-clicked', { connectionId: conn.id, appId: app.id, connection: conn })
+    EventBus.emit('connection-clicked', {
+      connectionId: MOCK_CONNECTION.id,
+      appId: MOCK_CONNECTION.appId,
+      connection: MOCK_CONNECTION,
+    })
   }
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="flex flex-col items-center gap-2">
-        <label className="text-xs text-gray-400 uppercase tracking-widest">App</label>
-        <select
-          value={appIndex}
-          onChange={(e) => setAppIndex(Number(e.target.value))}
-          className="bg-gray-800 text-gray-200 text-sm px-3 py-1.5 rounded border border-gray-600 focus:outline-none"
-        >
-          {available.map((a, i) => (
-            <option key={a.id} value={i}>
-              {a.name}
-            </option>
-          ))}
-        </select>
-      </div>
       <DebugButton onClick={open}>Open Connection Popover</DebugButton>
       <ConnectionPopover />
     </div>

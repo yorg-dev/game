@@ -12,15 +12,32 @@ import ConnectionEdit from './app/Connections/Edit'
 function App() {
   return (
     <Admin
-      dataProvider={dataProvider}
       authProvider={authProvider}
+      dashboard={GameDashboard}
+      dataProvider={dataProvider}
+      disableTelemetry
       i18nProvider={i18nProvider}
       layout={GameLayout}
-      dashboard={GameDashboard}
-      ready={GameDashboard}
-      disableTelemetry
     >
-      <Resource name="connections" list={ConnectionList} create={ConnectionCreate} edit={ConnectionEdit} />
+      <Resource name="achievements" />
+      <Resource name="agents" />
+      <Resource name="apps" />
+      <Resource name="blueprints" />
+      <Resource
+        name="connections"
+        list={ConnectionList}
+        create={ConnectionCreate}
+        edit={ConnectionEdit}
+      />
+      <Resource name="experts" />
+      <Resource name="features" />
+      <Resource name="land_objects" />
+      <Resource name="land_placements" />
+      <Resource name="lands" />
+      <Resource name="organizations" />
+      <Resource name="quest_steps" />
+      <Resource name="quests" />
+      <Resource name="worlds" />
     </Admin>
   )
 }

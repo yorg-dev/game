@@ -4,7 +4,7 @@ import { Agent } from '../entities/Agent'
 import { AGENT_TYPES } from '../entities/AgentType'
 import type { AgentType, AgentConfig } from '../entities/AgentType'
 import { User } from '../entities/User'
-import { AGENT_TEMPLATES } from '@/mocks/agentTemplates'
+import { findAgentTemplate } from '@/game/agentTemplates/agentTemplateStore'
 import type { AgentTemplate } from '@/models/AgentTemplate'
 import bunnyUrl from '../../assets/characters/bunny.png'
 import chickenUrl from '../../assets/characters/chicken_sprites.png'
@@ -436,7 +436,7 @@ export class GameScene extends Phaser.Scene {
     const unsubSpawn = EventBus.on(
       'spawn-agent',
       ({ templateId, name, x, y, networkId, remote }) => {
-        const template = AGENT_TEMPLATES.find((t) => t.id === templateId)
+        const template = findAgentTemplate(templateId)
         if (!template) return
 
         // Skip if this is an echo of our own broadcast

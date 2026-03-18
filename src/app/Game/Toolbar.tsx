@@ -33,7 +33,13 @@ function ToolbarSlot({ onClick, label, hotkey, active, children }: ToolbarSlotPr
 
 function AgentIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ imageRendering: 'pixelated' }}>
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      style={{ imageRendering: 'pixelated' }}
+    >
       <rect x="13" y="1" width="2" height="3" fill="#3a1e08" />
       <rect x="12" y="4" width="4" height="2" fill="#3a1e08" />
       <rect x="7" y="6" width="14" height="11" rx="1" fill="#3a1e08" />
@@ -55,7 +61,13 @@ function AgentIcon() {
 
 function ConnectionIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ imageRendering: 'pixelated' }}>
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      style={{ imageRendering: 'pixelated' }}
+    >
       <rect x="2" y="10" width="7" height="8" rx="1" fill="#3a1e08" />
       <rect x="3" y="11" width="5" height="6" fill="#f0a030" />
       <rect x="4" y="7" width="2" height="3" fill="#3a1e08" />
@@ -77,7 +89,13 @@ function ConnectionIcon() {
 
 function TrophyIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ imageRendering: 'pixelated' }}>
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      style={{ imageRendering: 'pixelated' }}
+    >
       <rect x="9" y="4" width="10" height="10" fill="#3a1e08" />
       <rect x="10" y="5" width="8" height="8" fill="#f5c842" />
       <rect x="6" y="5" width="3" height="6" fill="#3a1e08" />
@@ -98,7 +116,13 @@ function TrophyIcon() {
 
 function ExpertsIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ imageRendering: 'pixelated' }}>
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      style={{ imageRendering: 'pixelated' }}
+    >
       <rect x="3" y="5" width="8" height="7" rx="1" fill="#3a1e08" />
       <rect x="4" y="6" width="6" height="5" fill="#f5c8a0" />
       <rect x="3" y="12" width="8" height="6" rx="1" fill="#3a1e08" />
@@ -133,14 +157,20 @@ interface GameToolbarProps {
   onExperts: () => void
 }
 
-export function GameToolbar({ onAddAgent, onAddConnection, onLeaderboard, onExperts }: GameToolbarProps) {
+export function GameToolbar({
+  onAddAgent,
+  onAddConnection,
+  onLeaderboard,
+  onExperts,
+}: GameToolbarProps) {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 select-none">
       <div
         className="rounded-lg p-[5px]"
         style={{
           background: '#7c4a1e',
-          boxShadow: 'inset 0 2px 0 0 #a0622a, inset 0 -3px 0 0 #4e2a0e, 0 4px 12px rgba(0,0,0,0.6)',
+          boxShadow:
+            'inset 0 2px 0 0 #a0622a, inset 0 -3px 0 0 #4e2a0e, 0 4px 12px rgba(0,0,0,0.6)',
           border: '3px solid #3e1e08',
         }}
       >

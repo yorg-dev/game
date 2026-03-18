@@ -1,5 +1,5 @@
-import type { ReactElement, ReactNode } from "react";
-import { memo } from "react";
+import type { ReactElement, ReactNode } from 'react'
+import { memo } from 'react'
 import type {
   FilterPayload,
   ListControllerResult,
@@ -7,10 +7,10 @@ import type {
   SortPayload,
   ExtractRecordPaths,
   HintedString,
-} from "ra-core";
-import { ReferenceArrayFieldBase, useListContext } from "ra-core";
-import type { UseQueryOptions } from "@tanstack/react-query";
-import { SingleFieldList } from "@/components/admin/single-field-list";
+} from 'ra-core'
+import { ReferenceArrayFieldBase, useListContext } from 'ra-core'
+import type { UseQueryOptions } from '@tanstack/react-query'
+import { SingleFieldList } from '@/components/admin/single-field-list'
 
 /**
  * Displays multiple related records by following an array of foreign keys.
@@ -56,7 +56,7 @@ export const ReferenceArrayField = <
     queryOptions,
     render,
     ...rest
-  } = props;
+  } = props
   return (
     <ReferenceArrayFieldBase
       filter={filter}
@@ -71,39 +71,34 @@ export const ReferenceArrayField = <
     >
       <PureReferenceArrayFieldView {...rest} />
     </ReferenceArrayFieldBase>
-  );
-};
+  )
+}
 export interface ReferenceArrayFieldProps<
   RecordType extends RaRecord = RaRecord,
   ReferenceRecordType extends RaRecord = RaRecord,
 > extends ReferenceArrayFieldViewProps {
-  filter?: FilterPayload;
-  page?: number;
-  pagination?: ReactElement;
-  perPage?: number;
-  reference: string;
-  resource?: string;
-  source: NoInfer<HintedString<ExtractRecordPaths<RecordType>>>;
-  sort?: SortPayload;
-  queryOptions?: Omit<
-    UseQueryOptions<ReferenceRecordType[], Error>,
-    "queryFn" | "queryKey"
-  >;
-  render?: (props: ListControllerResult<ReferenceRecordType>) => ReactElement;
+  filter?: FilterPayload
+  page?: number
+  pagination?: ReactElement
+  perPage?: number
+  reference: string
+  resource?: string
+  source: NoInfer<HintedString<ExtractRecordPaths<RecordType>>>
+  sort?: SortPayload
+  queryOptions?: Omit<UseQueryOptions<ReferenceRecordType[], Error>, 'queryFn' | 'queryKey'>
+  render?: (props: ListControllerResult<ReferenceRecordType>) => ReactElement
 }
 
 export interface ReferenceArrayFieldViewProps {
-  children?: ReactNode;
-  className?: string;
-  empty?: ReactNode;
-  error?: ReactNode;
-  loading?: ReactNode;
-  pagination?: ReactNode;
+  children?: ReactNode
+  className?: string
+  empty?: ReactNode
+  error?: ReactNode
+  loading?: ReactNode
+  pagination?: ReactNode
 }
 
-export const ReferenceArrayFieldView = (
-  props: ReferenceArrayFieldViewProps,
-) => {
+export const ReferenceArrayFieldView = (props: ReferenceArrayFieldViewProps) => {
   const {
     children = defaultChildren,
     className,
@@ -111,16 +106,9 @@ export const ReferenceArrayFieldView = (
     error: errorElement,
     loading,
     pagination,
-  } = props;
-  const {
-    isPending,
-    error,
-    total,
-    hasPreviousPage,
-    hasNextPage,
-    data,
-    filterValues,
-  } = useListContext();
+  } = props
+  const { isPending, error, total, hasPreviousPage, hasNextPage, data, filterValues } =
+    useListContext()
 
   return (
     <div className={className}>
@@ -145,8 +133,8 @@ export const ReferenceArrayFieldView = (
         </span>
       )}
     </div>
-  );
-};
+  )
+}
 
-const defaultChildren = <SingleFieldList />;
-const PureReferenceArrayFieldView = memo(ReferenceArrayFieldView);
+const defaultChildren = <SingleFieldList />
+const PureReferenceArrayFieldView = memo(ReferenceArrayFieldView)

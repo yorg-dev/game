@@ -1,6 +1,6 @@
-import type { HTMLAttributes } from "react";
-import { useFieldValue, useTranslate } from "ra-core";
-import type { FieldProps } from "@/lib/field.type";
+import type { HTMLAttributes } from 'react'
+import { useFieldValue, useTranslate } from 'ra-core'
+import type { FieldProps } from '@/lib/field.type'
 
 /**
  * Displays a text value from a record field inside a span element.
@@ -23,38 +23,28 @@ import type { FieldProps } from "@/lib/field.type";
  *   </List>
  * );
  */
-export const TextField = <
-  RecordType extends Record<string, any> = Record<string, any>,
->({
+export const TextField = <RecordType extends Record<string, any> = Record<string, any>>({
   defaultValue,
   source,
   record,
   empty,
   ...rest
 }: TextFieldProps<RecordType>) => {
-  const value = useFieldValue({ defaultValue, source, record });
-  const translate = useTranslate();
+  const value = useFieldValue({ defaultValue, source, record })
+  const translate = useTranslate()
 
   if (value == null) {
     if (!empty) {
-      return null;
+      return null
     }
 
     return (
-      <span {...rest}>
-        {typeof empty === "string" ? translate(empty, { _: empty }) : empty}
-      </span>
-    );
+      <span {...rest}>{typeof empty === 'string' ? translate(empty, { _: empty }) : empty}</span>
+    )
   }
 
-  return (
-    <span {...rest}>
-      {typeof value !== "string" ? value.toString() : value}
-    </span>
-  );
-};
+  return <span {...rest}>{typeof value !== 'string' ? value.toString() : value}</span>
+}
 
-export interface TextFieldProps<
-  RecordType extends Record<string, any> = Record<string, any>,
->
+export interface TextFieldProps<RecordType extends Record<string, any> = Record<string, any>>
   extends FieldProps<RecordType>, HTMLAttributes<HTMLSpanElement> {}

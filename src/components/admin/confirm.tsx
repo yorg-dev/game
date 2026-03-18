@@ -1,9 +1,9 @@
-import { AlertCircle, CheckCircle } from "lucide-react";
-import { useTranslate } from "ra-core";
-import * as React from "react";
-import { type ComponentType, type MouseEventHandler, useCallback } from "react";
+import { AlertCircle, CheckCircle } from 'lucide-react'
+import { useTranslate } from 'ra-core'
+import * as React from 'react'
+import { type ComponentType, type MouseEventHandler, useCallback } from 'react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 
 /**
  * Generic confirmation dialog component for destructive actions.
@@ -72,9 +72,9 @@ export const Confirm = (props: ConfirmProps) => {
     loading,
     title,
     content,
-    cancel = "ra.action.cancel",
-    confirm = "ra.action.confirm",
-    confirmColor = "primary",
+    cancel = 'ra.action.cancel',
+    confirm = 'ra.action.confirm',
+    confirmColor = 'primary',
     ConfirmIcon = CheckCircle,
     CancelIcon = AlertCircle,
     onClose,
@@ -83,32 +83,32 @@ export const Confirm = (props: ConfirmProps) => {
     titleTranslateOptions = translateOptions,
     contentTranslateOptions = translateOptions,
     ...rest
-  } = props;
+  } = props
 
-  const translate = useTranslate();
+  const translate = useTranslate()
 
   const handleConfirm = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      onConfirm(e);
+      e.stopPropagation()
+      onConfirm(e)
     },
     [onConfirm],
-  );
+  )
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-  }, []);
+    e.stopPropagation()
+  }, [])
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className={className} onClick={handleClick} {...rest}>
         <DialogHeader>
           <DialogTitle>
-            {typeof title === "string"
+            {typeof title === 'string'
               ? translate(title, { _: title, ...titleTranslateOptions })
               : title}
           </DialogTitle>
-          {typeof content === "string" ? (
+          {typeof content === 'string' ? (
             <DialogDescription>
               {translate(content, {
                 _: content,
@@ -120,12 +120,7 @@ export const Confirm = (props: ConfirmProps) => {
           )}
         </DialogHeader>
         <DialogFooter>
-          <Button
-            variant="ghost"
-            disabled={loading}
-            onClick={onClose}
-            className="gap-1"
-          >
+          <Button variant="ghost" disabled={loading} onClick={onClose} className="gap-1">
             <CancelIcon className="h-5 w-5" />
             {translate(cancel, { _: cancel })}
           </Button>
@@ -133,7 +128,7 @@ export const Confirm = (props: ConfirmProps) => {
             disabled={loading}
             onClick={handleConfirm}
             className="gap-1"
-            variant={confirmColor === "warning" ? "destructive" : "default"}
+            variant={confirmColor === 'warning' ? 'destructive' : 'default'}
           >
             <ConfirmIcon className="h-5 w-5" />
             {translate(confirm, { _: confirm })}
@@ -141,26 +136,26 @@ export const Confirm = (props: ConfirmProps) => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
 export interface ConfirmProps {
-  cancel?: string;
-  className?: string;
-  confirm?: string;
-  confirmColor?: "primary" | "warning";
-  ConfirmIcon?: ComponentType;
-  CancelIcon?: ComponentType;
-  content?: React.ReactNode;
-  isOpen?: boolean;
-  loading?: boolean;
-  onClose: () => void;
-  onConfirm: MouseEventHandler;
-  title: React.ReactNode;
+  cancel?: string
+  className?: string
+  confirm?: string
+  confirmColor?: 'primary' | 'warning'
+  ConfirmIcon?: ComponentType
+  CancelIcon?: ComponentType
+  content?: React.ReactNode
+  isOpen?: boolean
+  loading?: boolean
+  onClose: () => void
+  onConfirm: MouseEventHandler
+  title: React.ReactNode
   /**
    * @deprecated use `titleTranslateOptions` and `contentTranslateOptions` instead
    */
-  translateOptions?: object;
-  titleTranslateOptions?: object;
-  contentTranslateOptions?: object;
+  translateOptions?: object
+  titleTranslateOptions?: object
+  contentTranslateOptions?: object
 }

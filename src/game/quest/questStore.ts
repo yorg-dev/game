@@ -8,7 +8,6 @@
 // ---------------------------------------------------------------------------
 
 import { EventBus } from '../EventBus'
-import { SAMPLE_QUESTS } from '@/mocks/quests'
 import type { Quest } from '@/models/Quest'
 
 const STORAGE_KEY = 'yorg-quest-progress'
@@ -17,7 +16,7 @@ type RawProgress = Record<string, Record<string, boolean>>
 
 // In-memory cache of quest definitions.  Starts with the mock list so the
 // tracker renders immediately; replaced with API data once loadQuests() resolves.
-let availableQuests: Quest[] = SAMPLE_QUESTS
+let availableQuests: Quest[] = []
 
 function loadRaw(): RawProgress {
   try {
@@ -86,7 +85,7 @@ export function completeStep(questId: string, stepId: string): boolean {
 
 export function resetAll(): void {
   localStorage.removeItem(STORAGE_KEY)
-  availableQuests = SAMPLE_QUESTS
+  availableQuests = []
 }
 
 // ---------------------------------------------------------------------------

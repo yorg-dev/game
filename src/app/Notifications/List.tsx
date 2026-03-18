@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { EventBus } from '@/game/EventBus'
-import { SAMPLE_NOTIFICATIONS } from '@/mocks/notifications'
 import type { Notification, NotificationSeverity } from '@/models/Notification'
 
 const SEVERITY_STYLES: Record<NotificationSeverity, { bar: string; badge: string; label: string }> =
@@ -70,7 +69,7 @@ function NotificationRow({ notif, onRead }: { notif: Notification; onRead: (id: 
 
 export function NotificationsModal() {
   const [open, setOpen] = useState(false)
-  const [notifications, setNotifications] = useState<Notification[]>(SAMPLE_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   useEffect(() => {
     return EventBus.on('sign-clicked', () => setOpen(true))

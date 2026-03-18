@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { createElement } from 'react'
 import {
   useCanAccess,
   useCreatePath,
@@ -6,8 +6,8 @@ import {
   useHasDashboard,
   useResourceDefinitions,
   useTranslate,
-} from "ra-core";
-import { Link, useMatch } from "react-router";
+} from 'ra-core'
+import { Link, useMatch } from 'react-router'
 import {
   Sidebar,
   SidebarContent,
@@ -19,9 +19,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { House, List, Shell } from "lucide-react";
+} from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
+import { House, List, Shell } from 'lucide-react'
 
 /**
  * Navigation sidebar displaying menu items, allowing users to navigate between different sections of the application.
@@ -36,23 +36,20 @@ import { House, List, Shell } from "lucide-react";
  * @see layout.tsx
  */
 export function AppSidebar() {
-  const hasDashboard = useHasDashboard();
-  const resources = useResourceDefinitions();
-  const { openMobile, setOpenMobile } = useSidebar();
+  const hasDashboard = useHasDashboard()
+  const resources = useResourceDefinitions()
+  const { openMobile, setOpenMobile } = useSidebar()
   const handleClick = () => {
     if (openMobile) {
-      setOpenMobile(false);
+      setOpenMobile(false)
     }
-  };
+  }
   return (
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <Link to="/">
                 <Shell className="!size-5" />
                 <span className="text-base font-semibold">Acme Inc.</span>
@@ -65,17 +62,11 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {hasDashboard ? (
-                <DashboardMenuItem onClick={handleClick} />
-              ) : null}
+              {hasDashboard ? <DashboardMenuItem onClick={handleClick} /> : null}
               {Object.keys(resources)
                 .filter((name) => resources[name].hasList)
                 .map((name) => (
-                  <ResourceMenuItem
-                    key={name}
-                    name={name}
-                    onClick={handleClick}
-                  />
+                  <ResourceMenuItem key={name} name={name} onClick={handleClick} />
                 ))}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -83,7 +74,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter />
     </Sidebar>
-  );
+  )
 }
 
 /**
@@ -96,11 +87,11 @@ export function AppSidebar() {
  * <DashboardMenuItem onClick={handleClick} />
  */
 export const DashboardMenuItem = ({ onClick }: { onClick?: () => void }) => {
-  const translate = useTranslate();
-  const label = translate("ra.page.dashboard", {
-    _: "Dashboard",
-  });
-  const match = useMatch({ path: "/", end: true });
+  const translate = useTranslate()
+  const label = translate('ra.page.dashboard', {
+    _: 'Dashboard',
+  })
+  const match = useMatch({ path: '/', end: true })
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={!!match}>
@@ -110,8 +101,8 @@ export const DashboardMenuItem = ({ onClick }: { onClick?: () => void }) => {
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
-  );
-};
+  )
+}
 
 /**
  * Menu item for a resource link in the sidebar.
@@ -123,44 +114,34 @@ export const DashboardMenuItem = ({ onClick }: { onClick?: () => void }) => {
  * @example
  * <ResourceMenuItem key={name} name="posts" onClick={handleClick} />
  */
-export const ResourceMenuItem = ({
-  name,
-  onClick,
-}: {
-  name: string;
-  onClick?: () => void;
-}) => {
+export const ResourceMenuItem = ({ name, onClick }: { name: string; onClick?: () => void }) => {
   const { canAccess, isPending } = useCanAccess({
     resource: name,
-    action: "list",
-  });
-  const resources = useResourceDefinitions();
-  const getResourceLabel = useGetResourceLabel();
-  const createPath = useCreatePath();
+    action: 'list',
+  })
+  const resources = useResourceDefinitions()
+  const getResourceLabel = useGetResourceLabel()
+  const createPath = useCreatePath()
   const to = createPath({
     resource: name,
-    type: "list",
-  });
-  const match = useMatch({ path: to, end: false });
+    type: 'list',
+  })
+  const match = useMatch({ path: to, end: false })
 
   if (isPending) {
-    return <Skeleton className="h-8 w-full" />;
+    return <Skeleton className="h-8 w-full" />
   }
 
-  if (!resources || !resources[name] || !canAccess) return null;
+  if (!resources || !resources[name] || !canAccess) return null
 
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={!!match}>
         <Link to={to} state={{ _scrollToTop: true }} onClick={onClick}>
-          {resources[name].icon ? (
-            createElement(resources[name].icon)
-          ) : (
-            <List />
-          )}
+          {resources[name].icon ? createElement(resources[name].icon) : <List />}
           {getResourceLabel(name, 2)}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
-  );
-};
+  )
+}

@@ -1,6 +1,6 @@
-import type { ReferenceInputBaseProps } from "ra-core";
-import { ReferenceInputBase } from "ra-core";
-import { AutocompleteInput } from "./autocomplete-input";
+import type { ReferenceInputBaseProps } from 'ra-core'
+import { ReferenceInputBase } from 'ra-core'
+import { AutocompleteInput } from './autocomplete-input'
 
 /**
  * Form input for editing foreign key relationships with autocompletion.
@@ -25,22 +25,22 @@ import { AutocompleteInput } from "./autocomplete-input";
  * );
  */
 export const ReferenceInput = (props: ReferenceInputProps) => {
-  const { children = defaultChildren, ...rest } = props;
+  const { children = defaultChildren, ...rest } = props
 
-  if (props.validate && import.meta.env.MODE !== "production") {
+  if (props.validate && import.meta.env.MODE !== 'production') {
     throw new Error(
-      "<ReferenceInput> does not accept a validate prop. Set the validate prop on the child instead.",
-    );
+      '<ReferenceInput> does not accept a validate prop. Set the validate prop on the child instead.',
+    )
   }
 
-  return <ReferenceInputBase {...rest}>{children}</ReferenceInputBase>;
-};
+  return <ReferenceInputBase {...rest}>{children}</ReferenceInputBase>
+}
 
-const defaultChildren = <AutocompleteInput />;
+const defaultChildren = <AutocompleteInput />
 
 export interface ReferenceInputProps extends ReferenceInputBaseProps {
   /**
    * Call validate on the child component instead
    */
-  validate?: never;
+  validate?: never
 }

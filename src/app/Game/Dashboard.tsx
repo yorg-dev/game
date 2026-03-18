@@ -22,11 +22,9 @@ import { LeaderboardList } from '@/app/Leaderboard/List'
 import { EventBus } from '@/game/EventBus'
 import { landProvider, landPlacementProvider, landObjectProvider } from '@/providers/landProvider'
 import { setActiveLand, getActiveLand, viewerPermissions } from '@/providers/activeLand'
-import { DEFAULT_LAND } from '@/mocks/lands'
-import { SAMPLE_CONNECTIONS } from '@/mocks/connections'
 
 type GameAuthProvider = AuthProvider & {
-  createGuestSession: () => Promise<void>
+  isGuest: () => boolean
 }
 
 export const GameDashboard = () => {
@@ -38,106 +36,77 @@ export const GameDashboard = () => {
   const [canManage, setCanManage] = useState(false)
   const initRan = useRef(false)
 
-  // 1. Ensure a valid session exists, then 2. resolve the starting land.
-  // Sequential so land requests always have a valid token.
-  // initRan guard prevents React StrictMode from running this twice in dev,
-  // which would create duplicate guest users / organizations on every page load.
+  // Phase 1: ensure a valid session exists, then emit session-ready.
+  // Land resolution is deferred to phase 2 (game-started) so no API calls
+  // fire while the player is still on the TitleScene.
+  // initRan guard prevents React StrictMode from running this twice in dev.
   useEffect(() => {
     if (initRan.current) return
     initRan.current = true
 
-    async function ensureGuestSession(): Promise<boolean> {
-      try {
-        await authProvider.createGuestSession()
-        return true
-      } catch (err) {
-        console.error('[App] Guest session creation failed:', err)
-        return false
-      }
-    }
-
-    /**
-     * Resolve which land to start on:
-     * 1. URL ?landId param (invite link) — with or without auth
-     * 2. The user's own first land from the backend
-     * 3. Local "My Sandbox" fallback (mock, no backend needed)
-     */
-    async function resolveStartingLand(urlLandId: string | null): Promise<typeof DEFAULT_LAND> {
-      // 1. Try the invite link land (with current token, including guest token)
-      if (urlLandId) {
-        const land = await landProvider.getLand(urlLandId)
-        // getLand returns DEFAULT_LAND only on non-auth errors; auth errors propagate
-        if (land.id === urlLandId) return land
-      }
-
-      // 2. Try to load the user's first real land from the backend
-      const myLand = await landProvider.getMyFirstLand()
-      if (myLand) return myLand
-
-      // 3. Local sandbox fallback (always works, no backend needed)
-      return DEFAULT_LAND
-    }
-
     async function init() {
-      const storedToken = localStorage.getItem('token')
-      const storedUser = localStorage.getItem('user')
-      console.debug('[App:init] stored token:', storedToken, '| stored user:', storedUser)
-
-      // Record synchronously (before any await) whether the user had a valid token
-      // when the page loaded. TitleScene uses this to distinguish returning users
-      // (who should skip the title screen) from freshly-created guest sessions
-      // (who should see the menu). Without this flag, createGuestSession() can
-      // complete before Phaser's first rAF, and the bare localStorage check would
-      // auto-start the game for new guests.
-      const hadToken = !!storedToken && storedToken !== 'undefined'
-      sessionStorage.setItem('_returningUser', hadToken ? '1' : '0')
-
-      if (!storedToken || storedToken === 'undefined') {
-        if (storedToken === 'undefined') localStorage.removeItem('token')
-        console.debug('[App:init] No valid token — creating guest session')
-        const ok = await ensureGuestSession()
-        if (!ok) {
-          // Guest session failed — still proceed, using local sandbox
-          console.warn('[App] Proceeding without a session token.')
-        }
-        console.debug(
-          '[App:init] After guest session — token:',
-          localStorage.getItem('token'),
-          '| user:',
-          localStorage.getItem('user'),
-        )
-      } else {
-        console.debug('[App:init] Existing token found — skipping guest session')
+      let authenticated = false
+      try {
+        await authProvider.checkAuth({})
+        authenticated = !authProvider.isGuest()
+      } catch {
+        // Not authenticated — show the title screen menu
       }
-      EventBus.emit('session-ready', undefined)
-
-      const urlLandId = new URLSearchParams(window.location.search).get('landId')
-      const land = await resolveStartingLand(urlLandId)
-      console.debug('[App:init] resolved land:', land?.id, '| viewer:', land?.viewer)
-
-      const placements = await landPlacementProvider.getPlacements(land.id)
-      // Prefer objects embedded in the land detail response. If absent or empty,
-      // fetch from the dedicated endpoint (falls back to mocks if API is unavailable).
-      const landObjects =
-        land.objects && land.objects.length > 0
-          ? land.objects
-          : await landObjectProvider.getObjects(land.id)
-      const connections = [...SAMPLE_CONNECTIONS]
-
-      const { canInteract, canManage } = viewerPermissions(land)
-      console.debug('[App:init] permissions — canInteract:', canInteract, '| canManage:', canManage)
-      const state = { land, placements, landObjects, connections, canInteract, canManage }
-      setActiveLand(state)
-      setCanManage(canManage)
-      EventBus.emit('land-ready', state)
-      EventBus.emit('connections-loaded', { connections })
+      EventBus.emit('session-ready', { authenticated })
     }
 
     init()
   }, [authProvider])
 
+  // Phase 2: once the player starts the game, resolve their land and load data.
+  // Kept separate so land API calls never fire during TitleScene.
   useEffect(() => {
-    const unsubStarted = EventBus.on('game-started', () => setGameStarted(true))
+    async function resolveStartingLand(urlLandId: string | null) {
+      if (urlLandId) {
+        const land = await landProvider.getLand(urlLandId)
+        if (land?.id === urlLandId) return land
+      }
+      return landProvider.getMyFirstLand()
+    }
+
+    async function loadLand() {
+      const urlLandId = new URLSearchParams(window.location.search).get('landId')
+      const land = await resolveStartingLand(urlLandId)
+
+      if (!land) {
+        console.warn('[App:loadLand] No land found — game will wait for land-ready')
+        return
+      }
+
+      console.debug('[App:loadLand] resolved land:', land.id, '| viewer:', land.viewer)
+
+      const placements = await landPlacementProvider.getPlacements(land.id)
+      const landObjects =
+        land.objects && land.objects.length > 0
+          ? land.objects
+          : await landObjectProvider.getObjects(land.id)
+
+      const { canInteract, canManage } = viewerPermissions(land)
+      console.debug(
+        '[App:loadLand] permissions — canInteract:',
+        canInteract,
+        '| canManage:',
+        canManage,
+      )
+      const state = { land, placements, landObjects, connections: [], canInteract, canManage }
+      setActiveLand(state)
+      setCanManage(canManage)
+      EventBus.emit('land-ready', state)
+      EventBus.emit('connections-loaded', { connections: [] })
+    }
+
+    return EventBus.on('game-started', () => {
+      setGameStarted(true)
+      loadLand()
+    })
+  }, [])
+
+  useEffect(() => {
     const unsubLogout = EventBus.on('logout', () => setGameStarted(false))
     const unsubEnter = EventBus.on('enter-house', () => setIndoor(true))
     const unsubExit = EventBus.on('exit-house', () => setIndoor(false))
@@ -158,9 +127,8 @@ export const GameDashboard = () => {
           land.objects && land.objects.length > 0
             ? land.objects
             : await landObjectProvider.getObjects(land.id)
-        const connections = [...SAMPLE_CONNECTIONS]
         const { canInteract, canManage } = viewerPermissions(land)
-        const state = { land, placements, landObjects, connections, canInteract, canManage }
+        const state = { land, placements, landObjects, connections: [], canInteract, canManage }
         setActiveLand(state)
         setCanManage(canManage)
         EventBus.emit('land-ready', state)
@@ -171,7 +139,6 @@ export const GameDashboard = () => {
       }
     })
     return () => {
-      unsubStarted()
       unsubLogout()
       unsubEnter()
       unsubExit()
