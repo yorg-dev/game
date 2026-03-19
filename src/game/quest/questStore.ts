@@ -46,8 +46,8 @@ export function getQuestsWithProgress(): Quest[] {
   for (let i = 0; i < availableQuests.length; i++) {
     const def = availableQuests[i]
     const progress = raw[def.id] ?? {}
-    const steps = def.steps.map((s) => ({ ...s, isComplete: progress[s.id] === true }))
-    const allDone = steps.every((s) => s.isComplete)
+    const steps = def.steps.map((s) => ({ ...s, is_complete: progress[s.id] === true }))
+    const allDone = steps.every((s) => s.is_complete)
     const prevDone = i === 0 || result[i - 1]?.status === 'completed'
 
     result.push({

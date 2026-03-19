@@ -25,7 +25,7 @@ export type ConnectionStatus =
  */
 export interface Connection {
   id: string // "conn_shopify_01"
-  appId: string // references App.id — "shopify"
+  app_id: string // references App.id — "shopify"
 
   /**
    * Human-readable label set by the owner.
@@ -39,7 +39,7 @@ export interface Connection {
 
   /**
    * Stored credential values, keyed by the credential names declared in
-   * `App.requiredCredentials`.
+   * `App.required_credentials`.
    *
    * In production these values would be encrypted at rest; here they are
    * typed as strings to keep the model simple.
@@ -49,19 +49,19 @@ export interface Connection {
   credentials: Record<string, string>
 
   /** ISO-8601 timestamp when the connection was first established. */
-  connectedAt: string
+  connected_at: string
 
   /**
    * ISO-8601 expiry for oauth2 access tokens.
    * Undefined for api_key / basic connections that don't expire.
    */
-  expiresAt?: string
+  expires_at?: string
 
   /** ISO-8601 timestamp of the most recent successful skill execution. */
-  lastUsedAt?: string
+  last_used_at?: string
 
   /** Human-readable reason populated when status is "error". */
-  errorMessage?: string
+  error_message?: string
 }
 
 // ─────────────────────────────────────────

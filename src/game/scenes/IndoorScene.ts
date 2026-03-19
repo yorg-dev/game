@@ -79,6 +79,16 @@ export class IndoorScene extends Phaser.Scene {
     this.unsubLeave = EventBus.on('leave-house', () => this.exitHouse())
     this.events.once('shutdown', () => this.unsubLeave?.())
 
+    // When the same house is re-entered, GameScene wakes this scene instead of
+    // re-launching it. Re-emit enter-house so the HUD re-activates.
+    this.events.on('wake', () => {
+      EventBus.emit('enter-house', {
+        appId: this.appId,
+        connection: this.connection,
+        interior: this.interior,
+      })
+    })
+
     EventBus.emit('enter-house', {
       appId: this.appId,
       connection: this.connection,
@@ -281,7 +291,8 @@ export class IndoorScene extends Phaser.Scene {
   private exitHouse(): void {
     EventBus.emit('exit-house', undefined)
     this.scene.wake('GameScene')
-    this.scene.stop()
+    // Sleep instead of stop so re-entering the same house is a cheap wake call.
+    this.scene.sleep()
   }
 
   // ---------------------------------------------------------------------------

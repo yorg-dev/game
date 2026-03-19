@@ -78,13 +78,13 @@ export function QuestTracker() {
 
   // ── Minimized pill ──────────────────────────────────────────────────────────
   if (minimized) {
-    const doneCount = displayQuest?.steps.filter((s) => s.isComplete).length ?? 0
+    const doneCount = displayQuest?.steps.filter((s) => s.is_complete).length ?? 0
     const totalCount = displayQuest?.steps.length ?? 0
     return (
       <>
         <button
           onClick={() => setMinimized(false)}
-          className="fixed bottom-4 left-4 z-40 flex items-center gap-2 px-3 py-2 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5] text-[#3d2010] text-xs font-bold hover:brightness-105 active:brightness-95 transition-[filter]"
+          className="fixed bottom-4 left-4 z-40 flex items-center gap-2 px-3 py-2 rounded-xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_3px_var(--color-parchment-50)] text-soil-800 text-xs font-bold hover:brightness-105 active:brightness-95 transition-[filter]"
           title="Show quest tracker"
         >
           <span className="text-sm leading-none">📋</span>
@@ -106,18 +106,18 @@ export function QuestTracker() {
         className={`fixed bottom-4 left-4 z-40 w-56 rounded-2xl border-4 overflow-hidden transition-colors duration-500 ${
           isCelebrating
             ? 'border-[#8b6c2a] bg-[#f5c84a] shadow-[inset_0_0_0_3px_#ffe88a]'
-            : 'border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5]'
+            : 'border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_3px_var(--color-parchment-50)]'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between px-4 py-2 border-b-4 transition-colors duration-500 ${
-            isCelebrating ? 'bg-[#e8a830] border-[#8b6c2a]' : 'bg-[#dcc898] border-[#7a5230]'
+            isCelebrating ? 'bg-[#e8a830] border-[#8b6c2a]' : 'bg-parchment-250 border-wood-700'
           }`}
         >
           <span
             className={`text-[10px] font-bold uppercase tracking-widest transition-colors duration-500 ${
-              isCelebrating ? 'text-[#3d2010]' : 'text-[#7a5230]'
+              isCelebrating ? 'text-soil-800' : 'text-wood-700'
             }`}
           >
             {isCelebrating ? '✓ Quest Complete!' : 'Active Quest'}
@@ -125,7 +125,7 @@ export function QuestTracker() {
           <button
             onClick={() => setMinimized(true)}
             aria-label="Minimize quest tracker"
-            className="w-5 h-5 flex items-center justify-center rounded text-[#9a6b28] hover:text-[#3d2010] transition-colors text-base leading-none"
+            className="w-5 h-5 flex items-center justify-center rounded text-wood-600 hover:text-soil-800 transition-colors text-base leading-none"
           >
             ─
           </button>
@@ -135,8 +135,8 @@ export function QuestTracker() {
         {displayQuest && (
           <div className="px-4 py-3 flex flex-col gap-2.5">
             <div>
-              <p className="text-sm font-bold text-[#3d2010] leading-tight">{displayQuest.title}</p>
-              <p className="text-[10px] text-[#7a5230] mt-0.5 leading-snug">
+              <p className="text-sm font-bold text-soil-800 leading-tight">{displayQuest.title}</p>
+              <p className="text-[10px] text-wood-700 mt-0.5 leading-snug">
                 {displayQuest.description}
               </p>
             </div>
@@ -148,18 +148,18 @@ export function QuestTracker() {
                   <div key={step.id} className="flex items-center gap-2.5">
                     <div
                       className={`w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
-                        step.isComplete
-                          ? `border-[#4a7c20] bg-[#5a9c28] ${isNew ? 'scale-125' : 'scale-100'}`
-                          : 'border-[#9a6b28] bg-[#dcc898] scale-100'
+                        step.is_complete
+                          ? `border-grass-700 bg-grass-600 ${isNew ? 'scale-125' : 'scale-100'}`
+                          : 'border-wood-600 bg-parchment-250 scale-100'
                       }`}
                     >
-                      {step.isComplete && <CheckIcon />}
+                      {step.is_complete && <CheckIcon />}
                     </div>
                     <span
                       className={`text-xs leading-snug transition-colors ${
-                        step.isComplete
+                        step.is_complete
                           ? 'text-[#7a7050] line-through'
-                          : 'text-[#3d2010] font-medium'
+                          : 'text-soil-800 font-medium'
                       }`}
                     >
                       {step.description}
@@ -175,8 +175,8 @@ export function QuestTracker() {
         {isCelebrating && nextQuest && (
           <div className="px-4 pb-3 -mt-1">
             <div className="rounded-lg bg-[#e8a830] border-2 border-[#8b6c2a] px-3 py-2">
-              <p className="text-[10px] font-bold text-[#3d2010]">🔓 Unlocked: {nextQuest.title}</p>
-              <p className="text-[10px] text-[#5a3810] mt-0.5">{nextQuest.description}</p>
+              <p className="text-[10px] font-bold text-soil-800">🔓 Unlocked: {nextQuest.title}</p>
+              <p className="text-[10px] text-wood-900 mt-0.5">{nextQuest.description}</p>
             </div>
           </div>
         )}
@@ -185,7 +185,7 @@ export function QuestTracker() {
         <div className={`px-4 pb-3 ${displayQuest || (isCelebrating && nextQuest) ? '' : 'pt-1'}`}>
           <button
             onClick={() => setShowBrowser(true)}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-dashed border-[#b8955a] text-xs text-[#9a6b28] font-bold hover:border-[#7a5230] hover:text-[#5a3810] hover:bg-[#dcc898] transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-dashed border-parchment-500 text-xs text-wood-600 font-bold hover:border-wood-700 hover:text-wood-900 hover:bg-parchment-250 transition-colors"
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <rect

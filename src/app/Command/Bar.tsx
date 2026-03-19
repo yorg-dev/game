@@ -8,7 +8,7 @@ interface Ack {
   message: string
 }
 
-export function CommandBar() {
+export function CommandBar({ voiceEnabled = false }: { voiceEnabled?: boolean }) {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [acks, setAcks] = useState<Ack[]>([])
@@ -109,7 +109,7 @@ export function CommandBar() {
               Issue Command
               <kbd className="ml-1 text-[10px] text-white/30 font-mono">/</kbd>
             </button>
-            <VoiceButton />
+            {voiceEnabled && <VoiceButton />}
           </div>
         )}
       </div>

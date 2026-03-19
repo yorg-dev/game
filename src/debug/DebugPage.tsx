@@ -46,12 +46,12 @@ const PANELS: { id: PanelId; label: string; description: string }[] = [
 
 const MOCK_CONNECTION: Connection = {
   id: 'shopify-demo',
-  appId: 'shopify',
+  app_id: 'shopify',
   label: 'Shopify — Demo Store',
   status: 'connected',
   credentials: {},
-  connectedAt: '2025-06-01T09:00:00Z',
-  lastUsedAt: '2026-02-20T14:32:00Z',
+  connected_at: '2025-06-01T09:00:00Z',
+  last_used_at: '2026-02-20T14:32:00Z',
 }
 
 const MOCK_DIALOG_LINES = [
@@ -164,7 +164,7 @@ function ConnectionPopoverPanel() {
   function open() {
     EventBus.emit('connection-clicked', {
       connectionId: MOCK_CONNECTION.id,
-      appId: MOCK_CONNECTION.appId,
+      appId: MOCK_CONNECTION.app_id,
       connection: MOCK_CONNECTION,
     })
   }

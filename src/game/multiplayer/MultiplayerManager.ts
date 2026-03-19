@@ -133,7 +133,7 @@ export class MultiplayerManager {
         console.log('[MP] placement-added received:', msg)
         EventBus.emit('add-connection', {
           connectionId: msg.connection.id,
-          appId: msg.connection.appId,
+          appId: msg.connection.app_id,
           worldX: msg.worldX,
           worldY: msg.worldY,
           connection: msg.connection,

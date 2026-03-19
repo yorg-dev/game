@@ -5,13 +5,13 @@ import type { Connection } from '@/models/Connection'
 
 const PLACEHOLDER_LAND: Land = {
   id: '',
-  worldId: '',
+  world_id: '',
   name: '',
-  ownerId: '',
-  ownerType: 'user',
-  isPublic: false,
-  createdAt: '',
-  updatedAt: '',
+  owner_id: '',
+  owner_type: 'user',
+  is_public: false,
+  created_at: '',
+  updated_at: '',
 }
 
 // ---------------------------------------------------------------------------
@@ -48,8 +48,8 @@ let _state: ActiveLandState = {
 /** Extract canInteract / canManage from the land's embedded viewer object. */
 export function viewerPermissions(land: Land): { canInteract: boolean; canManage: boolean } {
   return {
-    canInteract: land.viewer?.canInteract ?? false,
-    canManage: land.viewer?.canManage ?? false,
+    canInteract: land.viewer?.can_interact ?? false,
+    canManage: land.viewer?.can_manage ?? false,
   }
 }
 

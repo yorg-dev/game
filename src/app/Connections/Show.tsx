@@ -1,9 +1,14 @@
 import { useRecordContext } from 'ra-core'
 import type { Connection } from '@/models/Connection'
+import {
+  GameDialogHeader,
+  GameDialogTitle,
+  GameDialogDescription,
+} from '@/components/ui/game-dialog'
 
 const STATUS_COLOR: Record<string, string> = {
   connected: 'bg-emerald-600',
-  disconnected: 'bg-[#9a6b28]',
+  disconnected: 'bg-wood-600',
   expired: 'bg-amber-600',
   error: 'bg-red-700',
 }
@@ -19,60 +24,56 @@ export function ConnectionShow() {
   const connection = useRecordContext<Connection>()
   if (!connection) return null
 
-  const displayName = connection.label || connection.appId
+  const displayName = connection.label || connection.app_id
 
   return (
     <>
-      {/* Coloured top band */}
-      <div className="h-2 w-full shrink-0 bg-[#c8974c]" />
-
-      {/* Body */}
-      <div className="flex flex-col gap-4 px-5 py-5">
-        {/* Identity */}
-        <div className="flex items-center gap-4 pr-10">
-          <div className="w-14 h-14 rounded-xl shrink-0 flex items-center justify-center text-xl font-bold border-2 border-[#9a6b28] bg-[#dcc898] text-[#7a5230]">
+      <GameDialogHeader className="pr-14">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-base font-bold border-2 border-wood-600 bg-parchment-150 text-wood-700">
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <h2 className="text-base font-bold text-[#3d2010] leading-tight">{displayName}</h2>
-            <p className="text-sm text-[#7a5230] mt-0.5 font-mono">{connection.appId}</p>
+            <GameDialogTitle>{displayName}</GameDialogTitle>
+            <GameDialogDescription className="font-mono">{connection.app_id}</GameDialogDescription>
           </div>
         </div>
+      </GameDialogHeader>
 
+      <div className="flex flex-col gap-4 px-5 py-5">
         {/* Meta grid */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col gap-1.5 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-2.5">
-            <span className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+          <div className="flex flex-col gap-1.5 rounded-lg bg-parchment-250 border-2 border-wood-600 px-3 py-2.5">
+            <span className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">
               Status
             </span>
             <div className="flex items-center gap-2">
               <span
-                className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLOR[connection.status] ?? 'bg-[#9a6b28]'}`}
+                className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLOR[connection.status] ?? 'bg-wood-600'}`}
               />
-              <span className="text-sm font-bold text-[#3d2010]">
+              <span className="text-sm font-bold text-soil-800">
                 {STATUS_LABEL[connection.status] ?? connection.status}
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-2.5">
-            <span className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+          <div className="flex flex-col gap-1.5 rounded-lg bg-parchment-250 border-2 border-wood-600 px-3 py-2.5">
+            <span className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">
               App ID
             </span>
-            <span className="text-sm font-bold text-[#3d2010] font-mono truncate">
-              {connection.appId}
+            <span className="text-sm font-bold text-soil-800 font-mono truncate">
+              {connection.app_id}
             </span>
           </div>
         </div>
 
-        {/* Timestamps */}
-        <div className="flex items-center justify-between pt-1 border-t-2 border-[#b8955a]">
-          <span className="text-xs text-[#7a5230]">
-            Connected {new Date(connection.connectedAt).toLocaleDateString()}
+        <div className="flex items-center justify-between pt-1 border-t-2 border-parchment-500">
+          <span className="text-xs text-wood-700">
+            Connected {new Date(connection.connected_at).toLocaleDateString()}
           </span>
-          {connection.lastUsedAt && (
-            <span className="text-xs text-[#7a5230]">
-              Used {new Date(connection.lastUsedAt).toLocaleDateString()}
+          {connection.last_used_at && (
+            <span className="text-xs text-wood-700">
+              Used {new Date(connection.last_used_at).toLocaleDateString()}
             </span>
           )}
         </div>

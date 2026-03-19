@@ -6,6 +6,8 @@ import { useTranslate } from 'ra-core'
 import Form from './Form'
 
 const ConnectionCreate = () => {
+  console.log('Im here')
+
   const redirect: string = 'list'
   const [params] = useSearchParams()
   const translate = useTranslate()

@@ -63,9 +63,9 @@ export class QuestFactory {
     if (!quest) return
     const step = quest.steps.find((s) => s.id === stepId)
     if (!step) return
-    step.isComplete = true
+    step.is_complete = true
 
-    if (quest.steps.every((s) => s.isComplete)) {
+    if (quest.steps.every((s) => s.is_complete)) {
       quest.status = 'completed'
     }
   }

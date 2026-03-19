@@ -33,23 +33,23 @@ export interface App {
   category: AppCategory
 
   /** How the owner proves identity to this app. */
-  authType: AuthType
+  auth_type: AuthType
 
   /**
    * Credential keys this app requires.
-   * These are the same keys listed in `Skill.requiredCredentials`.
+   * These are the same keys listed in `Skill.required_credentials`.
    */
-  requiredCredentials: string[] // ["shopify_access_token", "shopify_store_url"]
+  required_credentials: string[] // ["shopify_access_token", "shopify_store_url"]
 
   /** Accent color used in the UI (hex). */
   color: string
 
   /** Whether the app is available for connection in the current build. */
-  isAvailable: boolean
+  is_available: boolean
 
   /**
    * Maps to the API's `connection_type` field.
    * Defaults to 'webhook' if not specified.
    */
-  connectionType?: string
+  connection_type?: string
 }

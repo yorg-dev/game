@@ -8,5 +8,5 @@ export interface Achievement {
   rarity: AchievementRarity
   category: string
   /** ISO timestamp — present when earned, absent when locked. */
-  unlockedAt?: string
+  unlocked_at?: string
 }

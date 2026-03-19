@@ -40,11 +40,11 @@ import { agentLevelProvider } from '@/providers/agentLevelProvider'
 // value so ConnectionHouseFactory can render it with the grey-brick texture.
 const HOME_CONNECTION: Connection = {
   id: 'home',
-  appId: 'home',
+  app_id: 'home',
   label: 'Home',
   status: 'connected',
   credentials: {},
-  connectedAt: '',
+  connected_at: '',
 }
 
 // ---------------------------------------------------------------------------
@@ -89,9 +89,27 @@ export class GameScene extends Phaser.Scene {
   private quests: QuestFactory = new QuestFactory(this)
   private multiplayer!: MultiplayerManager
   private hasMoved = false
+  // Tracked colliders — removed on shutdown to prevent leaks across restarts.
+  private colliders: Phaser.Physics.Arcade.Collider[] = []
+  // Last indoor scene appId — enables sleep/wake for same-house re-entry.
+  private lastIndoorAppId: string | null = null
 
   constructor() {
     super({ key: 'GameScene' })
+  }
+
+  // ---------------------------------------------------------------------------
+  // Lifecycle
+  // ---------------------------------------------------------------------------
+
+  // Reset per-run state before create() so scene.start() always begins clean.
+  init(): void {
+    this.agents = []
+    this.hasMoved = false
+    this.isDialogOpen = false
+    this.controlledAgent = null
+    this.colliders = []
+    this.lastIndoorAppId = null
   }
 
   preload(): void {
@@ -116,125 +134,21 @@ export class GameScene extends Phaser.Scene {
     this.houses.preload()
   }
 
+  // create() is an orchestrator — each named method owns a single concern.
   create(): void {
     this.mapDef = getActiveMap()
     this.game.canvas.style.background = this.mapDef.bgColor ?? '#000000'
 
-    this.createTileset()
-    this.layer = this.createMap()
-    this.createDecorations()
-
-    // Physics + camera world bounds derived from the map definition so they
-    // are always correct even when the features layer is empty.
-    const worldW = this.mapDef.cols * this.mapDef.tileSize
-    const worldH = this.mapDef.rows * this.mapDef.tileSize
-    this.physics.world.setBounds(0, 0, worldW, worldH)
-    this.cameras.main.setBounds(0, 0, worldW, worldH)
-
-    // Zoom in so 16 px tiles appear large enough to read on screen.
-    // Each tile renders at 48 CSS px; world size stays 960 × 544, camera scrolls.
-    this.cameras.main.setZoom(3)
-    // Round sprite positions to the nearest integer pixel before rendering.
-    // Without this, sub-pixel positions at zoom × 3 cause the sprite to flicker
-    // (blink in and out) as the camera scrolls with lerp.
-    this.cameras.main.setRoundPixels(true)
-
-    this.minimap = new MinimapFactory(this, this.mapDef)
-    this.minimap.create()
-
-    // Set up spritesheets + animations for every character type.
-    // Types with real asset sheets (loaded in preload) get their own animation
-    // config; all others get a procedurally generated canvas sheet.
-    const charFactory = new CharacterSheetFactory(this, this.mapDef.tileSize)
-
-    // Player character sprite
-    charFactory.createBunnyAnimations()
-
-    // Agent NPC sprites
-    for (const [type, cfg] of Object.entries(AGENT_TYPES) as Array<[AgentType, AgentConfig]>) {
-      if (type === 'engineering' || type === 'marketing') {
-        charFactory.createAssetSpriteAnimations(type as 'engineering' | 'marketing')
-      } else {
-        charFactory.createCharacterSheet(`char-${type}`, cfg.shirtColor)
-        charFactory.createAnimations(`char-${type}`)
-      }
-    }
-
-    const { placements, landObjects, connections } = getActiveLand()
-    const connPlacements = this.resolveConnectionPlacements(placements, connections)
-    const homeObj = landObjects.find((o) => o.object_type === 'home')
-    const signObj = landObjects.find((o) => o.object_type === 'bulletin_board')
-    const chestObj = landObjects.find((o) => o.object_type === 'chest')
-
-    // Home position comes from land_objects. If not yet loaded, omit it —
-    // land-ready will spawn it once the API responds.
-    const allHouses: PositionedConnection[] = [
-      ...(homeObj ? [{ connection: HOME_CONNECTION, x: homeObj.x, y: homeObj.y }] : []),
-      ...connPlacements,
-    ]
-
-    this.houses.create(this.mapDef, allHouses)
-    this.chest.createAnimations()
-    if (chestObj)
-      this.chest.spawn(chestObj.x, chestObj.y, () => {
-        this.isDialogOpen = true
-      })
-    if (signObj) this.sign.spawn(signObj.x, signObj.y)
-    this.selectionIndicator = this.createSelectionIndicator()
-
-    const { col, row } = this.mapDef.spawnTile
-    const spawnX = (col + 0.5) * this.mapDef.tileSize
-    const spawnY = (row + 0.5) * this.mapDef.tileSize
-
-    // Spawn the player — always the WASD-controlled character.
-    this.player = new User(this, spawnX, spawnY)
-    this.physics.add.collider(this.player, this.layer)
-    if (this.waterLayer) this.physics.add.collider(this.player, this.waterLayer)
-    if (this.fenceLayer) this.physics.add.collider(this.player, this.fenceLayer)
-    this.physics.add.collider(this.player, this.decorationGroup)
-    this.physics.add.collider(this.player, this.houses.group)
-    if (this.chest.sprite) this.physics.add.collider(this.player, this.chest.sprite)
-    if (this.sign.sprite) this.physics.add.collider(this.player, this.sign.sprite)
-    this.cameras.main.startFollow(this.player, true, 0.1, 0.1)
-
-    // enableCapture=false: don't preventDefault on WASD so text inputs still receive them.
-    // Movement suppression is handled in update() via activeElement / dialog checks.
-    this.keys = this.input.keyboard!.addKeys('W,A,S,D', false) as WASDKeys
-    this.eKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E, false)
-    this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, false)
-    this.mMapKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.P, false)
-    this.mMapKey.on('down', () => this.minimap.toggle())
-
-    // Door entry prompt — hidden until player is near a house door
-    this.doorPrompt = this.add
-      .text(0, 0, '[E] Enter', {
-        fontSize: '6px',
-        color: '#ffffff',
-        backgroundColor: '#000000cc',
-        padding: { x: 3, y: 2 },
-      })
-      .setOrigin(0.5, 1)
-      .setDepth(20)
-      .setResolution(3)
-      .setVisible(false)
-
-    // Agent chat prompt — hidden until player is near an agent
-    this.agentPrompt = this.add
-      .text(0, 0, '[Space] Chat', {
-        fontSize: '6px',
-        color: '#ffffff',
-        backgroundColor: '#000000cc',
-        padding: { x: 3, y: 2 },
-      })
-      .setOrigin(0.5, 1)
-      .setDepth(20)
-      .setResolution(3)
-      .setVisible(false)
-
-    this.multiplayer = new MultiplayerManager(this)
-    this.multiplayer.init(spawnX, spawnY, 'down', getActiveLand().land.id)
-    this.houses.setMultiplayer(this.multiplayer)
-
+    this.setupMap()
+    this.setupPhysicsBounds()
+    this.setupMinimap()
+    this.setupAnimations()
+    this.setupObjects()
+    this.setupPlayer()
+    this.setupCamera()
+    this.setupInput()
+    this.setupHUD()
+    this.setupMultiplayer()
     this.setupEventBusListeners()
     EventBus.emit('scene-ready', this)
   }
@@ -318,6 +232,151 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------------------
+  // Setup methods — called once from create()
+  // ---------------------------------------------------------------------------
+
+  private setupMap(): void {
+    this.createTileset()
+    this.layer = this.createMap()
+    this.createDecorations()
+  }
+
+  private setupPhysicsBounds(): void {
+    const worldW = this.mapDef.cols * this.mapDef.tileSize
+    const worldH = this.mapDef.rows * this.mapDef.tileSize
+    this.physics.world.setBounds(0, 0, worldW, worldH)
+    this.cameras.main.setBounds(0, 0, worldW, worldH)
+  }
+
+  private setupMinimap(): void {
+    this.minimap = new MinimapFactory(this, this.mapDef)
+    this.minimap.create()
+  }
+
+  private setupAnimations(): void {
+    const charFactory = new CharacterSheetFactory(this, this.mapDef.tileSize)
+    charFactory.createBunnyAnimations()
+    for (const [type, cfg] of Object.entries(AGENT_TYPES) as Array<[AgentType, AgentConfig]>) {
+      if (type === 'engineering' || type === 'marketing') {
+        charFactory.createAssetSpriteAnimations(type as 'engineering' | 'marketing')
+      } else {
+        charFactory.createCharacterSheet(`char-${type}`, cfg.shirtColor)
+        charFactory.createAnimations(`char-${type}`)
+      }
+    }
+  }
+
+  private setupObjects(): void {
+    const { placements, landObjects, connections, canInteract, canManage } = getActiveLand()
+    const connPlacements = this.resolveConnectionPlacements(placements, connections)
+    const homeObj = landObjects.find((o) => o.object_type === 'home')
+    const signObj = landObjects.find((o) => o.object_type === 'bulletin_board')
+    const chestObj = landObjects.find((o) => o.object_type === 'chest')
+
+    const allHouses: PositionedConnection[] = [
+      ...(homeObj ? [{ connection: HOME_CONNECTION, x: homeObj.x, y: homeObj.y }] : []),
+      ...connPlacements,
+    ]
+
+    this.houses.create(this.mapDef, allHouses)
+    this.chest.createAnimations()
+    if (chestObj)
+      this.chest.spawn(chestObj.x, chestObj.y, () => {
+        this.isDialogOpen = true
+      })
+    if (signObj) this.sign.spawn(signObj.x, signObj.y)
+    this.selectionIndicator = this.createSelectionIndicator()
+
+    // Publish permissions to the registry so factories and helpers can read
+    // them without coupling to activeLand directly.
+    this.registry.set('land.canInteract', canInteract)
+    this.registry.set('land.canManage', canManage)
+  }
+
+  private setupPlayer(): void {
+    const { col, row } = this.mapDef.spawnTile
+    const spawnX = (col + 0.5) * this.mapDef.tileSize
+    const spawnY = (row + 0.5) * this.mapDef.tileSize
+
+    this.player = new User(this, spawnX, spawnY)
+
+    // Store all colliders so shutdown can remove them cleanly.
+    this.colliders.push(this.physics.add.collider(this.player, this.layer))
+    if (this.waterLayer)
+      this.colliders.push(this.physics.add.collider(this.player, this.waterLayer))
+    if (this.fenceLayer)
+      this.colliders.push(this.physics.add.collider(this.player, this.fenceLayer))
+    this.colliders.push(this.physics.add.collider(this.player, this.decorationGroup))
+    this.colliders.push(this.physics.add.collider(this.player, this.houses.group))
+    if (this.chest.sprite)
+      this.colliders.push(this.physics.add.collider(this.player, this.chest.sprite))
+    if (this.sign.sprite)
+      this.colliders.push(this.physics.add.collider(this.player, this.sign.sprite))
+  }
+
+  private setupCamera(): void {
+    // Zoom in so 16 px tiles appear large enough to read on screen.
+    // Each tile renders at 48 CSS px; world size stays 960 × 544, camera scrolls.
+    this.cameras.main.setZoom(3)
+    // Round sprite positions to the nearest integer pixel before rendering.
+    // Without this, sub-pixel positions at zoom × 3 cause the sprite to flicker
+    // (blink in and out) as the camera scrolls with lerp.
+    this.cameras.main.setRoundPixels(true)
+    // Small deadzone so the camera doesn't snap instantly — reduces motion sickness
+    // on short steps while still tracking the player tightly.
+    this.cameras.main.setDeadzone(20, 16)
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1)
+  }
+
+  private setupInput(): void {
+    // enableCapture=false: don't preventDefault on WASD so text inputs still receive them.
+    // Movement suppression is handled in update() via activeElement / dialog checks.
+    this.keys = this.input.keyboard!.addKeys('W,A,S,D', false) as WASDKeys
+    this.eKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E, false)
+    this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, false)
+    this.mMapKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.P, false)
+    this.mMapKey.on('down', () => this.minimap.toggle())
+  }
+
+  private setupHUD(): void {
+    // Door entry prompt — hidden until player is near a house door
+    this.doorPrompt = this.add
+      .text(0, 0, '[E] Enter', {
+        fontSize: '6px',
+        color: '#ffffff',
+        backgroundColor: '#000000cc',
+        padding: { x: 3, y: 2 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(20)
+      .setResolution(3)
+      .setVisible(false)
+
+    // Agent chat prompt — hidden until player is near an agent
+    this.agentPrompt = this.add
+      .text(0, 0, '[Space] Chat', {
+        fontSize: '6px',
+        color: '#ffffff',
+        backgroundColor: '#000000cc',
+        padding: { x: 3, y: 2 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(20)
+      .setResolution(3)
+      .setVisible(false)
+  }
+
+  private setupMultiplayer(): void {
+    const { col, row } = this.mapDef.spawnTile
+    const spawnX = (col + 0.5) * this.mapDef.tileSize
+    const spawnY = (row + 0.5) * this.mapDef.tileSize
+
+    this.multiplayer = new MultiplayerManager(this)
+    this.multiplayer.init(spawnX, spawnY, 'down', getActiveLand().land.id)
+    this.houses.setMultiplayer(this.multiplayer)
+  }
+
+  // ---------------------------------------------------------------------------
   // Land placement helpers
   // ---------------------------------------------------------------------------
 
@@ -326,10 +385,10 @@ export class GameScene extends Phaser.Scene {
     connections: import('@/models/Connection').Connection[],
   ): PositionedConnection[] {
     return placements
-      .filter((p) => p.entityType === 'connection' && p.entityId !== 'home')
+      .filter((p) => p.entity_type === 'connection' && p.entity_id !== 'home')
       .flatMap((p) => {
-        const connection = connections.find((c) => c.id === p.entityId)
-        return connection ? [{ connection, x: p.worldX, y: p.worldY }] : []
+        const connection = connections.find((c) => c.id === p.entity_id)
+        return connection ? [{ connection, x: p.world_x, y: p.world_y }] : []
       })
   }
 
@@ -339,11 +398,11 @@ export class GameScene extends Phaser.Scene {
 
   private spawnAgentAt(template: AgentTemplate, x: number, y: number, name: string): Agent {
     const agent = new Agent(this, x, y, template, name)
-    this.physics.add.collider(agent, this.layer)
-    if (this.waterLayer) this.physics.add.collider(agent, this.waterLayer)
-    this.physics.add.collider(agent, this.houses.group)
-    if (this.chest.sprite) this.physics.add.collider(agent, this.chest.sprite)
-    if (this.sign.sprite) this.physics.add.collider(agent, this.sign.sprite)
+    this.colliders.push(this.physics.add.collider(agent, this.layer))
+    if (this.waterLayer) this.colliders.push(this.physics.add.collider(agent, this.waterLayer))
+    this.colliders.push(this.physics.add.collider(agent, this.houses.group))
+    if (this.chest.sprite) this.colliders.push(this.physics.add.collider(agent, this.chest.sprite))
+    if (this.sign.sprite) this.colliders.push(this.physics.add.collider(agent, this.sign.sprite))
     // Agents are NPCs — clicking opens their dialog/popover, not player control.
     agent.on('pointerdown', () => {
       EventBus.emit('agent-clicked', {
@@ -365,7 +424,7 @@ export class GameScene extends Phaser.Scene {
 
   /** Show or clear the attention badge based on whether all required integrations are connected. */
   private checkAgentAttention(agent: Agent): void {
-    const missingConnection = agent.template.requiredIntegrations.some(
+    const missingConnection = agent.template.required_integrations.some(
       (appId) => !this.houses.connectedAppIds.has(appId),
     )
     agent.setNeedsAttention(missingConnection)
@@ -379,7 +438,7 @@ export class GameScene extends Phaser.Scene {
   private static readonly AGENT_RADIUS = 24 // world px from agent centre
 
   private updateDoorProximity(): void {
-    const { canInteract } = getActiveLand()
+    const canInteract = (this.registry.get('land.canInteract') as boolean) ?? false
 
     const nearest = this.houses.findNearestDoor(this.player.x, this.player.y, GameScene.DOOR_RADIUS)
 
@@ -433,14 +492,23 @@ export class GameScene extends Phaser.Scene {
 
   private enterHouse(connection: Connection): void {
     this.doorPrompt.setVisible(false)
-    // Stop any active scene so data is fresh on re-enter
-    if (
-      this.scene.get(IndoorScene.KEY)?.scene.isActive() ||
-      this.scene.get(IndoorScene.KEY)?.scene.isSleeping()
-    ) {
-      this.scene.stop(IndoorScene.KEY)
+
+    const indoorScene = this.scene.get(IndoorScene.KEY)
+    const isSameHouse = this.lastIndoorAppId === connection.app_id
+
+    if (isSameHouse && indoorScene?.scene.isSleeping()) {
+      // Cheaper path: wake the sleeping IndoorScene instead of stop + re-launch.
+      // The wake event fires in IndoorScene to re-emit enter-house to the HUD.
+      this.scene.wake(IndoorScene.KEY)
+    } else {
+      // Different house or scene not yet sleeping — start fresh.
+      if (indoorScene?.scene.isActive() || indoorScene?.scene.isSleeping()) {
+        this.scene.stop(IndoorScene.KEY)
+      }
+      this.lastIndoorAppId = connection.app_id
+      this.scene.launch(IndoorScene.KEY, { appId: connection.app_id, connection })
     }
-    this.scene.launch(IndoorScene.KEY, { appId: connection.appId, connection })
+
     this.scene.sleep()
   }
 
@@ -462,7 +530,7 @@ export class GameScene extends Phaser.Scene {
         const spawnX = x ?? centerX
         const spawnY = y ?? centerY
         const agent = this.spawnAgentAt(template, spawnX, spawnY, name)
-        this.physics.add.collider(agent, this.player)
+        this.colliders.push(this.physics.add.collider(agent, this.player))
 
         // Assign a stable networkId and register with multiplayer
         const netId = networkId ?? Math.random().toString(36).slice(2, 10)
@@ -587,6 +655,14 @@ export class GameScene extends Phaser.Scene {
     })
 
     const unsubLogout = EventBus.on('logout', () => {
+      // Reset indoor state in case the player logs out while inside a house.
+      // exit-house is a no-op if already outdoors; emitting it is always safe.
+      EventBus.emit('exit-house', undefined)
+      // Stop IndoorScene so its EventBus listeners are cleaned up on logout.
+      const indoorScene = this.scene.get(IndoorScene.KEY)
+      if (indoorScene?.scene.isActive() || indoorScene?.scene.isSleeping()) {
+        this.scene.stop(IndoorScene.KEY)
+      }
       this.scene.start(TitleScene.KEY)
     })
 
@@ -625,8 +701,14 @@ export class GameScene extends Phaser.Scene {
     // placement-driven entities with the fresh data.
     const unsubConnLoaded = EventBus.on(
       'land-ready',
-      ({ placements, landObjects, connections }) => {
+      ({ placements, landObjects, connections, canInteract, canManage }) => {
         console.debug('[GameScene:land-ready] landObjects:', landObjects)
+
+        // Keep the registry current so updateDoorProximity and the factory
+        // always see the latest permissions without coupling to activeLand.
+        this.registry.set('land.canInteract', canInteract)
+        this.registry.set('land.canManage', canManage)
+
         const connPlacements = this.resolveConnectionPlacements(placements, connections)
         const homeObj = landObjects.find((o) => o.object_type === 'home')
         // Home position comes from land_objects. Skip if not defined on this land.
@@ -644,7 +726,8 @@ export class GameScene extends Phaser.Scene {
             this.sign.moveTo(signObj.x, signObj.y)
           } else {
             this.sign.spawn(signObj.x, signObj.y)
-            if (this.sign.sprite) this.physics.add.collider(this.player, this.sign.sprite)
+            if (this.sign.sprite)
+              this.colliders.push(this.physics.add.collider(this.player, this.sign.sprite))
           }
         }
         if (chestObj) {
@@ -654,7 +737,8 @@ export class GameScene extends Phaser.Scene {
             this.chest.spawn(chestObj.x, chestObj.y, () => {
               this.isDialogOpen = true
             })
-            if (this.chest.sprite) this.physics.add.collider(this.player, this.chest.sprite)
+            if (this.chest.sprite)
+              this.colliders.push(this.physics.add.collider(this.player, this.chest.sprite))
           }
         }
       },
@@ -677,6 +761,16 @@ export class GameScene extends Phaser.Scene {
       unsubMoveConn()
       unsubConnLoaded()
       this.multiplayer.destroy()
+
+      // Remove all tracked physics colliders to prevent stale callbacks
+      // firing if this scene is restarted (e.g. after logout → re-login).
+      // Guard with ?. — physics world may already be torn down on full shutdown.
+      this.colliders.forEach((c) => this.physics.world?.removeCollider(c))
+      this.colliders = []
+
+      // Release keyboard references so re-added keys on restart don't stack.
+      this.input.keyboard?.removeAllKeys(true, true)
+      this.input.off('pointerdown')
     })
 
     this.quests.start()
@@ -771,7 +865,7 @@ export class GameScene extends Phaser.Scene {
         agentName: agent.name,
       })
 
-      const steps = agent.template.skills.map((s) => s.skillId)
+      const steps = agent.template.skills.map((s) => s.skill_id)
 
       EventBus.emit('agent-executing', {
         agentId: agent.id,

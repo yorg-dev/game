@@ -27,7 +27,7 @@ function ContactLink({ type, value }: { type: string; value: string }) {
     href = value.startsWith('http') ? value : `https://facebook.com/${value}`
 
   const label = (
-    <span className="flex items-center gap-1.5 text-xs font-medium text-[#5a3810]">
+    <span className="flex items-center gap-1.5 text-xs font-medium text-wood-900">
       <span>{icon}</span>
       <span className="truncate max-w-[140px]">{value}</span>
     </span>
@@ -39,7 +39,7 @@ function ContactLink({ type, value }: { type: string; value: string }) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#dcc898] border border-[#9a6b28] hover:bg-[#c8b07a] transition-colors"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-parchment-250 border border-wood-600 hover:bg-parchment-400 transition-colors"
       >
         {label}
       </a>
@@ -47,7 +47,7 @@ function ContactLink({ type, value }: { type: string; value: string }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#dcc898] border border-[#9a6b28]">
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-parchment-250 border border-wood-600">
       {label}
     </span>
   )
@@ -55,10 +55,10 @@ function ContactLink({ type, value }: { type: string; value: string }) {
 
 export function ExpertCard({ expert }: { expert: Expert }) {
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl border-2 border-[#9a6b28] bg-[#dcc898]">
+    <div className="flex flex-col gap-3 p-4 rounded-xl border-2 border-wood-600 bg-parchment-250">
       {/* Name + tags */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-bold text-[#3d2010] leading-tight">{expert.name}</h3>
+        <h3 className="text-sm font-bold text-soil-800 leading-tight">{expert.name}</h3>
         <div className="flex flex-wrap gap-1 justify-end shrink-0">
           {expert.tags.map((tag) => (
             <span
@@ -73,7 +73,7 @@ export function ExpertCard({ expert }: { expert: Expert }) {
 
       {/* Bio */}
       {expert.bio && (
-        <p className="text-xs text-[#5a3810] leading-relaxed line-clamp-3">{expert.bio}</p>
+        <p className="text-xs text-wood-900 leading-relaxed line-clamp-3">{expert.bio}</p>
       )}
 
       {/* Contacts */}

@@ -2,7 +2,6 @@ import Phaser from 'phaser'
 import { EventBus } from '../EventBus'
 import { getConnectionDialog } from '../dialog/dialogs'
 import type { Connection } from '@/models/Connection'
-import { getActiveLand } from '@/providers/activeLand'
 import type { MultiplayerManager } from '../multiplayer/MultiplayerManager'
 
 export interface PositionedConnection {
@@ -80,6 +79,11 @@ export class ConnectionHouseFactory {
   // world-click dismiss handler.
   create(mapDef: MapDefinition, initialHouses: PositionedConnection[]): void {
     this.mapDef = mapDef
+    // Clear stale entries from a previous session so the idempotency guard in
+    // add() doesn't silently skip house creation on scene restart (re-login).
+    this.houses = []
+    this._connectedAppIds.clear()
+    this.buttonContainer = null
     this._group = this.scene.physics.add.staticGroup()
     this.loadInitialHouses(initialHouses)
 
@@ -97,7 +101,7 @@ export class ConnectionHouseFactory {
   add(connection: Connection, x: number, y: number): void {
     if (this.houses.some((h) => h.connection.id === connection.id)) return
     this.spawnHouse(connection, x, y)
-    if (connection.status === 'connected') this._connectedAppIds.add(connection.appId)
+    if (connection.status === 'connected') this._connectedAppIds.add(connection.app_id)
   }
 
   // Remove a single house by connection ID.
@@ -107,7 +111,7 @@ export class ConnectionHouseFactory {
     const [entry] = this.houses.splice(index, 1)
     this._group.remove(entry.sprite, true, true)
     entry.label.destroy()
-    this._connectedAppIds.delete(entry.connection.appId)
+    this._connectedAppIds.delete(entry.connection.app_id)
   }
 
   // Move a single house to a new world position.
@@ -122,7 +126,12 @@ export class ConnectionHouseFactory {
   // Destroy all houses and re-create from the provided placements.
   reload(houses: PositionedConnection[]): void {
     for (const { sprite, label } of this.houses) {
-      this._group.remove(sprite, true, true)
+      // Destroy directly rather than via _group.remove() — the group's internal
+      // RBush (this.children) can be undefined after a scene transition if the
+      // group was already destroyed, which would crash Group.remove().
+      // Destroying the sprite fires its DESTROY event which auto-removes it from
+      // the group's physics world via the registered removeCallbackHandler.
+      sprite.destroy()
       label.destroy()
     }
     this.houses = []
@@ -162,7 +171,7 @@ export class ConnectionHouseFactory {
   }
 
   private spawnHouse(connection: Connection, x: number, y: number): void {
-    const displayName = connection.label || connection.appId
+    const displayName = connection.label || connection.app_id
 
     const isHome = connection.id === 'home'
     const texture = isHome ? 'grey-brick-house' : 'small-house'
@@ -261,7 +270,8 @@ export class ConnectionHouseFactory {
         return
       }
       if (this._isDragging) return
-      const { canInteract, canManage } = getActiveLand()
+      const canInteract = (this.scene.registry.get('land.canInteract') as boolean) ?? false
+      const canManage = (this.scene.registry.get('land.canManage') as boolean) ?? false
       if (!canInteract && !canManage) return
       sprite.clearTint()
       this.showButtons(sprite, connection, canInteract, canManage, () => {
@@ -296,7 +306,7 @@ export class ConnectionHouseFactory {
       onClick: () =>
         EventBus.emit('connection-clicked', {
           connectionId: connection.id,
-          appId: connection.appId,
+          appId: connection.app_id,
           connection,
         }),
     })
@@ -306,7 +316,7 @@ export class ConnectionHouseFactory {
         label: 'Talk',
         color: 0x885522,
         onClick: () => {
-          const script = getConnectionDialog(connection.id, connection.label || connection.appId)
+          const script = getConnectionDialog(connection.id, connection.label || connection.app_id)
           this.onDialogOpen()
           EventBus.emit('dialog-start', { lines: script.lines })
         },

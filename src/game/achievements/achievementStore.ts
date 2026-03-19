@@ -44,7 +44,7 @@ export function getAchievementsWithProgress(): Achievement[] {
   const raw = loadRaw()
   return availableAchievements.map((a) => ({
     ...a,
-    unlockedAt: raw[a.id],
+    unlocked_at: raw[a.id],
   }))
 }
 

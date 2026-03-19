@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router'
 import { useAuthProvider } from 'ra-core'
 import type { AuthProvider, CoreLayoutProps } from 'ra-core'
 import { PhaserGame } from '@/game/PhaserGame'
@@ -20,9 +21,13 @@ import { AchievementToast } from '@/app/Achievements/Toast'
 import { ExpertList } from '@/app/Experts/List'
 import { LeaderboardList } from '@/app/Leaderboard/List'
 import { EventBus } from '@/game/EventBus'
+import { systemChannelProvider } from '@/providers/systemChannelProvider'
 import { dataProvider } from '@/providers/dataProvider'
 import type { Land } from '@/models/Land'
 import { setActiveLand, getActiveLand, viewerPermissions } from '@/providers/activeLand'
+import { setFeatures, isFeatureEnabled } from '@/providers/featureStore'
+import type { Feature } from '@/models/Feature'
+import { ConnectionListModal } from '@/app/Connections/ListModal'
 
 type GameAuthProvider = AuthProvider & {
   isGuest: () => boolean
@@ -30,11 +35,13 @@ type GameAuthProvider = AuthProvider & {
 
 export const GameLayout = ({ children }: CoreLayoutProps) => {
   const authProvider = useAuthProvider() as GameAuthProvider
+  const location = useLocation()
   const [gameStarted, setGameStarted] = useState(false)
   const [indoor, setIndoor] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [loginTab, setLoginTab] = useState<'login' | 'register'>('login')
   const [canManage, setCanManage] = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(false)
   const initRan = useRef(false)
 
   // Phase 1: ensure a valid session exists, then emit session-ready.
@@ -45,9 +52,23 @@ export const GameLayout = ({ children }: CoreLayoutProps) => {
     if (initRan.current) return
     initRan.current = true
 
-    function init() {
+    async function init() {
       const authenticated = !authProvider.isGuest()
+      systemChannelProvider.connect()
       EventBus.emit('session-ready', { authenticated })
+      if (authenticated) {
+        try {
+          const { data: features } = await dataProvider.getList<Feature>('features', {
+            pagination: { page: 1, perPage: 500 },
+            sort: { field: 'id', order: 'ASC' },
+            filter: {},
+          })
+          setFeatures(features)
+          setVoiceEnabled(isFeatureEnabled('voice_commands'))
+        } catch {
+          // Non-fatal — proceed without feature flags
+        }
+      }
     }
 
     init()
@@ -101,6 +122,7 @@ export const GameLayout = ({ children }: CoreLayoutProps) => {
     }
 
     return EventBus.on('game-started', () => {
+      setIndoor(false) // defensive reset — player always starts outdoors
       setGameStarted(true)
       loadLand()
     })
@@ -119,23 +141,40 @@ export const GameLayout = ({ children }: CoreLayoutProps) => {
       setCanManage(canManage)
     })
     const unsubConfirm = EventBus.on('login-confirmed', async () => {
+      try {
+        const { data: features } = await dataProvider.getList<Feature>('features', {
+          pagination: { page: 1, perPage: 500 },
+          sort: { field: 'id', order: 'ASC' },
+          filter: {},
+        })
+        setFeatures(features)
+        setVoiceEnabled(isFeatureEnabled('voice_commands'))
+      } catch {
+        // Non-fatal — proceed without feature flags
+      }
       // Switch to the user's first real land now that they're authenticated.
       const land = await dataProvider
         .getOne<Land>('my_land', { id: '' })
         .then((r) => r.data)
         .catch(() => null)
       if (land) {
-        const { data: placements } = await dataProvider.getList('land_placements', {
-          pagination: { page: 1, perPage: 500 },
-          sort: { field: 'id', order: 'ASC' },
-          filter: { land_id_eq: land.id },
-        })
+        const { canInteract, canManage } = viewerPermissions(land)
+        setCanManage(canManage)
         const landObjects = land.objects ?? []
         console.debug('[App:login-confirmed] land:', land.id, '| objects:', landObjects)
-        const { canInteract, canManage } = viewerPermissions(land)
+        let placements: any[] = []
+        try {
+          const result = await dataProvider.getList('land_placements', {
+            pagination: { page: 1, perPage: 500 },
+            sort: { field: 'id', order: 'ASC' },
+            filter: { land_id_eq: land.id },
+          })
+          placements = result.data
+        } catch {
+          // Non-fatal — proceed without placements
+        }
         const state = { land, placements, landObjects, connections: [], canInteract, canManage }
         setActiveLand(state)
-        setCanManage(canManage)
         EventBus.emit('land-ready', state)
       } else {
         // No land found — permissions stay as-is from the active land.
@@ -172,7 +211,7 @@ export const GameLayout = ({ children }: CoreLayoutProps) => {
               <ChatPanel />
               <LandSwitcher />
               <AgentPopover />
-              <CommandBar />
+              <CommandBar voiceEnabled={voiceEnabled} />
               <ConnectionPopover />
               <ControlHUD />
               <NotificationsModal />
@@ -201,8 +240,8 @@ export const GameLayout = ({ children }: CoreLayoutProps) => {
         />
       )}
 
-      {/* Route-specific content (resource views, etc.) rendered on top of the game */}
-      {children}
+      {/* /connections renders as a modal over the game; all other routes use the full admin layout */}
+      {location.pathname === '/connections' ? <ConnectionListModal /> : children}
     </div>
   )
 }

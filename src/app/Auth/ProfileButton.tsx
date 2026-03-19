@@ -77,7 +77,7 @@ export function ProfileButton() {
           onClick={handleClick}
           aria-label={guest ? 'Save progress' : 'Profile'}
           title={guest ? 'Save progress' : (email ?? 'Profile')}
-          className="relative w-12 h-12 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5,inset_0_0_0_5px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] flex items-center justify-center"
+          className="relative w-12 h-12 rounded-xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_3px_var(--color-parchment-50),inset_0_0_0_5px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] flex items-center justify-center"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <circle
@@ -98,18 +98,18 @@ export function ProfileButton() {
 
           {/* Status dot: amber = guest, green = signed in */}
           <span
-            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-[#e8d5a8] ${guest ? 'bg-amber-400' : 'bg-emerald-500'}`}
+            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-parchment-150 ${guest ? 'bg-amber-400' : 'bg-emerald-500'}`}
           />
         </button>
 
         {/* Guest nudge */}
         {guest && showDropdown && (
-          <div className="w-52 bg-[#e8d5a8] border-4 border-[#7a5230] rounded-xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden">
-            <div className="px-4 py-3 border-b-4 border-[#7a5230] bg-[#dcc898]">
-              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+          <div className="w-52 bg-parchment-150 border-4 border-wood-700 rounded-xl shadow-[inset_0_0_0_3px_var(--color-parchment-50)] overflow-hidden">
+            <div className="px-4 py-3 border-b-4 border-wood-700 bg-parchment-250">
+              <p className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">
                 Playing as guest
               </p>
-              <p className="text-xs text-[#7a5230] mt-0.5">Sign in to save your progress.</p>
+              <p className="text-xs text-wood-700 mt-0.5">Sign in to save your progress.</p>
             </div>
             <div className="px-3 py-2">
               <button
@@ -117,7 +117,7 @@ export function ProfileButton() {
                   setShowDropdown(false)
                   setShowLogin(true)
                 }}
-                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] text-left text-xs text-[#3d2010] font-bold hover:brightness-110 transition-[filter]"
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border-2 border-wood-700 bg-wood-500 text-left text-xs text-soil-800 font-bold hover:brightness-110 transition-[filter]"
               >
                 Save progress
               </button>
@@ -127,12 +127,12 @@ export function ProfileButton() {
 
         {/* Signed-in dropdown */}
         {!guest && showDropdown && (
-          <div className="w-52 bg-[#e8d5a8] border-4 border-[#7a5230] rounded-xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden">
-            <div className="px-4 py-3 border-b-4 border-[#7a5230] bg-[#dcc898]">
-              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+          <div className="w-52 bg-parchment-150 border-4 border-wood-700 rounded-xl shadow-[inset_0_0_0_3px_var(--color-parchment-50)] overflow-hidden">
+            <div className="px-4 py-3 border-b-4 border-wood-700 bg-parchment-250">
+              <p className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">
                 Signed in as
               </p>
-              <p className="text-sm font-bold text-[#3d2010] truncate mt-0.5">
+              <p className="text-sm font-bold text-soil-800 truncate mt-0.5">
                 {email ?? 'Unknown'}
               </p>
             </div>
@@ -142,20 +142,20 @@ export function ProfileButton() {
                   setShowDropdown(false)
                   EventBus.emit('show-achievements', undefined)
                 }}
-                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#e8d5a8] text-left text-xs text-[#5a3810] font-bold hover:bg-[#c8b07a] hover:border-[#7a5230] transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border-2 border-wood-600 bg-parchment-150 text-left text-xs text-wood-900 font-bold hover:bg-parchment-400 hover:border-wood-700 transition-colors"
               >
                 🏆 Achievements
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#e8d5a8] text-left text-xs text-[#5a3810] font-bold hover:bg-[#c8b07a] hover:border-[#7a5230] transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border-2 border-wood-600 bg-parchment-150 text-left text-xs text-wood-900 font-bold hover:bg-parchment-400 hover:border-wood-700 transition-colors"
               >
                 <svg
                   width="12"
                   height="12"
                   viewBox="0 0 12 12"
                   fill="none"
-                  className="shrink-0 text-[#7a5230]"
+                  className="shrink-0 text-wood-700"
                 >
                   <path
                     d="M5 2H2v8h3M8 4l2 2-2 2M10 6H5"

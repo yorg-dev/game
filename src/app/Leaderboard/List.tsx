@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react'
 import { useGetList } from 'ra-core'
 import { EventBus } from '@/game/EventBus'
 import type { LeaderboardEntry, LeaderboardPeriod, LeaderboardType } from '@/models/Leaderboard'
+import {
+  GameDialog,
+  GameDialogContent,
+  GameDialogHeader,
+  GameDialogTitle,
+} from '@/components/ui/game-dialog'
 
 const PERIODS: { key: LeaderboardPeriod; label: string }[] = [
   { key: 'day', label: 'Today' },
@@ -20,21 +26,21 @@ function RankRow({ entry, isCurrentUser }: { entry: LeaderboardEntry; isCurrentU
   return (
     <div
       className={`flex items-center gap-3 px-3 py-2 rounded-lg border-2 ${
-        isCurrentUser ? 'border-[#7a5230] bg-[#c8b07a]' : 'border-[#9a6b28] bg-[#dcc898]'
+        isCurrentUser ? 'border-wood-700 bg-parchment-400' : 'border-wood-600 bg-parchment-250'
       }`}
     >
-      <span className="w-7 text-center text-sm font-bold shrink-0 text-[#7a5230]">
+      <span className="w-7 text-center text-sm font-bold shrink-0 text-wood-700">
         {MEDAL[entry.rank] ?? `${entry.rank}`}
       </span>
-      <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">
+      <span className="flex-1 text-sm font-bold text-soil-800 truncate">
         {entry.name}
         {isCurrentUser && (
-          <span className="ml-1.5 text-[10px] font-bold text-[#7a5230] normal-case">(you)</span>
+          <span className="ml-1.5 text-[10px] font-bold text-wood-700 normal-case">(you)</span>
         )}
       </span>
-      <span className="text-sm font-bold text-[#3d2010] tabular-nums shrink-0">
-        {entry.score.toLocaleString()}{' '}
-        <span className="text-xs text-[#7a5230] font-normal">pts</span>
+      <span className="text-sm font-bold text-soil-800 tabular-nums shrink-0">
+        {(entry.score ?? 0).toLocaleString()}{' '}
+        <span className="text-xs text-wood-700 font-normal">pts</span>
       </span>
     </div>
   )
@@ -59,50 +65,23 @@ export function LeaderboardList() {
     sort: { field: 'rank', order: 'ASC' },
   })
 
-  if (!open) return null
-
   return (
-    <div
-      data-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={() => setOpen(false)}
-    >
-      <div
-        className="relative w-full max-w-md bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={() => setOpen(false)}
-          aria-label="Close"
-          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M10 2L2 10M2 2l8 8"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="square"
-            />
-          </svg>
-        </button>
-
-        {/* Header */}
-        <div className="px-5 pt-5 pb-3 border-b-4 border-[#7a5230] bg-[#dcc898] pr-14">
-          <h2 className="text-[#3d2010] font-bold text-base">Leaderboard</h2>
-        </div>
+    <GameDialog open={open} onOpenChange={(o) => !o && setOpen(false)}>
+      <GameDialogContent className="max-w-md">
+        <GameDialogHeader className="pr-14">
+          <GameDialogTitle>Leaderboard</GameDialogTitle>
+        </GameDialogHeader>
 
         {/* Type tabs */}
-        <div className="flex border-b-4 border-[#7a5230] px-5 bg-[#dcc898]">
+        <div className="flex border-b-4 border-wood-700 px-5 bg-parchment-250">
           {TYPES.map((t) => (
             <button
               key={t.key}
               onClick={() => setType(t.key)}
               className={`relative px-1 mr-5 pb-2.5 pt-2 text-sm font-bold transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:transition-all ${
                 type === t.key
-                  ? 'text-[#3d2010] after:bg-[#7a5230]'
-                  : 'text-[#9a6b28] hover:text-[#5a3810] after:bg-transparent'
+                  ? 'text-soil-800 after:bg-wood-700'
+                  : 'text-wood-600 hover:text-wood-900 after:bg-transparent'
               }`}
             >
               {t.label}
@@ -111,15 +90,15 @@ export function LeaderboardList() {
         </div>
 
         {/* Period selector */}
-        <div className="flex gap-2 px-5 py-3 border-b-2 border-[#b8955a]">
+        <div className="flex gap-2 px-5 py-3 border-b-2 border-parchment-500">
           {PERIODS.map((p) => (
             <button
               key={p.key}
               onClick={() => setPeriod(p.key)}
               className={`flex-1 py-1.5 rounded-lg border-2 text-xs font-bold transition-colors ${
                 period === p.key
-                  ? 'border-[#5a3810] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-2px_0_0_#5a3810] text-[#3d2010]'
-                  : 'border-[#9a6b28] bg-[#dcc898] text-[#7a5230] hover:bg-[#c8b07a]'
+                  ? 'border-wood-900 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-2px_0_0_var(--color-wood-900)] text-soil-800'
+                  : 'border-wood-600 bg-parchment-250 text-wood-700 hover:bg-parchment-400'
               }`}
             >
               {p.label}
@@ -134,7 +113,7 @@ export function LeaderboardList() {
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-10 rounded-lg bg-[#dcc898] border-2 border-[#b8955a] animate-pulse"
+                  className="h-10 rounded-lg bg-parchment-250 border-2 border-parchment-500 animate-pulse"
                 />
               ))}
             </div>
@@ -149,8 +128,8 @@ export function LeaderboardList() {
           {!loading && !error && data.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
               <span className="text-3xl">🏆</span>
-              <p className="text-sm font-bold text-[#3d2010]">No scores yet</p>
-              <p className="text-xs text-[#9a6b28]">
+              <p className="text-sm font-bold text-soil-800">No scores yet</p>
+              <p className="text-xs text-wood-600">
                 Complete achievements to appear on the leaderboard.
               </p>
             </div>
@@ -160,7 +139,7 @@ export function LeaderboardList() {
             !error &&
             data.map((entry) => <RankRow key={entry.id} entry={entry} isCurrentUser={false} />)}
         </div>
-      </div>
-    </div>
+      </GameDialogContent>
+    </GameDialog>
   )
 }

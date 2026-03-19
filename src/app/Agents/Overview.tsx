@@ -1,6 +1,7 @@
 import { useRecordContext } from 'ra-core'
 import { EventBus } from '@/game/EventBus'
 import type { SelectedAgent } from './types'
+import { gameBtn } from '@/components/ui/game-dialog'
 
 interface AgentOverviewProps {
   onClose: () => void
@@ -17,34 +18,34 @@ export function AgentOverview({ onClose, onRemove }: AgentOverviewProps) {
     <div className="flex flex-col gap-4 px-5 py-4 overflow-y-auto">
       {/* Badges */}
       <div className="flex items-center gap-2">
-        <span className="bg-[#c8b07a] border border-[#9a6b28] text-[#3d2010] text-xs font-bold px-2.5 py-1 rounded-md capitalize">
+        <span className="bg-parchment-400 border border-wood-600 text-soil-800 text-xs font-bold px-2.5 py-1 rounded-md capitalize">
           {template.category}
         </span>
-        <span className="bg-[#c8b07a] border border-[#9a6b28] text-[#3d2010] text-xs font-bold px-2.5 py-1 rounded-md">
+        <span className="bg-parchment-400 border border-wood-600 text-soil-800 text-xs font-bold px-2.5 py-1 rounded-md">
           {template.name}
         </span>
       </div>
 
       {/* Skills */}
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">Skills</p>
+        <p className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">Skills</p>
         <div className="flex flex-col gap-1.5">
           {template.skills.map((skill) => (
             <div
-              key={skill.skillId}
-              className="flex items-center gap-3 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-2"
+              key={skill.skill_id}
+              className="flex items-center gap-3 rounded-lg bg-parchment-250 border-2 border-wood-600 px-3 py-2"
             >
               <span
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 border border-[#7a5230]/30"
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 border border-wood-700/30"
                 style={{ background: template.color + '55', color: '#3d2010' }}
               >
                 {skill.order}
               </span>
-              <span className="flex-1 text-sm text-[#3d2010] font-mono truncate">
-                {skill.skillId}
+              <span className="flex-1 text-sm text-soil-800 font-mono truncate">
+                {skill.skill_id}
               </span>
-              {!skill.isRequired && (
-                <span className="text-[10px] text-[#9a6b28] shrink-0 font-bold">optional</span>
+              {!skill.is_required && (
+                <span className="text-[10px] text-wood-600 shrink-0 font-bold">optional</span>
               )}
             </div>
           ))}
@@ -53,30 +54,30 @@ export function AgentOverview({ onClose, onRemove }: AgentOverviewProps) {
 
       {/* Required Apps */}
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">
           Required Apps
         </p>
         <div className="flex flex-wrap gap-2">
-          {template.requiredIntegrations.map((appId) => (
+          {template.required_integrations.map((appId) => (
             <div
               key={appId}
-              className="flex items-center gap-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28] px-3 py-1.5"
+              className="flex items-center gap-2 rounded-lg bg-parchment-250 border-2 border-wood-600 px-3 py-1.5"
             >
-              <span className="w-2 h-2 rounded-full shrink-0 bg-[#9a6b28]" />
-              <span className="text-sm font-bold text-[#3d2010]">{appId}</span>
+              <span className="w-2 h-2 rounded-full shrink-0 bg-wood-600" />
+              <span className="text-sm font-bold text-soil-800">{appId}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 pt-1 border-t-2 border-[#b8955a]">
+      <div className="flex gap-2 pt-1 border-t-2 border-parchment-500">
         <button
           onClick={() => {
             EventBus.emit('select-agent', { id: agent.id })
             onClose()
           }}
-          className="flex-1 px-3 py-1.5 rounded-lg text-sm font-bold text-[#3d2010] border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] hover:brightness-110 transition-[filter]"
+          className={`flex-1 ${gameBtn}`}
         >
           Take Control
         </button>

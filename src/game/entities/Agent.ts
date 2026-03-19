@@ -103,7 +103,7 @@ export class Agent extends Character {
 
   /** Returns the workflow step for the given skill id, if this agent has it. */
   getSkill(skillId: string): AgentSkill | undefined {
-    return this.template.skills.find((s) => s.skillId === skillId)
+    return this.template.skills.find((s) => s.skill_id === skillId)
   }
 
   // ── Wander public API ───────────────────────────────────────────────────

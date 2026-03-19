@@ -25,19 +25,19 @@ export type PlacementEntityType =
  */
 export interface LandPlacement {
   id: string // "lp_01"
-  landId: string // parent Land
+  land_id: string // parent Land
 
-  /** Discriminator — determines which table/collection entityId points to. */
-  entityType: PlacementEntityType
+  /** Discriminator — determines which table/collection entity_id points to. */
+  entity_type: PlacementEntityType
 
   /** Foreign key into the entity's own table (connections, agents, …). */
-  entityId: string
+  entity_id: string
 
   /** World-space pixel coordinates of the placed entity. */
-  worldX: number
-  worldY: number
+  world_x: number
+  world_y: number
 
   /** ISO-8601 timestamps. */
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }

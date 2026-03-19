@@ -7,31 +7,34 @@
   --color-wood-50: #fdf5e0;
   --color-wood-100: #f8eecc;
   --color-wood-200: #f0d890;
-  --color-wood-300: #e8c878;
+  --color-wood-300: #e8c07a;
   --color-wood-400: #d4a856;
-  --color-wood-500: #c4924a;
-  --color-wood-600: #9b6b3a;
-  --color-wood-700: #8b5a2b;
+  --color-wood-500: #c8974c;
+  --color-wood-600: #9a6b28;
+  --color-wood-700: #7a5230;
   --color-wood-800: #7a4a20;
-  --color-wood-900: #5a3010;
+  --color-wood-900: #5a3810;
   --color-wood-950: #3a2008;
 
   /* Grass color scale */
   --color-grass-300: #a0d45e;
   --color-grass-400: #8dc45a;
   --color-grass-500: #78c341;
-  --color-grass-600: #5da832;
-  --color-grass-700: #4a9028;
+  --color-grass-600: #5a9c28;
+  --color-grass-700: #4a7c20;
   --color-grass-800: #2d5e14;
   --color-grass-900: #1a3a08;
   --color-grass-950: #0e2808;
 
   /* Parchment — NavBar frame color scale */
+  --color-parchment-50: #f5edd5;
   --color-parchment-100: #f7e8c3;
+  --color-parchment-150: #e8d5a8;
   --color-parchment-200: #e4c89e;
+  --color-parchment-250: #dcc898;
   --color-parchment-300: #d4b896;
-  --color-parchment-400: #c9a87a;
-  --color-parchment-500: #bf9163;
+  --color-parchment-400: #c8b07a;
+  --color-parchment-500: #b8955a;
   --color-parchment-600: #8d6564;
   --color-parchment-900: #5c3d1e;
 
@@ -39,7 +42,7 @@
   --color-plum-500: #6f4a51;
 
   /* Soil / dark */
-  --color-soil-800: #3d2414;
+  --color-soil-800: #3d2010;
   --color-soil-900: #28180a;
   --color-soil-950: #1e0e04;
 

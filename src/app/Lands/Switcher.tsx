@@ -15,33 +15,33 @@ export function LandSwitcher() {
   const [showInvite, setShowInvite] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  async function loadLands(worldId: string) {
+  async function loadLands(world_id: string) {
     const { data: fetched } = await dataProvider.getList<Land>('lands', {
       pagination: { page: 1, perPage: 100 },
       sort: { field: 'id', order: 'ASC' },
-      filter: { world_id_eq: worldId },
+      filter: { world_id_eq: world_id },
     })
     if (fetched.length > 0) setLands(fetched)
   }
 
-  // On mount: load lands using the real worldId from the backend.
-  // Falls back to the active land's worldId if the user has no orgs/worlds yet.
+  // On mount: load lands using the real world_id from the backend.
+  // Falls back to the active land's world_id if the user has no orgs/worlds yet.
   useEffect(() => {
     dataProvider
       .getOne<Land>('my_land', { id: '' })
       .then(({ data: land }) => {
-        const worldId = land?.worldId ?? getActiveLand().land.worldId
-        loadLands(worldId)
+        const world_id = land?.world_id ?? getActiveLand().land.world_id
+        loadLands(world_id)
       })
-      .catch(() => loadLands(getActiveLand().land.worldId))
+      .catch(() => loadLands(getActiveLand().land.world_id))
   }, [])
 
   useEffect(() => {
     return EventBus.on('land-ready', ({ land }) => {
       setCurrentLand(land)
-      // Only reload lands if the worldId actually changed
-      if (land.worldId !== getActiveLand().land.worldId) {
-        loadLands(land.worldId)
+      // Only reload lands if the world_id actually changed
+      if (land.world_id !== getActiveLand().land.world_id) {
+        loadLands(land.world_id)
       }
     })
   }, [])
@@ -52,7 +52,7 @@ export function LandSwitcher() {
       dataProvider
         .getOne<Land>('my_land', { id: '' })
         .then(({ data: land }) => {
-          if (land) loadLands(land.worldId)
+          if (land) loadLands(land.world_id)
         })
         .catch(() => {})
     })
@@ -66,10 +66,10 @@ export function LandSwitcher() {
     return () => document.removeEventListener('pointerdown', onPointerDown)
   }, [open])
 
-  async function handleCreateLand(name: string, isPublic: boolean) {
+  async function handleCreateLand(name: string, is_public: boolean) {
     const { land: activeLand } = getActiveLand()
     const { data: newLand } = await dataProvider.create<Land>('lands', {
-      data: { worldId: activeLand.worldId, name, isPublic, ownerId: '', ownerType: 'user' },
+      data: { world_id: activeLand.world_id, name, is_public, owner_id: '', owner_type: 'user' },
     })
     setLands((prev) => [...prev, newLand])
     setShowCreate(false)
@@ -112,7 +112,7 @@ export function LandSwitcher() {
           <button
             onClick={() => setOpen((v) => !v)}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_2px_#f5edd5,inset_0_0_0_4px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] text-sm font-bold text-[#3d2010] disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_2px_var(--color-parchment-50),inset_0_0_0_4px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] text-sm font-bold text-soil-800 disabled:opacity-50"
           >
             <svg width="10" height="13" viewBox="0 0 10 13" fill="none" aria-hidden="true">
               <path
@@ -146,7 +146,7 @@ export function LandSwitcher() {
             onClick={() => setShowInvite(true)}
             aria-label="Invite to land"
             title="Invite to land"
-            className="flex items-center justify-center w-10 h-10 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_2px_#f5edd5,inset_0_0_0_4px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter]"
+            className="flex items-center justify-center w-10 h-10 rounded-xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_2px_var(--color-parchment-50),inset_0_0_0_4px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter]"
           >
             <svg width="16" height="14" viewBox="0 0 16 14" fill="none" aria-hidden="true">
               <circle cx="6" cy="4" r="2.5" stroke="#7a5230" strokeWidth="1.5" />
@@ -164,17 +164,17 @@ export function LandSwitcher() {
         {open && lands.length === 0 && (
           <div
             data-modal="true"
-            className="absolute bottom-full mb-2 w-60 bg-[#e8d5a8] border-4 border-[#7a5230] rounded-xl shadow-[inset_0_0_0_2px_#f5edd5] overflow-hidden"
+            className="absolute bottom-full mb-2 w-60 bg-parchment-150 border-4 border-wood-700 rounded-xl shadow-[inset_0_0_0_2px_var(--color-parchment-50)] overflow-hidden"
             onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
           >
             <div className="flex flex-col gap-3 p-3">
-              <p className="text-xs text-[#7a5230]">Sign in to create and manage lands.</p>
+              <p className="text-xs text-wood-700">Sign in to create and manage lands.</p>
               <button
                 onClick={() => {
                   setOpen(false)
                   EventBus.emit('show-login', { tab: 'register' })
                 }}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 transition-[filter]"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-wood-700 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-3px_0_0_var(--color-wood-900)] text-soil-800 text-sm font-bold hover:brightness-110 transition-[filter]"
               >
                 <span className="text-base leading-none">+</span>
                 Create Land
@@ -186,11 +186,11 @@ export function LandSwitcher() {
         {open && lands.length > 0 && (
           <div
             data-modal="true"
-            className="absolute bottom-full mb-2 w-60 bg-[#e8d5a8] border-4 border-[#7a5230] rounded-xl shadow-[inset_0_0_0_2px_#f5edd5] overflow-hidden"
+            className="absolute bottom-full mb-2 w-60 bg-parchment-150 border-4 border-wood-700 rounded-xl shadow-[inset_0_0_0_2px_var(--color-parchment-50)] overflow-hidden"
             onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
           >
-            <div className="px-4 py-2 border-b-4 border-[#7a5230] bg-[#dcc898]">
-              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-widest">
+            <div className="px-4 py-2 border-b-4 border-wood-700 bg-parchment-250">
+              <p className="text-[10px] font-bold text-wood-700 uppercase tracking-widest">
                 Switch Land
               </p>
             </div>
@@ -201,18 +201,18 @@ export function LandSwitcher() {
                   onClick={() => switchLand(land)}
                   className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg border-2 text-left text-sm font-bold transition-colors ${
                     land.id === currentLand.id
-                      ? 'border-[#7a5230] bg-[#c8974c] text-[#3d2010]'
-                      : 'border-[#9a6b28] bg-[#dcc898] text-[#3d2010] hover:border-[#7a5230] hover:bg-[#c8b07a]'
+                      ? 'border-wood-700 bg-wood-500 text-soil-800'
+                      : 'border-wood-600 bg-parchment-250 text-soil-800 hover:border-wood-700 hover:bg-parchment-400'
                   }`}
                 >
                   <span className="flex-1 truncate">{land.name}</span>
-                  {!land.isPublic && (
+                  {!land.is_public && (
                     <svg
                       width="10"
                       height="11"
                       viewBox="0 0 10 11"
                       fill="none"
-                      className="shrink-0 text-[#7a5230]"
+                      className="shrink-0 text-wood-700"
                       aria-label="Private"
                     >
                       <rect
@@ -245,13 +245,13 @@ export function LandSwitcher() {
                   )}
                 </button>
               ))}
-              <div className="mt-1 pt-1 border-t-2 border-[#b8955a]">
+              <div className="mt-1 pt-1 border-t-2 border-parchment-500">
                 <button
                   onClick={() => {
                     setOpen(false)
                     setShowCreate(true)
                   }}
-                  className="flex items-center gap-2 px-3 py-1.5 w-full rounded-lg border-2 border-dashed border-[#b8955a] text-left text-xs text-[#9a6b28] font-bold hover:border-[#7a5230] hover:text-[#5a3810] hover:bg-[#dcc898] transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 w-full rounded-lg border-2 border-dashed border-parchment-500 text-left text-xs text-wood-600 font-bold hover:border-wood-700 hover:text-wood-900 hover:bg-parchment-250 transition-colors"
                 >
                   <span className="text-sm leading-none">+</span>
                   <span>Create Land</span>

@@ -3,7 +3,7 @@ export type QuestStatus = 'locked' | 'active' | 'completed'
 export interface QuestStep {
   id: string
   description: string
-  isComplete: boolean
+  is_complete: boolean
 }
 
 export interface Quest {

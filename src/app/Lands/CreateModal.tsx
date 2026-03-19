@@ -1,16 +1,20 @@
 import { useState } from 'react'
+import {
+  GameDialog,
+  GameDialogContent,
+  GameDialogHeader,
+  GameDialogTitle,
+  GameDialogDescription,
+  GameDialogFooter,
+  gameBtn,
+  gameBtnGhost,
+  gameInput,
+} from '@/components/ui/game-dialog'
 
 interface Props {
   onSubmit: (name: string, isPublic: boolean) => Promise<void>
   onCancel: () => void
 }
-
-const btnPrimary =
-  'px-4 py-1.5 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 active:shadow-[inset_0_-1px_0_0_#5a3810,inset_0_1px_0_0_#c8a060] disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]'
-const btnGhost =
-  'px-4 py-1.5 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors'
-const inputClass =
-  'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] transition-colors'
 
 export function CreateLandModal({ onSubmit, onCancel }: Props) {
   const [name, setName] = useState('')
@@ -33,42 +37,16 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
   }
 
   return (
-    <div
-      data-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onCancel}
-    >
-      <div
-        className="relative w-full max-w-sm bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onCancel}
-          aria-label="Close"
-          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M10 2L2 10M2 2l8 8"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="square"
-            />
-          </svg>
-        </button>
+    <GameDialog open onOpenChange={(o) => !o && onCancel()}>
+      <GameDialogContent className="max-w-sm">
+        <GameDialogHeader className="pr-14">
+          <GameDialogTitle>Create Land</GameDialogTitle>
+          <GameDialogDescription>Add a new map to your world.</GameDialogDescription>
+        </GameDialogHeader>
 
-        {/* Header */}
-        <div className="px-5 pt-5 pb-3 border-b-4 border-[#7a5230] bg-[#dcc898] pr-14">
-          <h2 className="text-[#3d2010] font-bold text-base">Create Land</h2>
-          <p className="text-xs text-[#7a5230] pt-0.5">Add a new map to your world.</p>
-        </div>
-
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+            <label className="text-xs font-bold text-wood-700 uppercase tracking-widest">
               Name
             </label>
             <input
@@ -77,13 +55,13 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Marketing Team"
-              className={inputClass}
+              className={gameInput}
               required
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+            <label className="text-xs font-bold text-wood-700 uppercase tracking-widest">
               Visibility
             </label>
             <div className="flex gap-2">
@@ -92,8 +70,8 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
                 onClick={() => setIsPublic(true)}
                 className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-bold transition-colors ${
                   isPublic
-                    ? 'border-[#7a5230] bg-[#c8974c] text-[#3d2010]'
-                    : 'border-[#9a6b28] bg-[#dcc898] text-[#5a3810] hover:border-[#7a5230] hover:bg-[#c8b07a]'
+                    ? 'border-wood-700 bg-wood-500 text-soil-800'
+                    : 'border-wood-600 bg-parchment-250 text-wood-900 hover:border-wood-700 hover:bg-parchment-400'
                 }`}
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
@@ -111,8 +89,8 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
                 onClick={() => setIsPublic(false)}
                 className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-bold transition-colors ${
                   !isPublic
-                    ? 'border-[#7a5230] bg-[#c8974c] text-[#3d2010]'
-                    : 'border-[#9a6b28] bg-[#dcc898] text-[#5a3810] hover:border-[#7a5230] hover:bg-[#c8b07a]'
+                    ? 'border-wood-700 bg-wood-500 text-soil-800'
+                    : 'border-wood-600 bg-parchment-250 text-wood-900 hover:border-wood-700 hover:bg-parchment-400'
                 }`}
               >
                 <svg width="10" height="11" viewBox="0 0 10 11" fill="none" className="shrink-0">
@@ -143,16 +121,16 @@ export function CreateLandModal({ onSubmit, onCancel }: Props) {
             </p>
           )}
 
-          <div className="flex items-center justify-end gap-2 pt-1 border-t-4 border-[#7a5230] bg-[#dcc898] -mx-5 -mb-5 px-5 py-4">
-            <button type="button" onClick={onCancel} className={btnGhost}>
+          <GameDialogFooter className="-mx-5 -mb-5">
+            <button type="button" onClick={onCancel} className={gameBtnGhost}>
               Cancel
             </button>
-            <button type="submit" disabled={!name.trim() || loading} className={btnPrimary}>
+            <button type="submit" disabled={!name.trim() || loading} className={gameBtn}>
               {loading ? 'Creating…' : 'Create Land'}
             </button>
-          </div>
+          </GameDialogFooter>
         </form>
-      </div>
-    </div>
+      </GameDialogContent>
+    </GameDialog>
   )
 }

@@ -3,6 +3,16 @@ import { useGetList, useCreate } from 'ra-core'
 import type { App } from '@/models/App'
 import type { ApiConnection } from '@/models/Connection'
 import type { Tool } from '@/models/Tool'
+import {
+  GameDialog,
+  GameDialogContent,
+  GameDialogHeader,
+  GameDialogTitle,
+  GameDialogFooter,
+  gameBtn,
+  gameBtnGhost,
+  gameInput,
+} from '@/components/ui/game-dialog'
 
 const AI_PROVIDER_APPS: App[] = [
   {
@@ -10,27 +20,27 @@ const AI_PROVIDER_APPS: App[] = [
     name: 'Claude (Anthropic)',
     description: 'Use your own Anthropic API key for agent chat',
     category: 'ai',
-    authType: 'api_key',
-    requiredCredentials: [],
+    auth_type: 'api_key',
+    required_credentials: [],
     color: '#D97706',
-    isAvailable: true,
-    connectionType: 'anthropic',
+    is_available: true,
+    connection_type: 'anthropic',
   },
   {
     id: 'openai',
     name: 'OpenAI',
     description: 'Use your own OpenAI API key for agent chat',
     category: 'ai',
-    authType: 'api_key',
-    requiredCredentials: [],
+    auth_type: 'api_key',
+    required_credentials: [],
     color: '#10A37F',
-    isAvailable: true,
-    connectionType: 'openai',
+    is_available: true,
+    connection_type: 'openai',
   },
 ]
 
 function isAiProvider(app: App | null): boolean {
-  return app?.connectionType === 'anthropic' || app?.connectionType === 'openai'
+  return app?.connection_type === 'anthropic' || app?.connection_type === 'openai'
 }
 
 interface Props {
@@ -39,13 +49,6 @@ interface Props {
 }
 
 type Step = 'choose-app' | 'credentials' | 'webhook'
-
-const btnPrimary =
-  'px-4 py-1.5 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 active:shadow-[inset_0_-1px_0_0_#5a3810,inset_0_1px_0_0_#c8a060] disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]'
-const btnGhost =
-  'px-4 py-1.5 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors'
-const inputClass =
-  'w-full px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810]'
 
 const CATEGORY_COLORS: Record<string, string> = {
   ecommerce: 'bg-green-700/20 text-green-800 border-green-700/40',
@@ -82,7 +85,7 @@ function AppGrid({
 }) {
   return (
     <div className="grid grid-cols-3 gap-2 p-5 max-h-80 overflow-y-auto">
-      {loading && <p className="col-span-3 text-center text-sm text-[#7a5230] py-6">Loading…</p>}
+      {loading && <p className="col-span-3 text-center text-sm text-wood-700 py-6">Loading…</p>}
       {apps.map((a) => (
         <button
           key={a.id}
@@ -90,20 +93,20 @@ function AppGrid({
           onClick={() => onSelect(a)}
           className={`flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-colors ${
             selected?.id === a.id
-              ? 'border-[#5a3810] bg-[#c8b07a]'
-              : 'border-[#9a6b28] bg-[#dcc898] hover:border-[#7a5230] hover:bg-[#c8b07a]'
+              ? 'border-wood-900 bg-parchment-400'
+              : 'border-wood-600 bg-parchment-250 hover:border-wood-700 hover:bg-parchment-400'
           }`}
         >
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold border border-[#9a6b28]/50"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold border border-wood-600/50"
             style={{ background: a.color + '33', color: a.color }}
           >
             {a.name.charAt(0)}
           </div>
           <div className="w-full min-w-0">
-            <p className="text-sm font-bold text-[#3d2010] truncate">{a.name}</p>
+            <p className="text-sm font-bold text-soil-800 truncate">{a.name}</p>
             <span
-              className={`mt-1 inline-block text-[10px] px-1.5 py-0 rounded border font-bold ${CATEGORY_COLORS[a.category] ?? 'bg-[#c8b07a] text-[#3d2010] border-[#9a6b28]'}`}
+              className={`mt-1 inline-block text-[10px] px-1.5 py-0 rounded border font-bold ${CATEGORY_COLORS[a.category] ?? 'bg-parchment-400 text-soil-800 border-wood-600'}`}
             >
               {a.category}
             </span>
@@ -141,24 +144,24 @@ function CredentialsForm({
 }) {
   return (
     <form onSubmit={onSubmit} className="flex flex-col">
-      <div className="flex items-center gap-3 mx-5 mt-4 p-3 rounded-xl bg-[#dcc898] border-2 border-[#9a6b28]">
+      <div className="flex items-center gap-3 mx-5 mt-4 p-3 rounded-xl bg-parchment-250 border-2 border-wood-600">
         <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 border border-[#9a6b28]/50"
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 border border-wood-600/50"
           style={{ background: app.color + '33', color: app.color }}
         >
           {app.name.charAt(0)}
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-[#3d2010]">{app.name}</p>
-          <p className="text-xs text-[#7a5230]">
-            {app.authType} · {app.category}
+          <p className="text-sm font-bold text-soil-800">{app.name}</p>
+          <p className="text-xs text-wood-700">
+            {app.auth_type} · {app.category}
           </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-4 px-5 py-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+          <label className="text-xs font-bold text-wood-700 uppercase tracking-widest">
             Connection Label
           </label>
           <input
@@ -166,54 +169,52 @@ function CredentialsForm({
             value={label}
             onChange={(e) => onLabelChange(e.target.value)}
             placeholder={`e.g. ${app.name} – Main`}
-            className={inputClass}
+            className={gameInput}
           />
         </div>
 
         {isAiProvider(app) ? (
           <div className="flex flex-col gap-3">
-            <p className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
-              AI Provider
-            </p>
+            <p className="text-xs font-bold text-wood-700 uppercase tracking-widest">AI Provider</p>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-[#7a5230] font-mono font-bold">API Key</label>
+              <label className="text-xs text-wood-700 font-mono font-bold">API Key</label>
               <input
                 type="password"
                 value={credentials['api_key'] ?? ''}
                 onChange={(e) => onCredentialChange('api_key', e.target.value)}
                 placeholder={`Enter your ${app.name} API key`}
-                className={`${inputClass} font-mono`}
+                className={`${gameInput} font-mono`}
                 autoComplete="off"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-[#7a5230] font-mono font-bold">
-                Model <span className="text-[#9a6b28] normal-case font-normal">(optional)</span>
+              <label className="text-xs text-wood-700 font-mono font-bold">
+                Model <span className="text-wood-600 normal-case font-normal">(optional)</span>
               </label>
               <input
                 type="text"
                 value={aiModel}
                 onChange={(e) => onAiModelChange(e.target.value)}
                 placeholder={
-                  app.connectionType === 'openai' ? 'gpt-4o-mini' : 'claude-haiku-4-5-20251001'
+                  app.connection_type === 'openai' ? 'gpt-4o-mini' : 'claude-haiku-4-5-20251001'
                 }
-                className={`${inputClass} font-mono`}
+                className={`${gameInput} font-mono`}
               />
             </div>
-            <p className="text-xs text-[#9a6b28] italic">
+            <p className="text-xs text-wood-600 italic">
               Your key is stored securely and never returned. Only one AI provider can be active at
               a time.
             </p>
           </div>
         ) : (
-          (app.requiredCredentials ?? []).length > 0 && (
+          (app.required_credentials ?? []).length > 0 && (
             <div className="flex flex-col gap-3">
-              <p className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+              <p className="text-xs font-bold text-wood-700 uppercase tracking-widest">
                 Credentials
               </p>
-              {(app.requiredCredentials ?? []).map((key) => (
+              {(app.required_credentials ?? []).map((key) => (
                 <div key={key} className="flex flex-col gap-1.5">
-                  <label className="text-xs text-[#7a5230] font-mono font-bold">{key}</label>
+                  <label className="text-xs text-wood-700 font-mono font-bold">{key}</label>
                   <input
                     type={
                       key.toLowerCase().includes('secret') || key.toLowerCase().includes('token')
@@ -223,7 +224,7 @@ function CredentialsForm({
                     value={credentials[key] ?? ''}
                     onChange={(e) => onCredentialChange(key, e.target.value)}
                     placeholder={`Enter ${key}`}
-                    className={`${inputClass} font-mono`}
+                    className={`${gameInput} font-mono`}
                   />
                 </div>
               ))}
@@ -238,19 +239,19 @@ function CredentialsForm({
         )}
       </div>
 
-      <div className="flex items-center justify-end gap-2 px-5 py-4 border-t-4 border-[#7a5230] bg-[#dcc898]">
-        <button type="button" onClick={onBack} className={btnGhost}>
+      <GameDialogFooter>
+        <button type="button" onClick={onBack} className={gameBtnGhost}>
           ‹ Back
         </button>
         <button
           type="submit"
           disabled={!label.trim() || saving}
-          className="px-4 py-1.5 rounded-lg border-2 border-[#7a5230] shadow-[inset_0_2px_0_0_rgba(255,255,255,0.3),inset_0_-3px_0_0_rgba(0,0,0,0.3)] text-white text-sm font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]"
+          className="px-4 py-1.5 rounded-lg border-2 border-wood-700 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.3),inset_0_-3px_0_0_rgba(0,0,0,0.3)] text-white text-sm font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]"
           style={{ background: app.color }}
         >
           {saving ? 'Connecting…' : `Connect ${app.name}`}
         </button>
-      </div>
+      </GameDialogFooter>
     </form>
   )
 }
@@ -282,7 +283,7 @@ function WebhookForm({
         <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
           <span className="text-emerald-700 text-xs font-bold">✓ Connected to {app.name}</span>
         </div>
-        <p className="text-xs text-[#7a5230] leading-relaxed">
+        <p className="text-xs text-wood-700 leading-relaxed">
           Add a webhook URL so your agent can trigger it when you ask. You can skip this and add
           tools later.
         </p>
@@ -290,7 +291,7 @@ function WebhookForm({
 
       <div className="flex flex-col gap-4 px-5 py-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+          <label className="text-xs font-bold text-wood-700 uppercase tracking-widest">
             Webhook Name
           </label>
           <input
@@ -298,11 +299,11 @@ function WebhookForm({
             value={webhookName}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder={`e.g. ${app.name} Notify`}
-            className={inputClass}
+            className={gameInput}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-[#7a5230] uppercase tracking-widest">
+          <label className="text-xs font-bold text-wood-700 uppercase tracking-widest">
             Webhook URL
           </label>
           <input
@@ -310,7 +311,7 @@ function WebhookForm({
             value={webhookUrl}
             onChange={(e) => onUrlChange(e.target.value)}
             placeholder="https://your-n8n-instance.com/webhook/..."
-            className={`${inputClass} font-mono`}
+            className={`${gameInput} font-mono`}
           />
         </div>
 
@@ -321,18 +322,18 @@ function WebhookForm({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2 px-5 py-4 border-t-4 border-[#7a5230] bg-[#dcc898]">
+      <GameDialogFooter className="justify-between">
         <button
           type="button"
           onClick={onSkip}
-          className="text-xs text-[#9a6b28] hover:text-[#5a3810] font-bold transition-colors"
+          className="text-xs text-wood-600 hover:text-wood-900 font-bold transition-colors"
         >
           Skip for now
         </button>
-        <button type="submit" disabled={!webhookUrl.trim() || saving} className={btnPrimary}>
+        <button type="submit" disabled={!webhookUrl.trim() || saving} className={gameBtn}>
           {saving ? 'Saving…' : 'Add Webhook'}
         </button>
-      </div>
+      </GameDialogFooter>
     </form>
   )
 }
@@ -375,7 +376,7 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
       setCredentials({ api_key: '' })
       setAiModel('')
     } else {
-      setCredentials(Object.fromEntries((app.requiredCredentials ?? []).map((k) => [k, ''])))
+      setCredentials(Object.fromEntries((app.required_credentials ?? []).map((k) => [k, ''])))
     }
     setError(null)
     setStep('credentials')
@@ -390,7 +391,7 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
       const aiProvider = isAiProvider(app)
       const data: Record<string, unknown> = {
         name: label.trim(),
-        connection_type: app.connectionType ?? 'webhook',
+        connection_type: app.connection_type ?? 'webhook',
       }
       if (aiProvider) {
         data.credentials = credentials['api_key'] ?? ''
@@ -448,43 +449,18 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
   const currentStepIndex = STEP_LABELS.findIndex((s) => s.key === step)
 
   return (
-    <div
-      data-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onCancel}
-    >
-      <div
-        className="relative w-full max-w-lg bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onCancel}
-          aria-label="Close"
-          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M10 2L2 10M2 2l8 8"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="square"
-            />
-          </svg>
-        </button>
-
-        {/* Header */}
-        <div className="px-5 pt-5 pb-3 border-b-4 border-[#7a5230] bg-[#dcc898]">
-          <h2 className="text-[#3d2010] font-bold text-base pr-10">New Connection</h2>
-          <div className="flex items-center gap-2 pt-1 text-xs text-[#7a5230]">
+    <GameDialog open onOpenChange={(o) => !o && onCancel()}>
+      <GameDialogContent className="max-w-lg">
+        <GameDialogHeader className="pr-10">
+          <GameDialogTitle>New Connection</GameDialogTitle>
+          <div className="flex items-center gap-2 pt-1 text-xs text-wood-700">
             {STEP_LABELS.map(({ key, label }, i) => (
               <span key={key} className="flex items-center gap-2">
                 {i > 0 && <span>›</span>}
                 <span
                   className={
                     step === key
-                      ? 'font-bold text-[#3d2010]'
+                      ? 'font-bold text-soil-800'
                       : currentStepIndex > i
                         ? 'line-through opacity-40'
                         : 'opacity-50'
@@ -495,7 +471,7 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
               </span>
             ))}
           </div>
-        </div>
+        </GameDialogHeader>
 
         {/* Step 1 — App grid */}
         {step === 'choose-app' && (
@@ -506,14 +482,14 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
               selected={app}
               onSelect={handleChooseApp}
             />
-            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t-4 border-[#7a5230] bg-[#dcc898]">
-              <button onClick={onCancel} className={btnGhost}>
+            <GameDialogFooter>
+              <button onClick={onCancel} className={gameBtnGhost}>
                 Cancel
               </button>
-              <button disabled={!app} onClick={handleNext} className={btnPrimary}>
+              <button disabled={!app} onClick={handleNext} className={gameBtn}>
                 Next ›
               </button>
-            </div>
+            </GameDialogFooter>
           </>
         )}
 
@@ -550,7 +526,7 @@ export function NewConnectionModal({ onSuccess, onCancel }: Props) {
             onSubmit={handleAddWebhook}
           />
         )}
-      </div>
-    </div>
+      </GameDialogContent>
+    </GameDialog>
   )
 }

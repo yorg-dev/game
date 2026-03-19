@@ -12,11 +12,11 @@ export type AgentCategory = 'ecommerce' | 'sales' | 'support' | 'marketing'
  * and an optional guard condition.
  */
 export interface AgentSkill {
-  skillId: string // references Skill.id  e.g. "shopify:create_refund"
+  skill_id: string // references Skill.id  e.g. "shopify:create_refund"
   order: number // 1-indexed position in the workflow
 
   /** When false the agent continues even if this skill fails. */
-  isRequired: boolean
+  is_required: boolean
 
   /**
    * Maps skill input fields to runtime data paths.
@@ -27,7 +27,7 @@ export interface AgentSkill {
    *
    * @example { "orderId": "trigger.data.order_id" }
    */
-  inputMapping: Record<string, string>
+  input_mapping: Record<string, string>
 
   /**
    * Optional guard expression evaluated before the skill runs.
@@ -48,12 +48,12 @@ export interface AgentTemplate {
   skills: AgentSkill[]
 
   /** Integrations that must be connected before deploying. */
-  requiredIntegrations: string[] // ["shopify", "gmail"]
+  required_integrations: string[] // ["shopify", "gmail"]
 
   /** Visual identity on the field.  Currently maps to an existing AgentType key. */
   sprite: string // "agent-returns" (or a AgentType key for current renderer)
   color: string // accent color for this agent type
 
-  authorType: 'agent' | 'community' | 'owner'
-  isPublished: boolean
+  author_type: 'agent' | 'community' | 'owner'
+  is_published: boolean
 }

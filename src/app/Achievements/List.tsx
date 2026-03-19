@@ -3,13 +3,18 @@ import { ListBase, useListContext } from 'ra-core'
 import { EventBus } from '@/game/EventBus'
 import * as achievementStore from '@/game/achievements/achievementStore'
 import type { Achievement, AchievementRarity } from '@/models/Achievement'
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
+import {
+  GameDialog,
+  GameDialogContent,
+  GameDialogHeader,
+  GameDialogTitle,
+  GameDialogDescription,
+} from '@/components/ui/game-dialog'
 
 const RARITY_STYLE: Record<AchievementRarity, { border: string; badge: string; label: string }> = {
   common: {
-    border: 'border-[#9a6b28]',
-    badge: 'bg-[#dcc898] border-[#9a6b28] text-[#5a3810]',
+    border: 'border-wood-600',
+    badge: 'bg-parchment-250 border-wood-600 text-wood-900',
     label: 'Common',
   },
   rare: {
@@ -45,21 +50,19 @@ function formatDate(iso: string): string {
   })
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
-
 function AchievementCard({ achievement }: { achievement: Achievement }) {
-  const earned = !!achievement.unlockedAt
+  const earned = !!achievement.unlocked_at
   const s = RARITY_STYLE[achievement.rarity]
 
   return (
     <div
-      className={`relative flex flex-col gap-2 p-3 rounded-xl border-2 bg-[#dcc898] transition-opacity ${s.border} ${earned ? 'opacity-100' : 'opacity-45'}`}
+      className={`relative flex flex-col gap-2 p-3 rounded-xl border-2 bg-parchment-250 transition-opacity ${s.border} ${earned ? 'opacity-100' : 'opacity-45'}`}
     >
       <div className="text-2xl leading-none">{earned ? achievement.icon : '🔒'}</div>
 
       <div>
         <p
-          className={`text-xs font-bold leading-tight ${earned ? 'text-[#3d2010]' : 'text-[#7a5230]'}`}
+          className={`text-xs font-bold leading-tight ${earned ? 'text-soil-800' : 'text-wood-700'}`}
         >
           {achievement.title}
         </p>
@@ -70,26 +73,20 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
         </span>
       </div>
 
-      <p className="text-[10px] text-[#7a5230] leading-snug">{achievement.description}</p>
+      <p className="text-[10px] text-wood-700 leading-snug">{achievement.description}</p>
 
-      {earned && achievement.unlockedAt && (
-        <p className="text-[9px] font-mono text-[#9a6b28] mt-auto">
-          {formatDate(achievement.unlockedAt)}
+      {earned && achievement.unlocked_at && (
+        <p className="text-[9px] font-mono text-wood-600 mt-auto">
+          {formatDate(achievement.unlocked_at)}
         </p>
       )}
     </div>
   )
 }
 
-// ─── Grid ─────────────────────────────────────────────────────────────────────
-
 type FilterTab = 'all' | 'earned' | 'locked'
 
-interface AchievementGridProps {
-  onClose: () => void
-}
-
-function AchievementGrid({ onClose }: AchievementGridProps) {
+function AchievementGrid() {
   const { data: achievementDefs } = useListContext<Achievement>()
 
   const [achievements, setAchievements] = useState<Achievement[]>(() =>
@@ -120,8 +117,8 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
     }
   }, [])
 
-  const earned = achievements.filter((a) => !!a.unlockedAt)
-  const locked = achievements.filter((a) => !a.unlockedAt)
+  const earned = achievements.filter((a) => !!a.unlocked_at)
+  const locked = achievements.filter((a) => !a.unlocked_at)
   const byStatus = filter === 'earned' ? earned : filter === 'locked' ? locked : achievements
   const categories = Array.from(new Set(achievements.map((a) => a.category))).filter(Boolean)
   const visible = category ? byStatus.filter((a) => a.category === category) : byStatus
@@ -133,45 +130,16 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
   ]
 
   return (
-    <div
-      className="relative flex flex-col w-full max-w-lg max-h-[82vh] bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
-      onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
-    >
-      {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-5 py-4 bg-[#dcc898] border-b-4 border-[#7a5230] shrink-0">
-        <div>
-          <h2 className="text-base font-bold text-[#3d2010]">Achievements</h2>
-          <p className="text-xs text-[#7a5230] mt-0.5">
-            {earned.length} of {achievements.length} earned
-          </p>
-        </div>
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M10 2L2 10M2 2l8 8"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="square"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* ── Status tabs ─────────────────────────────────────────────── */}
-      <div className="flex border-b-2 border-[#7a5230] shrink-0 bg-[#dcc898]">
+    <>
+      <div className="flex border-b-2 border-wood-700 shrink-0 bg-parchment-250">
         {TABS.map(({ key, label, count }) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
             className={`relative flex-1 py-2 text-xs font-bold uppercase tracking-wider transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:transition-all ${
               filter === key
-                ? 'text-[#3d2010] after:bg-[#7a5230]'
-                : 'text-[#9a6b28] hover:text-[#5a3810] after:bg-transparent'
+                ? 'text-soil-800 after:bg-wood-700'
+                : 'text-wood-600 hover:text-wood-900 after:bg-transparent'
             }`}
           >
             {label}
@@ -180,14 +148,13 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
         ))}
       </div>
 
-      {/* ── Category filter ──────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b-4 border-[#7a5230] shrink-0 bg-[#dcc898]">
+      <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b-4 border-wood-700 shrink-0 bg-parchment-250">
         <button
           onClick={() => setCategory(null)}
           className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
             category === null
-              ? 'bg-[#7a5230] border-[#5a3810] text-[#f5edd5]'
-              : 'bg-[#c8b07a] border-[#9a6b28] text-[#5a3810] hover:bg-[#baa068]'
+              ? 'bg-wood-700 border-wood-900 text-parchment-50'
+              : 'bg-parchment-400 border-wood-600 text-wood-900 hover:bg-[#baa068]'
           }`}
         >
           All categories
@@ -198,8 +165,8 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
             onClick={() => setCategory(cat === category ? null : cat)}
             className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
               category === cat
-                ? 'bg-[#7a5230] border-[#5a3810] text-[#f5edd5]'
-                : 'bg-[#c8b07a] border-[#9a6b28] text-[#5a3810] hover:bg-[#baa068]'
+                ? 'bg-wood-700 border-wood-900 text-parchment-50'
+                : 'bg-parchment-400 border-wood-600 text-wood-900 hover:bg-[#baa068]'
             }`}
           >
             {CATEGORY_LABELS[cat] ?? cat}
@@ -207,15 +174,14 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
         ))}
       </div>
 
-      {/* ── Achievement grid ────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto p-4">
         {visible.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
             <p className="text-3xl">{filter === 'earned' ? '🔒' : '🏆'}</p>
-            <p className="text-sm font-bold text-[#3d2010]">
+            <p className="text-sm font-bold text-soil-800">
               {filter === 'earned' ? 'Nothing earned yet' : 'All unlocked!'}
             </p>
-            <p className="text-xs text-[#9a6b28]">
+            <p className="text-xs text-wood-600">
               {filter === 'earned' ? 'Keep playing to earn achievements.' : 'You did it!'}
             </p>
           </div>
@@ -228,14 +194,13 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
         )}
       </div>
 
-      {/* ── Progress bar ────────────────────────────────────────────── */}
-      <div className="shrink-0 border-t-4 border-[#7a5230] bg-[#dcc898] px-5 py-3 flex items-center gap-3">
-        <span className="text-[10px] font-bold text-[#7a5230] uppercase tracking-wider shrink-0">
+      <div className="shrink-0 border-t-4 border-wood-700 bg-parchment-250 px-5 py-3 flex items-center gap-3">
+        <span className="text-[10px] font-bold text-wood-700 uppercase tracking-wider shrink-0">
           Progress
         </span>
-        <div className="flex-1 h-2 rounded-full bg-[#c8b07a] border border-[#9a6b28] overflow-hidden">
+        <div className="flex-1 h-2 rounded-full bg-parchment-400 border border-wood-600 overflow-hidden">
           <div
-            className="h-full rounded-full bg-[#c8974c] transition-all duration-500"
+            className="h-full rounded-full bg-wood-500 transition-all duration-500"
             style={{
               width:
                 achievements.length > 0
@@ -244,17 +209,15 @@ function AchievementGrid({ onClose }: AchievementGridProps) {
             }}
           />
         </div>
-        <span className="text-[10px] font-bold text-[#7a5230] shrink-0 tabular-nums">
+        <span className="text-[10px] font-bold text-wood-700 shrink-0 tabular-nums">
           {achievements.length > 0
             ? `${Math.round((earned.length / achievements.length) * 100)}%`
             : '0%'}
         </span>
       </div>
-    </div>
+    </>
   )
 }
-
-// ─── List ─────────────────────────────────────────────────────────────────────
 
 export function AchievementList() {
   const [open, setOpen] = useState(false)
@@ -264,26 +227,26 @@ export function AchievementList() {
   }, [])
 
   useEffect(() => {
-    const unsub = EventBus.on('show-achievements', () => setOpen(true))
-    return unsub
+    return EventBus.on('show-achievements', () => setOpen(true))
   }, [])
 
-  if (!open) return null
-
   return (
-    <div
-      data-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={() => setOpen(false)}
-    >
-      <ListBase
-        resource="achievements"
-        perPage={200}
-        sort={{ field: 'id', order: 'ASC' }}
-        disableSyncWithLocation
-      >
-        <AchievementGrid onClose={() => setOpen(false)} />
-      </ListBase>
-    </div>
+    <GameDialog open={open} onOpenChange={(o) => !o && setOpen(false)}>
+      <GameDialogContent className="max-w-lg max-h-[82vh] flex flex-col">
+        <GameDialogHeader className="pr-14">
+          <GameDialogTitle>Achievements</GameDialogTitle>
+          <GameDialogDescription></GameDialogDescription>
+        </GameDialogHeader>
+
+        <ListBase
+          resource="achievements"
+          perPage={200}
+          sort={{ field: 'id', order: 'ASC' }}
+          disableSyncWithLocation
+        >
+          <AchievementGrid />
+        </ListBase>
+      </GameDialogContent>
+    </GameDialog>
   )
 }

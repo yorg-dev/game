@@ -126,21 +126,21 @@ export function AgentExecutionPanel() {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-40 w-64 rounded-2xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden transition-all duration-300 ${
+      className={`fixed bottom-4 right-4 z-40 w-64 rounded-2xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_3px_var(--color-parchment-50)] overflow-hidden transition-all duration-300 ${
         mounted ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
       }`}
     >
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div
-        className={`flex items-center gap-2.5 px-4 py-2.5 border-b-4 border-[#7a5230] transition-colors duration-500 ${
-          state.complete ? 'bg-[#b8d890]' : 'bg-[#dcc898]'
+        className={`flex items-center gap-2.5 px-4 py-2.5 border-b-4 border-wood-700 transition-colors duration-500 ${
+          state.complete ? 'bg-[#b8d890]' : 'bg-parchment-250'
         }`}
       >
         <div
-          className="w-3 h-3 rounded-full shrink-0 border border-[#7a5230]/40"
+          className="w-3 h-3 rounded-full shrink-0 border border-wood-700/40"
           style={{ background: state.templateColor }}
         />
-        <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">{state.agentName}</span>
+        <span className="flex-1 text-sm font-bold text-soil-800 truncate">{state.agentName}</span>
         {state.complete && (
           <span className="text-[10px] font-bold text-[#3a6010] uppercase tracking-wider shrink-0">
             ✓ Done
@@ -149,7 +149,7 @@ export function AgentExecutionPanel() {
         <button
           onClick={dismiss}
           aria-label="Dismiss"
-          className="w-5 h-5 flex items-center justify-center text-[#9a6b28] hover:text-[#3d2010] transition-colors shrink-0"
+          className="w-5 h-5 flex items-center justify-center text-wood-600 hover:text-soil-800 transition-colors shrink-0"
         >
           <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
             <path
@@ -163,11 +163,11 @@ export function AgentExecutionPanel() {
       </div>
 
       {/* ── Command label ───────────────────────────────────────────────────── */}
-      <div className="px-4 pt-2.5 pb-2 border-b-2 border-[#c8b07a]">
-        <p className="text-[9px] font-bold text-[#7a5230] uppercase tracking-widest mb-0.5">
+      <div className="px-4 pt-2.5 pb-2 border-b-2 border-parchment-400">
+        <p className="text-[9px] font-bold text-wood-700 uppercase tracking-widest mb-0.5">
           Command
         </p>
-        <p className="text-xs text-[#3d2010] font-medium leading-snug line-clamp-2">
+        <p className="text-xs text-soil-800 font-medium leading-snug line-clamp-2">
           &ldquo;{state.command}&rdquo;
         </p>
       </div>
@@ -179,10 +179,10 @@ export function AgentExecutionPanel() {
             <div
               className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
                 step.status === 'done'
-                  ? 'border-[#4a7c20] bg-[#5a9c28]'
+                  ? 'border-grass-700 bg-grass-600'
                   : step.status === 'running'
-                    ? 'border-[#b87820] bg-[#e8a830] text-[#3d2010]'
-                    : 'border-[#9a6b28] bg-[#dcc898] text-[#9a6b28]'
+                    ? 'border-[#b87820] bg-[#e8a830] text-soil-800'
+                    : 'border-wood-600 bg-parchment-250 text-wood-600'
               }`}
             >
               {step.status === 'done' ? (
@@ -198,8 +198,8 @@ export function AgentExecutionPanel() {
                 step.status === 'done'
                   ? 'text-[#7a7050] line-through'
                   : step.status === 'running'
-                    ? 'text-[#3d2010] font-bold'
-                    : 'text-[#9a6b28]'
+                    ? 'text-soil-800 font-bold'
+                    : 'text-wood-600'
               }`}
             >
               {step.skillId}

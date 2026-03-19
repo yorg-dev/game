@@ -20,7 +20,7 @@ interface AgentEntry {
 
 const STATUS_DOT: Record<string, string> = {
   connected: 'bg-emerald-600',
-  disconnected: 'bg-[#9a6b28]',
+  disconnected: 'bg-wood-600',
   expired: 'bg-amber-600',
   error: 'bg-red-700',
 }
@@ -56,21 +56,21 @@ function SectionHeader({
   return (
     <button
       onClick={onToggle}
-      className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-left hover:bg-[#c8b07a] transition-colors group"
+      className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-left hover:bg-parchment-400 transition-colors group"
     >
-      <span className="text-[11px] font-bold text-[#7a5230] uppercase tracking-widest group-hover:text-[#3d2010] transition-colors">
+      <span className="text-[11px] font-bold text-wood-700 uppercase tracking-widest group-hover:text-soil-800 transition-colors">
         {label}
       </span>
       <div className="flex items-center gap-2">
         {count > 0 && (
-          <span className="text-[11px] font-bold text-[#9a6b28] tabular-nums">{count}</span>
+          <span className="text-[11px] font-bold text-wood-600 tabular-nums">{count}</span>
         )}
         <svg
           width="10"
           height="10"
           viewBox="0 0 10 10"
           fill="none"
-          className={`text-[#9a6b28] transition-transform duration-150 ${expanded ? 'rotate-180' : ''}`}
+          className={`text-wood-600 transition-transform duration-150 ${expanded ? 'rotate-180' : ''}`}
         >
           <path
             d="M1 3l4 4 4-4"
@@ -92,14 +92,14 @@ function HotkeysModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm bg-[#e8d5a8] border-4 border-[#7a5230] rounded-2xl shadow-[inset_0_0_0_3px_#f5edd5] overflow-hidden"
+        className="relative w-full max-w-sm bg-parchment-150 border-4 border-wood-700 rounded-2xl shadow-[inset_0_0_0_3px_var(--color-parchment-50)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}
       >
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
+          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-wood-700 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-3px_0_0_var(--color-wood-900)] text-soil-800 hover:brightness-110 transition-[filter]"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path
@@ -111,22 +111,22 @@ function HotkeysModal({ onClose }: { onClose: () => void }) {
           </svg>
         </button>
 
-        <div className="px-5 pt-5 pb-3 border-b-4 border-[#7a5230] bg-[#dcc898] pr-14">
-          <h2 className="text-[#3d2010] font-bold text-base">Keyboard Shortcuts</h2>
+        <div className="px-5 pt-5 pb-3 border-b-4 border-wood-700 bg-parchment-250 pr-14">
+          <h2 className="text-soil-800 font-bold text-base">Keyboard Shortcuts</h2>
         </div>
 
         <div className="flex flex-col gap-0.5 p-4">
           {HOTKEYS.map(({ keys, label }) => (
             <div
               key={label}
-              className="flex items-center justify-between px-2 py-2 rounded-lg hover:bg-[#dcc898] transition-colors"
+              className="flex items-center justify-between px-2 py-2 rounded-lg hover:bg-parchment-250 transition-colors"
             >
-              <span className="text-sm font-bold text-[#3d2010]">{label}</span>
+              <span className="text-sm font-bold text-soil-800">{label}</span>
               <div className="flex items-center gap-1">
                 {keys.map((k) => (
                   <kbd
                     key={k}
-                    className="inline-flex items-center justify-center min-w-[1.6rem] h-6 px-1.5 rounded-md border-2 border-[#9a6b28] bg-[#dcc898] shadow-[inset_0_2px_0_0_#f0e0c0,inset_0_-2px_0_0_#7a5230] text-[11px] font-mono font-bold text-[#3d2010] leading-none"
+                    className="inline-flex items-center justify-center min-w-[1.6rem] h-6 px-1.5 rounded-md border-2 border-wood-600 bg-parchment-250 shadow-[inset_0_2px_0_0_#f0e0c0,inset_0_-2px_0_0_var(--color-wood-700)] text-[11px] font-mono font-bold text-soil-800 leading-none"
                   >
                     {k}
                   </kbd>
@@ -244,11 +244,11 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
     dynamicCount++
     const newConn: Connection = {
       id: apiConnection.id,
-      appId,
+      app_id: appId,
       label: apiConnection.name,
       status: 'connected',
       credentials: {},
-      connectedAt: new Date().toISOString(),
+      connected_at: new Date().toISOString(),
     }
     setConnections((prev) => [...prev, newConn])
     EventBus.emit('add-connection', {
@@ -264,7 +264,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
   function handleClickConnection(conn: Connection) {
     EventBus.emit('connection-clicked', {
       connectionId: conn.id,
-      appId: conn.appId,
+      appId: conn.app_id,
       connection: conn,
     })
   }
@@ -273,7 +273,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
     <button
       onClick={() => setOpen(false)}
       aria-label="Close menu"
-      className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
+      className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-wood-700 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-3px_0_0_var(--color-wood-900)] text-soil-800 hover:brightness-110 transition-[filter]"
     >
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
         <path
@@ -293,7 +293,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
         <button
           onClick={() => setOpen(true)}
           aria-label="Open menu"
-          className="fixed top-4 left-4 z-50 w-12 h-12 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5,inset_0_0_0_5px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] flex items-center justify-center"
+          className="fixed top-4 left-4 z-50 w-12 h-12 rounded-xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_3px_var(--color-parchment-50),inset_0_0_0_5px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] flex items-center justify-center"
         >
           <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
             <rect y="0" width="18" height="2.5" rx="1.25" fill="#7a5230" />
@@ -306,17 +306,17 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
       {/* Guest panel */}
       {!canManage && open && (
         <nav
-          className="fixed top-0 left-0 z-50 h-full flex flex-col bg-[#e8d5a8] border-r-4 border-[#7a5230] shadow-[inset_-3px_0_0_#f5edd5]"
+          className="fixed top-0 left-0 z-50 h-full flex flex-col bg-parchment-150 border-r-4 border-wood-700 shadow-[inset_-3px_0_0_var(--color-parchment-50)]"
           style={{ width: '17rem' }}
         >
-          <div className="relative flex items-center px-5 py-4 border-b-4 border-[#7a5230] bg-[#dcc898] shrink-0">
-            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">
+          <div className="relative flex items-center px-5 py-4 border-b-4 border-wood-700 bg-parchment-250 shrink-0">
+            <span className="text-soil-800 font-bold tracking-widest text-sm uppercase select-none">
               Menu
             </span>
             {closeButton}
           </div>
           <div className="flex-1 flex flex-col gap-3 px-4 py-5">
-            <p className="text-xs text-[#7a5230]">
+            <p className="text-xs text-wood-700">
               Sign in to manage your land, add agents, and connect apps.
             </p>
             <button
@@ -324,7 +324,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                 setOpen(false)
                 EventBus.emit('show-login', { tab: 'register' })
               }}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 transition-[filter]"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-wood-700 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-3px_0_0_var(--color-wood-900)] text-soil-800 text-sm font-bold hover:brightness-110 transition-[filter]"
             >
               <span className="text-base leading-none">+</span>
               Create Land
@@ -334,7 +334,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                 setOpen(false)
                 EventBus.emit('show-leaderboard', undefined)
               }}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-wood-600 bg-parchment-250 text-wood-900 text-sm font-bold hover:bg-parchment-400 transition-colors"
             >
               <span className="text-base leading-none">🏆</span>
               Leaderboard
@@ -344,7 +344,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                 setOpen(false)
                 EventBus.emit('show-experts', undefined)
               }}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] text-[#5a3810] text-sm font-bold hover:bg-[#c8b07a] transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-wood-600 bg-parchment-250 text-wood-900 text-sm font-bold hover:bg-parchment-400 transition-colors"
             >
               <span className="text-base leading-none">⭐</span>
               Experts
@@ -356,11 +356,11 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
       {/* Owner panel */}
       {canManage && open && (
         <nav
-          className="fixed top-0 left-0 z-50 h-full flex flex-col bg-[#e8d5a8] border-r-4 border-[#7a5230] shadow-[inset_-3px_0_0_#f5edd5]"
+          className="fixed top-0 left-0 z-50 h-full flex flex-col bg-parchment-150 border-r-4 border-wood-700 shadow-[inset_-3px_0_0_var(--color-parchment-50)]"
           style={{ width: '17rem' }}
         >
-          <div className="relative flex items-center px-5 py-4 border-b-4 border-[#7a5230] bg-[#dcc898] shrink-0">
-            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">
+          <div className="relative flex items-center px-5 py-4 border-b-4 border-wood-700 bg-parchment-250 shrink-0">
+            <span className="text-soil-800 font-bold tracking-widest text-sm uppercase select-none">
               Menu
             </span>
             {closeButton}
@@ -378,21 +378,21 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
               {agentExpanded && (
                 <div className="flex flex-col gap-1 mt-0.5 mb-2 px-1">
                   {agents.length === 0 ? (
-                    <p className="text-[#9a6b28] text-xs px-2 py-1.5 italic">No agents yet</p>
+                    <p className="text-wood-600 text-xs px-2 py-1.5 italic">No agents yet</p>
                   ) : (
                     agents.map((s) => (
                       <div
                         key={s.id}
-                        className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#dcc898] border-2 border-[#9a6b28]"
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg bg-parchment-250 border-2 border-wood-600"
                       >
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#7a5230]/40"
+                          className="w-2.5 h-2.5 rounded-full shrink-0 border border-wood-700/40"
                           style={{ background: s.template.color }}
                         />
-                        <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">
+                        <span className="flex-1 text-sm font-bold text-soil-800 truncate">
                           {s.name}
                         </span>
-                        <span className="text-[10px] border border-[#9a6b28] bg-[#e8d5a8] text-[#7a5230] font-bold px-1.5 py-0 rounded shrink-0">
+                        <span className="text-[10px] border border-wood-600 bg-parchment-150 text-wood-700 font-bold px-1.5 py-0 rounded shrink-0">
                           {s.template.name}
                         </span>
                       </div>
@@ -400,7 +400,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                   )}
                   <button
                     onClick={() => setShowAgentModal(true)}
-                    className="flex items-center gap-2 px-3 py-1.5 mt-0.5 rounded-lg border-2 border-dashed border-[#b8955a] text-left text-xs text-[#9a6b28] font-bold hover:border-[#7a5230] hover:text-[#5a3810] hover:bg-[#dcc898] transition-colors w-full"
+                    className="flex items-center gap-2 px-3 py-1.5 mt-0.5 rounded-lg border-2 border-dashed border-parchment-500 text-left text-xs text-wood-600 font-bold hover:border-wood-700 hover:text-wood-900 hover:bg-parchment-250 transition-colors w-full"
                   >
                     <span className="text-sm leading-none">+</span>
                     <span>New Agent</span>
@@ -408,7 +408,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                 </div>
               )}
 
-              <div className="mx-2 my-1 border-t-2 border-[#b8955a]" />
+              <div className="mx-2 my-1 border-t-2 border-parchment-500" />
 
               {/* Connections */}
               <SectionHeader
@@ -420,27 +420,27 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
               {connExpanded && (
                 <div className="flex flex-col gap-1 mt-0.5 mb-2 px-1">
                   {connections.length === 0 ? (
-                    <p className="text-[#9a6b28] text-xs px-2 py-1.5 italic">No connections yet</p>
+                    <p className="text-wood-600 text-xs px-2 py-1.5 italic">No connections yet</p>
                   ) : (
                     connections.map((conn) => (
                       <button
                         key={conn.id}
                         onClick={() => handleClickConnection(conn)}
-                        className="flex items-center gap-3 px-3 py-2 rounded-lg border-2 border-[#9a6b28] bg-[#dcc898] cursor-pointer text-left w-full hover:border-[#7a5230] hover:bg-[#c8b07a] transition-colors"
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg border-2 border-wood-600 bg-parchment-250 cursor-pointer text-left w-full hover:border-wood-700 hover:bg-parchment-400 transition-colors"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#7a5230]/30 bg-[#9a6b28]" />
-                        <span className="flex-1 text-sm font-bold text-[#3d2010] truncate">
-                          {conn.label || conn.appId}
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-wood-700/30 bg-wood-600" />
+                        <span className="flex-1 text-sm font-bold text-soil-800 truncate">
+                          {conn.label || conn.app_id}
                         </span>
                         <span
-                          className={`w-2 h-2 rounded-full shrink-0 border border-[#7a5230]/30 ${STATUS_DOT[conn.status] ?? 'bg-[#9a6b28]'}`}
+                          className={`w-2 h-2 rounded-full shrink-0 border border-wood-700/30 ${STATUS_DOT[conn.status] ?? 'bg-wood-600'}`}
                         />
                       </button>
                     ))
                   )}
                   <button
                     onClick={() => setShowConnModal(true)}
-                    className="flex items-center gap-2 px-3 py-1.5 mt-0.5 rounded-lg border-2 border-dashed border-[#b8955a] text-left text-xs text-[#9a6b28] font-bold hover:border-[#7a5230] hover:text-[#5a3810] hover:bg-[#dcc898] transition-colors w-full"
+                    className="flex items-center gap-2 px-3 py-1.5 mt-0.5 rounded-lg border-2 border-dashed border-parchment-500 text-left text-xs text-wood-600 font-bold hover:border-wood-700 hover:text-wood-900 hover:bg-parchment-250 transition-colors w-full"
                   >
                     <span className="text-sm leading-none">+</span>
                     <span>Add Connection</span>
@@ -451,7 +451,7 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
           </div>
 
           {/* Settings footer */}
-          <div className="shrink-0 border-t-4 border-[#7a5230] bg-[#dcc898] px-3 py-2">
+          <div className="shrink-0 border-t-4 border-wood-700 bg-parchment-250 px-3 py-2">
             <SectionHeader
               label="Settings"
               count={0}
@@ -462,14 +462,14 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
               <div className="mt-1 mb-1 px-1 flex flex-col gap-1">
                 <button
                   onClick={() => setShowHotkeys(true)}
-                  className="flex items-center gap-2 px-3 py-2 w-full rounded-lg border-2 border-[#9a6b28] bg-[#e8d5a8] text-left text-xs text-[#5a3810] font-bold hover:bg-[#c8b07a] hover:border-[#7a5230] transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 w-full rounded-lg border-2 border-wood-600 bg-parchment-150 text-left text-xs text-wood-900 font-bold hover:bg-parchment-400 hover:border-wood-700 transition-colors"
                 >
                   <svg
                     width="12"
                     height="12"
                     viewBox="0 0 12 12"
                     fill="none"
-                    className="shrink-0 text-[#7a5230]"
+                    className="shrink-0 text-wood-700"
                   >
                     <rect x="0.5" y="2.5" width="11" height="7" rx="1.5" stroke="currentColor" />
                     <rect x="2" y="4.5" width="2" height="1.5" rx="0.5" fill="currentColor" />
@@ -481,14 +481,14 @@ export function GameMenu({ canManage = false }: { canManage?: boolean }) {
                 </button>
                 <button
                   onClick={() => setShowCreateAccount(true)}
-                  className="flex items-center gap-2 px-3 py-2 w-full rounded-lg border-2 border-[#9a6b28] bg-[#e8d5a8] text-left text-xs text-[#5a3810] font-bold hover:bg-[#c8b07a] hover:border-[#7a5230] transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 w-full rounded-lg border-2 border-wood-600 bg-parchment-150 text-left text-xs text-wood-900 font-bold hover:bg-parchment-400 hover:border-wood-700 transition-colors"
                 >
                   <svg
                     width="12"
                     height="12"
                     viewBox="0 0 12 12"
                     fill="none"
-                    className="shrink-0 text-[#7a5230]"
+                    className="shrink-0 text-wood-700"
                   >
                     <circle cx="6" cy="4" r="2.5" stroke="currentColor" />
                     <path

@@ -12,8 +12,8 @@ interface Toast {
 
 const RARITY_STYLE: Record<AchievementRarity, { border: string; badge: string; label: string }> = {
   common: {
-    border: 'border-[#9a6b28]',
-    badge: 'bg-[#dcc898] text-[#5a3810]',
+    border: 'border-wood-600',
+    badge: 'bg-parchment-250 text-wood-900',
     label: 'Common',
   },
   rare: {
@@ -77,16 +77,16 @@ export function AchievementToast() {
         return (
           <div
             key={toast.id}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 bg-[#e8d5a8] shadow-lg transition-all duration-300 ${s.border} ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 bg-parchment-150 shadow-lg transition-all duration-300 ${s.border} ${
               toast.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
             }`}
           >
             <span className="text-2xl leading-none">{toast.icon}</span>
             <div>
-              <p className="text-[10px] font-bold text-[#7a5230] uppercase tracking-wider">
+              <p className="text-[10px] font-bold text-wood-700 uppercase tracking-wider">
                 Achievement unlocked!
               </p>
-              <p className="text-xs font-bold text-[#3d2010]">{toast.title}</p>
+              <p className="text-xs font-bold text-soil-800">{toast.title}</p>
               <span
                 className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${s.badge}`}
               >

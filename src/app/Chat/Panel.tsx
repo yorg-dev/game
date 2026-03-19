@@ -54,11 +54,11 @@ function MessageList({
 }) {
   if (tab === 'agents' && agents.length === 0) {
     return (
-      <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">No agents in this land</p>
+      <p className="text-wood-600 text-xs px-2 py-4 italic text-center">No agents in this land</p>
     )
   }
   if (messages.length === 0) {
-    return <p className="text-[#9a6b28] text-xs px-2 py-4 italic text-center">No messages yet</p>
+    return <p className="text-wood-600 text-xs px-2 py-4 italic text-center">No messages yet</p>
   }
   return (
     <div className="flex flex-col gap-2">
@@ -68,13 +68,13 @@ function MessageList({
           className={`flex flex-col gap-0.5 ${msg.fromSelf ? 'items-end' : 'items-start'}`}
         >
           {!msg.fromSelf && (
-            <span className="text-[10px] font-bold text-[#9a6b28] px-1">{msg.authorName}</span>
+            <span className="text-[10px] font-bold text-wood-600 px-1">{msg.authorName}</span>
           )}
           <div
             className={`max-w-[85%] px-3 py-1.5 rounded-xl text-sm leading-relaxed break-words border-2 font-medium ${
               msg.fromSelf
-                ? 'bg-[#7a5230] border-[#5a3810] text-[#f5edd5] rounded-tr-sm'
-                : 'bg-[#dcc898] border-[#9a6b28] text-[#3d2010] rounded-tl-sm'
+                ? 'bg-wood-700 border-wood-900 text-parchment-50 rounded-tr-sm'
+                : 'bg-parchment-250 border-wood-600 text-soil-800 rounded-tl-sm'
             } ${msg.text === '…' ? 'opacity-60 italic' : ''}`}
           >
             {msg.text}
@@ -101,7 +101,7 @@ function MessageInput({
 }) {
   const disabled = tab === 'agents' && agents.length === 0
   return (
-    <div className="shrink-0 border-t-4 border-[#7a5230] bg-[#dcc898] px-3 py-3">
+    <div className="shrink-0 border-t-4 border-wood-700 bg-parchment-250 px-3 py-3">
       <form onSubmit={onSubmit} className="flex items-center gap-2">
         <input
           value={draft}
@@ -110,12 +110,12 @@ function MessageInput({
             tab === 'agents' ? 'Message all agents, or @name for one' : `Message ${tab}…`
           }
           disabled={disabled}
-          className="flex-1 px-3 py-2 rounded-lg bg-[#f5edd5] border-2 border-[#9a6b28] text-[#3d2010] text-sm placeholder:text-[#b8955a] focus:outline-none focus:border-[#5a3810] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-3 py-2 rounded-lg bg-parchment-50 border-2 border-wood-600 text-soil-800 text-sm placeholder:text-parchment-500 focus:outline-none focus:border-wood-900 disabled:opacity-50 disabled:cursor-not-allowed"
         />
         <button
           type="submit"
           disabled={!draft.trim() || disabled}
-          className="shrink-0 px-3 py-2 rounded-lg border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] text-sm font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]"
+          className="shrink-0 px-3 py-2 rounded-lg border-2 border-wood-700 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-3px_0_0_var(--color-wood-900)] text-soil-800 text-sm font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-[filter]"
         >
           Send
         </button>
@@ -295,7 +295,7 @@ export function ChatPanel() {
         <button
           onClick={handleOpen}
           aria-label="Open chat"
-          className="fixed top-4 right-20 z-50 w-12 h-12 rounded-xl border-4 border-[#7a5230] bg-[#e8d5a8] shadow-[inset_0_0_0_3px_#f5edd5,inset_0_0_0_5px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] flex items-center justify-center"
+          className="fixed top-4 right-20 z-50 w-12 h-12 rounded-xl border-4 border-wood-700 bg-parchment-150 shadow-[inset_0_0_0_3px_var(--color-parchment-50),inset_0_0_0_5px_#c8a86a] hover:brightness-105 active:brightness-95 transition-[filter] flex items-center justify-center"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path
@@ -307,7 +307,7 @@ export function ChatPanel() {
             />
           </svg>
           {hasUnread && (
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#b84040] border-2 border-[#e8d5a8]" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#b84040] border-2 border-parchment-150" />
           )}
         </button>
       )}
@@ -315,18 +315,18 @@ export function ChatPanel() {
       {/* Side panel */}
       {open && (
         <div
-          className="fixed top-0 right-0 z-50 h-full flex flex-col bg-[#e8d5a8] border-l-4 border-[#7a5230] shadow-[-3px_0_0_#f5edd5]"
+          className="fixed top-0 right-0 z-50 h-full flex flex-col bg-parchment-150 border-l-4 border-wood-700 shadow-[-3px_0_0_var(--color-parchment-50)]"
           style={{ width: '17rem' }}
         >
           {/* Header */}
-          <div className="relative flex items-center px-5 py-4 border-b-4 border-[#7a5230] bg-[#dcc898] shrink-0">
-            <span className="text-[#3d2010] font-bold tracking-widest text-sm uppercase select-none">
+          <div className="relative flex items-center px-5 py-4 border-b-4 border-wood-700 bg-parchment-250 shrink-0">
+            <span className="text-soil-800 font-bold tracking-widest text-sm uppercase select-none">
               Chat
             </span>
             <button
               onClick={() => setOpen(false)}
               aria-label="Close chat"
-              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-[#7a5230] bg-[#c8974c] shadow-[inset_0_2px_0_0_#e8c07a,inset_0_-3px_0_0_#5a3810] text-[#3d2010] hover:brightness-110 transition-[filter]"
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl border-2 border-wood-700 bg-wood-500 shadow-[inset_0_2px_0_0_var(--color-wood-300),inset_0_-3px_0_0_var(--color-wood-900)] text-soil-800 hover:brightness-110 transition-[filter]"
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path
@@ -340,15 +340,15 @@ export function ChatPanel() {
           </div>
 
           {/* Tab bar */}
-          <div className="flex border-b-4 border-[#7a5230] shrink-0 bg-[#dcc898]">
+          <div className="flex border-b-4 border-wood-700 shrink-0 bg-parchment-250">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => handleTabClick(key)}
                 className={`relative flex-1 py-2 text-xs font-bold uppercase tracking-wider transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:transition-all ${
                   activeTab === key
-                    ? 'text-[#3d2010] after:bg-[#7a5230]'
-                    : 'text-[#9a6b28] hover:text-[#5a3810] after:bg-transparent'
+                    ? 'text-soil-800 after:bg-wood-700'
+                    : 'text-wood-600 hover:text-wood-900 after:bg-transparent'
                 }`}
               >
                 {label}
