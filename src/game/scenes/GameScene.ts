@@ -32,6 +32,22 @@ import type { PositionedConnection } from '../factories/ConnectionHouseFactory'
 import { agentLevelProvider } from '@/providers/agentLevelProvider'
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+// The home building is always present on every land — it is a map object,
+// not a user-created connection. We construct a minimal Connection-shaped
+// value so ConnectionHouseFactory can render it with the grey-brick texture.
+const HOME_CONNECTION: Connection = {
+  id: 'home',
+  appId: 'home',
+  label: 'Home',
+  status: 'connected',
+  credentials: {},
+  connectedAt: '',
+}
+
+// ---------------------------------------------------------------------------
 // Input type
 // ---------------------------------------------------------------------------
 
@@ -146,16 +162,16 @@ export class GameScene extends Phaser.Scene {
 
     const { placements, landObjects, connections } = getActiveLand()
     const connPlacements = this.resolveConnectionPlacements(placements, connections)
-    const homeObj = landObjects.find((o) => o.objectType === 'home')
-    const signObj = landObjects.find((o) => o.objectType === 'bulletin_board')
-    const chestObj = landObjects.find((o) => o.objectType === 'chest')
+    const homeObj = landObjects.find((o) => o.object_type === 'home')
+    const signObj = landObjects.find((o) => o.object_type === 'bulletin_board')
+    const chestObj = landObjects.find((o) => o.object_type === 'chest')
 
-    // Home is a map object (identity anchor), not a placement
-    const homeConn = connections.find((c) => c.id === 'home')
-    const homePos = homeObj ?? { x: 240, y: 136 } // fallback for lands without objects yet
-    const allHouses: PositionedConnection[] = homeConn
-      ? [{ connection: homeConn, x: homePos.x, y: homePos.y }, ...connPlacements]
-      : connPlacements
+    // Home position comes from land_objects. If not yet loaded, omit it —
+    // land-ready will spawn it once the API responds.
+    const allHouses: PositionedConnection[] = [
+      ...(homeObj ? [{ connection: HOME_CONNECTION, x: homeObj.x, y: homeObj.y }] : []),
+      ...connPlacements,
+    ]
 
     this.houses.create(this.mapDef, allHouses)
     this.chest.createAnimations()
@@ -610,20 +626,37 @@ export class GameScene extends Phaser.Scene {
     const unsubConnLoaded = EventBus.on(
       'land-ready',
       ({ placements, landObjects, connections }) => {
+        console.debug('[GameScene:land-ready] landObjects:', landObjects)
         const connPlacements = this.resolveConnectionPlacements(placements, connections)
-        const homeObj = landObjects.find((o) => o.objectType === 'home')
-        const homeConn = connections.find((c) => c.id === 'home')
-        const homePos = homeObj ?? { x: 240, y: 136 }
-        const allHouses: PositionedConnection[] = homeConn
-          ? [{ connection: homeConn, x: homePos.x, y: homePos.y }, ...connPlacements]
-          : connPlacements
+        const homeObj = landObjects.find((o) => o.object_type === 'home')
+        // Home position comes from land_objects. Skip if not defined on this land.
+        const allHouses: PositionedConnection[] = [
+          ...(homeObj ? [{ connection: HOME_CONNECTION, x: homeObj.x, y: homeObj.y }] : []),
+          ...connPlacements,
+        ]
         this.houses.reload(allHouses)
 
-        // Reposition map objects if they changed
-        const signObj = landObjects.find((o) => o.objectType === 'bulletin_board')
-        const chestObj = landObjects.find((o) => o.objectType === 'chest')
-        if (signObj) this.sign.moveTo(signObj.x, signObj.y)
-        if (chestObj) this.chest.moveTo(chestObj.x, chestObj.y)
+        // Spawn or reposition the bulletin board and chest
+        const signObj = landObjects.find((o) => o.object_type === 'bulletin_board')
+        const chestObj = landObjects.find((o) => o.object_type === 'chest')
+        if (signObj) {
+          if (this.sign.sprite) {
+            this.sign.moveTo(signObj.x, signObj.y)
+          } else {
+            this.sign.spawn(signObj.x, signObj.y)
+            if (this.sign.sprite) this.physics.add.collider(this.player, this.sign.sprite)
+          }
+        }
+        if (chestObj) {
+          if (this.chest.sprite) {
+            this.chest.moveTo(chestObj.x, chestObj.y)
+          } else {
+            this.chest.spawn(chestObj.x, chestObj.y, () => {
+              this.isDialogOpen = true
+            })
+            if (this.chest.sprite) this.physics.add.collider(this.player, this.chest.sprite)
+          }
+        }
       },
     )
 

@@ -25,11 +25,8 @@ function getStoredUser(): StoredUser | null {
 const authProvider = {
   //: AuthProvider = {
   checkAuth: async () => {
-    const user = getStoredUser()
-    if (!user || user.guest) {
-      EventBus.emit('show-login', { tab: 'login' })
-      throw new Error('Not authenticated')
-    }
+    // Always resolve — the game manages its own auth state via isGuest()/EventBus.
+    // Throwing here causes react-admin to call logout() in a loop.
   },
   checkError: (error: any) => {
     if (!error) return Promise.reject()

@@ -12,6 +12,9 @@ import type { ActiveLandState } from '@/providers/activeLand'
 export interface GameEventMap {
   /** Fired by a Scene once its create() has finished. */
   'scene-ready': Phaser.Scene
+  /** TitleScene → React: player selected a menu option to start the game. */
+  'game-started': undefined
+
   /** React → Phaser: user submitted the New Agent modal. */
   'spawn-agent': {
     templateId: string
@@ -40,10 +43,59 @@ export interface GameEventMap {
   'release-agent': undefined
   /** Phaser → React: a Agent was removed from the scene. */
   'agent-removed': { id: number }
+  /** WS → Phaser: a remote agent moved — apply state to the local sprite. */
+  'agent-remote-moved': {
+    localId: number
+    x: number
+    y: number
+    facing: import('./entities/Character').Direction
+    moving: boolean
+  }
+  /** React → Phaser: user sent a direct message to a specific Agent. */
+  'agent-message': { messageId: string; agentId: number; text: string }
+  /** Phaser → React: a specific Agent replied to a direct message. */
+  'agent-response': { messageId: string; agentId: number; text: string }
+  /** GameScene → all: an agent gained XP from a command, voice, or chat. */
+  'agent-xp-gained': {
+    agentId: number
+    agentSlug: string
+    xpGained: number
+    level: number
+    xp: number
+    xpToNext: number
+  }
+  /** GameScene → all: an agent crossed a level threshold. */
+  'agent-leveled-up': {
+    agentId: number
+    agentSlug: string
+    newLevel: number
+    previousLevel: number
+  }
+  /** Phaser → React: an agent is walking toward the player and will execute a task. */
+  'agent-executing': {
+    agentId: number
+    agentName: string
+    templateId: string
+    command: string
+    steps: string[] // skill IDs in execution order
+  }
+  /** Phaser → React: a single skill step changed status during execution. */
+  'agent-step-progress': {
+    agentId: number
+    stepIndex: number
+    status: 'running' | 'done'
+  }
+  /** Phaser → React: an agent finished all skill steps. */
+  'agent-execution-complete': {
+    agentId: number
+    summary: string
+  }
+
   /** React → Phaser: the user issued a natural-language command to all Agents. */
   'command-issued': { id: string; text: string }
   /** Phaser → React: a Agent has acknowledged a command. */
   'command-acknowledged': { commandId: string; agentId: number; agentName: string }
+
   /** Phaser → React: user clicked a connection house in the game world. */
   'connection-clicked': { connectionId: string; appId: string; connection: Connection }
   /** React → Phaser (or WS → Phaser): a new connection was added — place a house in the world.
@@ -60,18 +112,6 @@ export interface GameEventMap {
   'remove-connection': { connectionId: string }
   /** WS → Phaser: a connection placement was moved by another client. */
   'move-connection': { connectionId: string; worldX: number; worldY: number }
-  /** WS → Phaser: a remote agent moved — apply state to the local sprite. */
-  'agent-remote-moved': {
-    localId: number
-    x: number
-    y: number
-    facing: import('./entities/Character').Direction
-    moving: boolean
-  }
-  /** React → Phaser: user sent a direct message to a specific Agent. */
-  'agent-message': { messageId: string; agentId: number; text: string }
-  /** Phaser → React: a specific Agent replied to a direct message. */
-  'agent-response': { messageId: string; agentId: number; text: string }
   /** Phaser → React: start a click-through dialog sequence. */
   'dialog-start': { lines: DialogLine[] }
   /** React → Phaser: the dialog was fully dismissed. */
@@ -90,8 +130,6 @@ export interface GameEventMap {
   'login-confirmed': undefined
   /** React → TitleScene: user dismissed the login modal. */
   'login-cancelled': undefined
-  /** TitleScene → React: player selected a menu option to start the game. */
-  'game-started': undefined
   /** App → all: connections have been loaded (from backend or fallback). */
   'connections-loaded': { connections: Connection[] }
   /**
@@ -112,43 +150,9 @@ export interface GameEventMap {
   'player-moved': undefined
   /** questStore → React: a quest step was marked complete. */
   'quest-step-completed': { questId: string; stepId: string }
-  /** GameScene → all: an agent gained XP from a command, voice, or chat. */
-  'agent-xp-gained': {
-    agentId: number
-    agentSlug: string
-    xpGained: number
-    level: number
-    xp: number
-    xpToNext: number
-  }
-  /** GameScene → all: an agent crossed a level threshold. */
-  'agent-leveled-up': {
-    agentId: number
-    agentSlug: string
-    newLevel: number
-    previousLevel: number
-  }
   /** questStore → React: available quest definitions were (re)loaded from the API. */
   'quests-updated': undefined
-  /** Phaser → React: an agent is walking toward the player and will execute a task. */
-  'agent-executing': {
-    agentId: number
-    agentName: string
-    templateId: string
-    command: string
-    steps: string[] // skill IDs in execution order
-  }
-  /** Phaser → React: a single skill step changed status during execution. */
-  'agent-step-progress': {
-    agentId: number
-    stepIndex: number
-    status: 'running' | 'done'
-  }
-  /** Phaser → React: an agent finished all skill steps. */
-  'agent-execution-complete': {
-    agentId: number
-    summary: string
-  }
+
   /** achievementStore → React: an achievement was just earned. */
   'achievement-unlocked': {
     id: string

@@ -53,7 +53,7 @@ export function LeaderboardList() {
     data = [],
     isPending: loading,
     error,
-  } = useGetList<LeaderboardEntry>('leaderboard', {
+  } = useGetList<LeaderboardEntry>('leaderboards', {
     filter: { type, period },
     pagination: { page: 1, perPage: 25 },
     sort: { field: 'rank', order: 'ASC' },

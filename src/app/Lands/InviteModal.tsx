@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuthProvider } from 'ra-core'
-import { landProvider } from '@/providers/landProvider'
+import httpProvider from '@/providers/httpProvider'
 
 interface Props {
   landId: string
@@ -30,7 +30,11 @@ export function InviteLandModal({ landId, landName, onSignIn, onCancel }: Props)
     setError(null)
     setLoading(true)
     try {
-      await landProvider.inviteToLand(landId, email.trim())
+      const api = import.meta.env.VITE_API_URL as string
+      await httpProvider(`${api}/lands/${landId}/invitations`, {
+        method: 'POST',
+        body: JSON.stringify({ email: email.trim() }),
+      })
       setSent(true)
     } catch (err: any) {
       setError(err?.message ?? 'Failed to send invite.')

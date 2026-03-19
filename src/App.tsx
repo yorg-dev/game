@@ -18,6 +18,7 @@ function App() {
       disableTelemetry
       i18nProvider={i18nProvider}
       layout={GameLayout}
+      loginPage={false}
     >
       <Resource name="achievements" />
       <Resource name="agents" />

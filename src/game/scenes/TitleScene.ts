@@ -71,6 +71,13 @@ export class TitleScene extends Phaser.Scene {
     this.isTransitioning = false
     this.menuItems = []
 
+    // Fast path: if a valid non-guest session is already in localStorage,
+    // skip the title screen entirely and go straight to the game.
+    if (this.isAlreadyAuthenticated()) {
+      this.startGame()
+      return
+    }
+
     this.cameras.main.fadeIn(900, 0, 0, 0)
 
     this.createBackground()
@@ -80,9 +87,8 @@ export class TitleScene extends Phaser.Scene {
     this.createHint()
     this.setupInput()
 
-    // Auto-start authenticated users (returning or invite link).
-    // Dashboard emits session-ready with the auth state resolved via ra-core —
-    // no direct localStorage reads here.
+    // Async fallback: handles the case where auth resolves after the scene
+    // starts (e.g. token validation via network or invite-link flow).
     const unsubSession = EventBus.on('session-ready', ({ authenticated }) => {
       unsubSession()
       if (!this.isTransitioning && authenticated) {
@@ -112,6 +118,21 @@ export class TitleScene extends Phaser.Scene {
       Phaser.Input.Keyboard.JustDown(this.spaceKey)
     ) {
       this.activateSelected()
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Auth check — synchronous localStorage read, mirrors authProvider.checkAuth
+  // ---------------------------------------------------------------------------
+
+  private isAlreadyAuthenticated(): boolean {
+    try {
+      const raw = localStorage.getItem('user')
+      if (!raw) return false
+      const user = JSON.parse(raw)
+      return user && !user.guest
+    } catch {
+      return false
     }
   }
 
@@ -236,7 +257,7 @@ export class TitleScene extends Phaser.Scene {
     this.cursor = this.add
       .text(0, 0, '▶', {
         fontFamily: '"Courier New", monospace',
-        fontSize: '14px',
+        fontSize: '16px',
         color: C.accent,
       })
       .setOrigin(1, 0.5)
@@ -247,25 +268,25 @@ export class TitleScene extends Phaser.Scene {
       const y = cy + 116 + i * 50
 
       const txt = this.add
-        .text(cx + 14, y, def.label, {
+        .text(cx, y, def.label, {
           fontFamily: '"Courier New", monospace',
           fontSize: '16px',
           color: C.menuNormal,
           letterSpacing: 3,
         })
-        .setOrigin(0, 0.5)
+        .setOrigin(0.5, 0.5)
         .setAlpha(0)
         .setDepth(1)
         .setInteractive({ useHandCursor: true })
 
       const sub = this.add
-        .text(cx + 14, y + 16, def.subLabel, {
+        .text(cx, y + 18, def.subLabel, {
           fontFamily: '"Courier New", monospace',
-          fontSize: '10px',
+          fontSize: '12px',
           color: C.hint,
           letterSpacing: 1,
         })
-        .setOrigin(0, 0.5)
+        .setOrigin(0.5, 0.5)
         .setAlpha(0)
         .setDepth(1)
 
@@ -306,7 +327,7 @@ export class TitleScene extends Phaser.Scene {
 
     const active = this.menuItems[this.selectedIndex]?.text
     if (active) {
-      this.cursor.setPosition(active.x - 10, active.y)
+      this.cursor.setPosition(active.x - active.width / 2 - 12, active.y)
 
       // Pulse the cursor
       this.tweens.killTweensOf(this.cursor)
@@ -349,7 +370,7 @@ export class TitleScene extends Phaser.Scene {
     const hint = this.add
       .text(cx, cy + 230, '↑  ↓  ARROWS   ·   ENTER TO SELECT', {
         fontFamily: '"Courier New", monospace',
-        fontSize: '10px',
+        fontSize: '13px',
         color: C.hint,
         letterSpacing: 2,
       })

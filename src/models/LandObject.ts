@@ -33,8 +33,8 @@ export interface LandLayout {
 
 export interface LandObject {
   id: string
-  landId: string
-  objectType: LandObjectType
+  land_id: string
+  object_type: LandObjectType
 
   /** World-space pixel coordinates. */
   x: number
@@ -55,6 +55,6 @@ export interface LandObject {
   layout: LandLayout | null
 
   /** ISO-8601 timestamps. */
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }

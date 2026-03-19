@@ -26,6 +26,15 @@
   --color-grass-900: #1a3a08;
   --color-grass-950: #0e2808;
 
+  /* Parchment — NavBar frame color scale */
+  --color-parchment-100: #f7e8c3;
+  --color-parchment-200: #e4c89e;
+  --color-parchment-300: #d4b896;
+  --color-parchment-400: #c9a87a;
+  --color-parchment-500: #bf9163;
+  --color-parchment-600: #8d6564;
+  --color-parchment-900: #5c3d1e;
+
   /* Plum — menu background */
   --color-plum-500: #6f4a51;
 
@@ -46,6 +55,22 @@
     0 0 0 2.5px #fff, 0 0 0 4.5px rgba(190, 150, 70, 0.55);
   --shadow-slot-cta:
     inset 1px 1px 0 rgba(255, 255, 255, 0.7), inset -1px -1px 0 rgba(80, 160, 50, 0.35);
+
+  /* NavBar frame shadows */
+  --shadow-navbar-outer:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+  --shadow-navbar-inner: 0 3px 0 var(--color-parchment-500);
+
+  /* Parchment nav button shadows */
+  --shadow-parchment-raised:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.7), inset -3px -3px 0 rgba(120, 70, 10, 0.4),
+    3px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-parchment-hover:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.8), inset -3px -3px 0 rgba(120, 70, 10, 0.35),
+    4px 4px 0 rgba(0, 0, 0, 0.45);
+  --shadow-parchment-pressed:
+    inset 3px 3px 0 rgba(120, 70, 10, 0.38), inset -2px -2px 0 rgba(255, 255, 255, 0.4),
+    1px 1px 0 rgba(0, 0, 0, 0.3);
 
   /* Button shadows */
   --shadow-wood-btn:

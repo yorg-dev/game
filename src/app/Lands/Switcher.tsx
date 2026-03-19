@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { landProvider, landPlacementProvider } from '@/providers/landProvider'
+import { dataProvider } from '@/providers/dataProvider'
 import { getActiveLand, setActiveLand, viewerPermissions } from '@/providers/activeLand'
 import { EventBus } from '@/game/EventBus'
 import type { Land } from '@/models/Land'
@@ -16,17 +16,24 @@ export function LandSwitcher() {
   const ref = useRef<HTMLDivElement>(null)
 
   async function loadLands(worldId: string) {
-    const fetched = await landProvider.getLands(worldId)
+    const { data: fetched } = await dataProvider.getList<Land>('lands', {
+      pagination: { page: 1, perPage: 100 },
+      sort: { field: 'id', order: 'ASC' },
+      filter: { world_id_eq: worldId },
+    })
     if (fetched.length > 0) setLands(fetched)
   }
 
   // On mount: load lands using the real worldId from the backend.
   // Falls back to the active land's worldId if the user has no orgs/worlds yet.
   useEffect(() => {
-    landProvider.getMyFirstLand().then((land) => {
-      const worldId = land?.worldId ?? getActiveLand().land.worldId
-      loadLands(worldId)
-    })
+    dataProvider
+      .getOne<Land>('my_land', { id: '' })
+      .then(({ data: land }) => {
+        const worldId = land?.worldId ?? getActiveLand().land.worldId
+        loadLands(worldId)
+      })
+      .catch(() => loadLands(getActiveLand().land.worldId))
   }, [])
 
   useEffect(() => {
@@ -42,9 +49,12 @@ export function LandSwitcher() {
   useEffect(() => {
     // After login the user has real lands — reload from backend
     return EventBus.on('login-confirmed', () => {
-      landProvider.getMyFirstLand().then((land) => {
-        if (land) loadLands(land.worldId)
-      })
+      dataProvider
+        .getOne<Land>('my_land', { id: '' })
+        .then(({ data: land }) => {
+          if (land) loadLands(land.worldId)
+        })
+        .catch(() => {})
     })
   }, [])
 
@@ -58,12 +68,8 @@ export function LandSwitcher() {
 
   async function handleCreateLand(name: string, isPublic: boolean) {
     const { land: activeLand } = getActiveLand()
-    const newLand = await landProvider.createLand({
-      worldId: activeLand.worldId,
-      name,
-      isPublic,
-      ownerId: '', // set server-side from token
-      ownerType: 'user',
+    const { data: newLand } = await dataProvider.create<Land>('lands', {
+      data: { worldId: activeLand.worldId, name, isPublic, ownerId: '', ownerType: 'user' },
     })
     setLands((prev) => [...prev, newLand])
     setShowCreate(false)
@@ -78,7 +84,11 @@ export function LandSwitcher() {
     setLoading(true)
     setOpen(false)
     try {
-      const placements = await landPlacementProvider.getPlacements(land.id)
+      const { data: placements } = await dataProvider.getList('land_placements', {
+        pagination: { page: 1, perPage: 500 },
+        sort: { field: 'id', order: 'ASC' },
+        filter: { land_id_eq: land.id },
+      })
       const connections: import('@/models/Connection').Connection[] = []
       const landObjects = land.objects ?? getActiveLand().landObjects
       const { canInteract, canManage } = viewerPermissions(land)
